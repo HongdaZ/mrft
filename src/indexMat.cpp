@@ -4,10 +4,9 @@
 
 extern "C" {
   
-  SEXP indexMat( SEXP img, SEXP p ) {
+  SEXP indexMat( SEXP img ) {
     int n_nbr = 6;
     double *image = REAL( img );
-    int n_thread = REAL( p )[ 0 ];
     
     SEXP dim = getAttrib( img, R_DimSymbol );
     int nr = INTEGER( dim )[ 0 ];
