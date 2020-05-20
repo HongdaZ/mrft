@@ -1,4 +1,4 @@
-useDynLib( TumorSeg )
+useDynLib( mrft )
 exportPattern("^[[:alpha:]]+")
 
 #importFrom(): import selected functions (including S4 generics).
