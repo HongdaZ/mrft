@@ -15,4 +15,5 @@ initTrn <- function( file ) {
                  file )
   }
   lbl <- readNifti( label )
+  lbl <- lbl[ img$idx ]
 }
