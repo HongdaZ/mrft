@@ -14,24 +14,20 @@ splitCWG <- function( patient ) {
   t1ce[ lbl != 0 ] <- NA
   
   # Find csf & necrosis
-  q_flair <- quantile( flair, probs = .20, na.rm = T )
+  q_flair <- quantile( flair, probs = c( .20, .40, .50 ) , na.rm = T )
   q_t2 <- quantile( t2, probs = .80, na.rm = T )
   
-  csf <- flair < q_flair & t2 > q_t2
+  csf <- flair < q_flair[ 1 ] & t2 > q_t2
   lbl[ csf ] <- -1
   
   # Find white matter
-  q_flair <- quantile( flair, probs = .40, na.rm = T )
-  q_t1ce <- quantile( t1ce, probs = .60, na.rm = T )
+  q_t1ce <- quantile( t1ce, probs = c( .60, .50 ), na.rm = T )
   
-  wm <- flair < q_flair & t1ce > q_t1ce
+  wm <- flair < q_flair[ 2 ] & t1ce > q_t1ce[ 1 ]
   lbl[ wm ] <- -2
   
   # Find grey matter
-  q_flair <- quantile( flair, probs = .50, na.rm = T )
-  q_t1ce <- quantile( t1ce, probs = .50, na.rm = T )
-  
-  gm <- flair > q_flair & t1ce < q_t1ce
+  gm <- flair > q_flair[ 3 ] & t1ce < q_t1ce[ 2 ]
   lbl[ gm ] <- -3
   lbl
 }
