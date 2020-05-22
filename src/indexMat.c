@@ -1,9 +1,10 @@
 #include <R.h>
 #include <Rinternals.h>
 
-SEXP indexMat( SEXP img ) {
+SEXP indexMat( SEXP img, SEXP label ) {
   int n_nbr = 6;
   double *image = REAL( img );
+  double *lbl = REAL( label );
   
   SEXP dim = getAttrib( img, R_DimSymbol );
   int nr = INTEGER( dim )[ 0 ];
@@ -16,7 +17,7 @@ SEXP indexMat( SEXP img ) {
   // Get the number of non-zero voxels and index in valid voxel vector
   int n_valid = 0;
   for( int i = 0; i < len; ++ i ) {
-    if( ISNAN( image[ i ] ) ) { 
+    if( ISNAN( image[ i ] ) | ISNAN( lbl[ i ] ) ) { 
       // change here for simultaneous flair and t2 model
     // if( ISNAN( flair[ i ] ) | ISNAN( t2[ i ] ) ) { ...
       ptr_fidx[ i ] = NA_INTEGER;

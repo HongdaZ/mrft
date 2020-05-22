@@ -3,8 +3,7 @@
 # a neighboring voxel intensity matrix, a index vector and 
 # a neighbor index matrix 
 
-readIntst <- function( file ) {
-  n_nbr <- 6
+readIntst <- function( file, label ) {
   img <- readNifti( file ) # colum major array
-  indexMat( img )
+  indexMat( img, label )
 } 
