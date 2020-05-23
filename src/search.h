@@ -2,6 +2,10 @@
 #define SEARCH_H
 #include <Rinternals.h>
 #include <stack> 
-std::stack<int> search( SEXP label, SEXP nidx, 
-                       const int start, const double l );
+#include <queue>
+using std::stack;
+using std::queue;
+
+stack<int>& search( int *label, int *nidx, 
+                    queue<int>& front, const int & l, stack<int>& region );
 #endif

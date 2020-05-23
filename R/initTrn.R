@@ -17,5 +17,6 @@ initTrn <- function( patient, label, modality ) {
   img <- readIntst( file, label )
   label <- label[ img$idx ]
   label <- rbind( label, rep( 0, length( label ) ) )
-  # Find initial regions of csf, wm and gm
+  storage.mode( label ) <- "integer"
+
 }
