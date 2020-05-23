@@ -18,5 +18,6 @@ initTrn <- function( patient, label, modality ) {
   label <- label[ img$idx ]
   label <- rbind( label, rep( 0, length( label ) ) )
   storage.mode( label ) <- "integer"
+  
 
 }
