@@ -14,7 +14,7 @@ void search( int *label, int *nidx,
     for( int i = 0; i < 6; ++ i ) {
       n_idx = nidx[ 6 * ( index - 1 ) + i ];
       // Rprintf( "neighbor = %d \n", n_idx );
-      if( n_idx != NA_INTEGER ) {
+      if( !ISNA( n_idx ) ) { // have to include an R internal function
         if( label[ 2 * ( n_idx - 1 ) ] == l &&
             label[ 2 * n_idx - 1 ] != 1 ) {
           front.push( n_idx );
