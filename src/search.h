@@ -6,6 +6,6 @@
 using std::stack;
 using std::queue;
 
-void search( int *label, int *nidx, 
+void search( double *label, int *nidx, 
              queue<int>& front, const int & l, stack<int>& region );
 #endif

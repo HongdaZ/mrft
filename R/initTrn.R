@@ -15,9 +15,22 @@ initTrn <- function( patient, label, modality ) {
             label[ label == 4 ] <- NA
           } )
   img <- readIntst( file, label )
-  label <- label[ img$idx ]
-  label <- rbind( label, rep( 0, length( label ) ) )
-  storage.mode( label ) <- "integer"
+  seg <- label[ img$idx ]
+  seg <- rbind( seg, rep( 0, length( seg ) ) )
+
+  regions <- NULL
+  # seg is numeric
+  n_region <- 0
+  for( i in 1 : dim( seg )[ 2 ] ) {
+    if( seg[ 1, i ]  > 0 ) {
+      region <- findRegion( seg, img$nidx, i )
+      seg[ 1, region ] <- - 4 - n_region
+      
+      regions[[ n_region + 1 ]] <- list( label = - 4 - n_region,
+                                          region = region )
+      n_region <- n_region + 1
+    }
+  }
   
 
 }

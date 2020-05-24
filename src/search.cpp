@@ -5,7 +5,7 @@
 using std::queue;
 using std::stack;
 using std::size_t;
-void search( int *label, int *nidx, 
+void search( double *label, int *nidx, 
              queue<int>& front, const int & l, stack<int>& region ) {
   if( !front.empty() ) {
     int index = front.front();

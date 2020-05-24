@@ -7,7 +7,7 @@ using std::size_t;
 
 extern "C" {
   SEXP findRegion( SEXP label, SEXP nidx, SEXP start ) {
-    int *ptr_label = INTEGER( label  );
+    double *ptr_label = REAL( label  );
     int *ptr_nidx = INTEGER(  nidx );
     int *ptr_start = INTEGER( start );
     
