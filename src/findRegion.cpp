@@ -28,7 +28,7 @@ extern "C" {
       // Rprintf( "region = %d \n", region.top() );
       region.pop();
     }
-    Rprintf( "NA_INTEGER = %d \n", NA_INTEGER );
+    // Rprintf( "NA_INTEGER = %d \n", NA_INTEGER );
     UNPROTECT( 1 );
     return res;
   }
