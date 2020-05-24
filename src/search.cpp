@@ -4,19 +4,22 @@
 #include <queue>
 using std::queue;
 using std::stack;
-
+using std::size_t;
 void search( int *label, int *nidx, 
              queue<int>& front, const int & l, stack<int>& region ) {
   if( !front.empty() ) {
     int index = front.front();
-    Rprintf( "index = %d \n", index );
     front.pop();
-    if( label[ 2 * ( index - 1 ) ] == l & label[ 2 * index - 1 ] != 1 ) {
-      label[ 2 * index - 1 ] = 1;
-      region.push( index );
-      for( int i = 0; i < 6; ++ i ) {
-        if( !ISNAN( nidx[ 6 * ( index - 1 ) + i ] ) ) {
-          front.push( nidx[ 6 * ( index - 1 ) + i ] );
+    int n_idx;
+    for( int i = 0; i < 6; ++ i ) {
+      n_idx = nidx[ 6 * ( index - 1 ) + i ];
+      // Rprintf( "neighbor = %d \n", n_idx );
+      if( n_idx != NA_INTEGER ) {
+        if( label[ 2 * ( n_idx - 1 ) ] == l &&
+            label[ 2 * n_idx - 1 ] != 1 ) {
+          front.push( n_idx );
+          region.push( n_idx );
+          label[ 2 * n_idx - 1 ] = 1;
         }
       }
     }

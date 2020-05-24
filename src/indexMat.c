@@ -17,9 +17,9 @@ SEXP indexMat( SEXP img, SEXP label ) {
   // Get the number of non-zero voxels and index in valid voxel vector
   int n_valid = 0;
   for( int i = 0; i < len; ++ i ) {
-    if( ISNAN( image[ i ] ) | ISNAN( lbl[ i ] ) ) { 
+    if( ISNAN( image[ i ] ) || ISNAN( lbl[ i ] ) ) { 
       // change here for simultaneous flair and t2 model
-    // if( ISNAN( flair[ i ] ) | ISNAN( t2[ i ] ) ) { ...
+    // if( ISNAN( flair[ i ] ) || ISNAN( t2[ i ] ) ) { ...
       ptr_fidx[ i ] = NA_INTEGER;
     } else {
       ptr_fidx[ i ] = ++ n_valid; 
