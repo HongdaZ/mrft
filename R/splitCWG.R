@@ -1,6 +1,6 @@
 # Split CSF & necrosis, white matter and grey matter in training data
 # csf = 1, wm = 2, g = 3, TBD = 0, o.w. = NA 
-splitCWG <- function( patient, modality ) {
+splitCWG <- function( patient ) {
   
   lbl <- readNifti( patient[ 2 ] )
   
@@ -8,16 +8,7 @@ splitCWG <- function( patient, modality ) {
   t2 <- readNifti( patient[ 5 ] )
   t1ce <- readNifti( patient[ 4 ] )
   
-  switch( modality,
-          "flair" = {
-            img <- flair
-          },
-          "t1ce" = {
-            img <- t1ce
-          },
-          "t2" = {
-            img <- t2
-          } )
+  img <- list( flair = flair, t1ce = t1ce, t2 = t2 )
   
   flair[ lbl != 0 ] <- NA
   t2[ lbl != 0 ] <- NA
@@ -42,15 +33,13 @@ splitCWG <- function( patient, modality ) {
   gm <- flair > q_flair[ 3 ] & t1ce < q_t1ce[ 2 ]
   lbl[ gm ] <- -3
   # Remove the darkest 1% of the voxels
-  switch( modality,
-          "flair" = {
-            lbl[ flair < q_flair[ 4 ] ] <- NA
-          },
-          "t1ce" = {
-            lbl[ t1ce < q_t1ce[ 3 ] ] <- NA
-          },
-          "t2" = {
-            lbl[ t2 < q_t2[ 2 ] ] <- NA
-          } )
+  lbl_flair <- lbl
+  lbl_flair[ flair < q_flair[ 4 ] ] <- NA
+  lbl_t1ce <- lbl
+  lbl_t1ce[ t1ce < q_t1ce[ 3 ] ] <- NA
+  lbl_t2 <- lbl
+  lbl_t2[ t2 < q_t2[ 2 ] ] <- NA
+  
+  lbl <- list( flair = lbl_flair, t1ce = lbl_t1ce, t2 = lbl_t2 )
   list( label = lbl, intensity = img )
 }

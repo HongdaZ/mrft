@@ -1,10 +1,9 @@
 # Train the model
 
 trainModel <- function( patient ) {
-  lbl_intst <- splitCWG( patient, "flair" )
   
-  label <- lbl_intst$label
-  img <- lbl_intst$intensity
-  model <- initTrn( img, label, "flair")
+  l_intst <- splitCWG( patient )
+  flair_model <- initTrn( l_intst$intensity$flair, 
+                    l_intst$label$flair, "flair")
   
 }
