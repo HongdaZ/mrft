@@ -5,13 +5,25 @@ splitCWG <- function( patient, modality ) {
   lbl <- readNifti( patient[ 2 ] )
   
   flair <- readNifti( patient[ 1 ] )
-  flair[ lbl != 0 ] <- NA
-  
   t2 <- readNifti( patient[ 5 ] )
-  t2[ lbl != 0 ] <- NA
-  
   t1ce <- readNifti( patient[ 4 ] )
+  
+  switch( modality,
+          "flair" = {
+            img <- flair
+          },
+          "t1ce" = {
+            img <- t1ce
+          },
+          "t2" = {
+            img <- t2
+          } )
+  
+  flair[ lbl != 0 ] <- NA
+  t2[ lbl != 0 ] <- NA
   t1ce[ lbl != 0 ] <- NA
+  
+  
   
   # Find csf & necrosis
   q_flair <- quantile( flair, probs = c( .20, .40, .50, .01 ) , na.rm = T )
@@ -40,5 +52,5 @@ splitCWG <- function( patient, modality ) {
           "t2" = {
             lbl[ t2 < q_t2[ 2 ] ] <- NA
           } )
-  lbl
+  list( label = lbl, intensity = img )
 }
