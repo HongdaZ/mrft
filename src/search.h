@@ -5,7 +5,8 @@
 #include <queue>
 using std::stack;
 using std::queue;
-
-void search( double *label, int *nidx, 
-             queue<int>& front, const int & l, stack<int>& region );
+extern "C" {
+  void search( double *label, int *nidx, 
+               queue<int>& front, const int & l, stack<int>& region );
+} // extern "C"
 #endif
