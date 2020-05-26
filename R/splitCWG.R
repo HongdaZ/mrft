@@ -2,19 +2,16 @@
 # csf = 1, wm = 2, g = 3, TBD = 0, o.w. = NA 
 splitCWG <- function( patient ) {
   
-  lbl <- readNifti( patient[ 2 ], internal = T )
-  lbl <- as.array( lbl )
+  lbl <- readNifti( patient[ 2 ] )
   flair <- readNifti( patient[ 1 ] )
   t2 <- readNifti( patient[ 5 ] )
   t1ce <- readNifti( patient[ 4 ] )
   
   img <- list( flair = flair, t1ce = t1ce, t2 = t2 )
   
-  flair[ lbl != 0 ] <- NA
-  t2[ lbl != 0 ] <- NA
-  t1ce[ lbl != 0 ] <- NA
-  
-  
+  flair[ lbl != 0 ] <-NaN
+  t2[ lbl != 0 ] <- NaN
+  t1ce[ lbl != 0 ] <- NaN
   
   # Find csf & necrosis
   q_flair <- quantile( flair, probs = c( .20, .40, .50, .01 ), na.rm = T, 
@@ -40,10 +37,6 @@ splitCWG <- function( patient ) {
   lbl_t1ce[ t1ce < q_t1ce[ 3 ] ] <- NA_integer_
   lbl_t2 <- lbl
   lbl_t2[ t2 < q_t2[ 2 ] ] <- NA_integer_
-  
-  # storage.mode( lbl_flair ) <- "integer"
-  # storage.mode( lbl_t1ce ) <- "integer"
-  # storage.mode( lbl_t2 ) <- "integer"
   
   lbl <- list( flair = lbl_flair, t1ce = lbl_t1ce, t2 = lbl_t2 )
   list( label = lbl, intensity = img )
