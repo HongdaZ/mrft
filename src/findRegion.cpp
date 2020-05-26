@@ -3,11 +3,10 @@
 #include "search.h"
 using std::stack;
 using std::queue;
-using std::size_t;
 
 extern "C" {
   SEXP findRegion( SEXP label, SEXP nidx, SEXP start ) {
-    double *ptr_label = REAL( label  );
+    int *ptr_label = INTEGER( label  );
     int *ptr_nidx = INTEGER(  nidx );
     int *ptr_start = INTEGER( start );
     
@@ -18,7 +17,7 @@ extern "C" {
     front.push( ptr_start[ 0 ] );
     region.push( ptr_start[ 0 ] );
     ptr_label[ 2 * ptr_start[ 0 ] - 1 ] = 1;
-    search( ptr_label, ptr_nidx, front, l, region );
+    search( ptr_label, ptr_nidx, front, l, region, NA_INTEGER );
     int len = region.size();
     SEXP res = PROTECT( allocVector( INTSXP, len ) );
     int *ptr_res = INTEGER( res );
