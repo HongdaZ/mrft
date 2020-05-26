@@ -17,18 +17,4 @@ initTrn <- function( img, label, modality ) {
 
   list( info = info, seg = seg )
   
-  # regions <- NULL
-  # # seg is numeric
-  # n_region <- 0
-  # for( i in 1 : dim( seg )[ 2 ] ) {
-  #   if( seg[ 1, i ]  > 0 ) {
-  #     region <- findRegion( seg, info$nidx, i )
-  #     seg[ 1, region ] <- - 4 - n_region
-  # 
-  #     regions[[ n_region + 1 ]] <- list( label = - 4 - n_region,
-  #                                         region = region )
-  #     n_region <- n_region + 1
-  #   }
-  # }
-  
 }
