@@ -9,9 +9,11 @@ splitCWG <- function( patient ) {
   
   img <- list( flair = flair, t1ce = t1ce, t2 = t2 )
   
-  flair[ lbl != 0 ] <-NaN
-  t2[ lbl != 0 ] <- NaN
-  t1ce[ lbl != 0 ] <- NaN
+  non_valid <- lbl != 0
+  
+  flair[ non_valid ] <-NaN
+  t2[ non_valid ] <- NaN
+  t1ce[ non_valid ] <- NaN
   
   # Find csf & necrosis
   q_flair <- quantile( flair, probs = c( .20, .40, .50, .01 ), na.rm = T, 
