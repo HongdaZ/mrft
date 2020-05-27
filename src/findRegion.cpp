@@ -1,8 +1,10 @@
 #include <R.h>
 #include <Rinternals.h>
+#include <list>
 #include "search.h"
 using std::stack;
 using std::queue;
+using std::list;
 
 extern "C" {
   SEXP findRegion( SEXP label, SEXP nidx, SEXP start ) {
@@ -12,6 +14,7 @@ extern "C" {
     
     queue<int> front;
     stack<int> region;
+    list<int> region_list;
     
     int l = ptr_label[ 2 * ( ptr_start[ 0 ] - 1 ) ];
     front.push( ptr_start[ 0 ] );
@@ -23,6 +26,7 @@ extern "C" {
     int *ptr_res = INTEGER( res );
     for( int i = 0; i < len; ++ i ) {
       ptr_res[ i ] = region.top();
+      region_list.push_back( region.top() );
       ptr_label[ 2 * region.top() - 1 ] = 0;
       // Rprintf( "region = %d \n", region.top() );
       region.pop();
