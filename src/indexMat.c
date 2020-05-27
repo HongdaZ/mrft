@@ -3,8 +3,8 @@
 
 SEXP indexMat( SEXP img, SEXP label ) {
   int n_nbr = 6;
-  double *image = REAL( img );
-  int *lbl = INTEGER( label );
+  const double *image = REAL( img );
+  const int *lbl = INTEGER( label );
   
   SEXP dim = getAttrib( img, R_DimSymbol );
   int nr = INTEGER( dim )[ 0 ];
