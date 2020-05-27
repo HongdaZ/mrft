@@ -2,7 +2,7 @@
 
 void search( int *label, int *nidx, 
              queue<int>& front, const int& l, stack<int>& region, int na ) {
-  if( !front.empty() ) {
+  while( !front.empty() ) {
     int index = front.front();
     front.pop();
     int n_idx;
@@ -20,8 +20,6 @@ void search( int *label, int *nidx,
         }
       }
     }
-    return search( label, nidx, front, l, region, na );
-  } else {
-    return;
   }
+  return;
 }

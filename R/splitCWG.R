@@ -3,17 +3,20 @@
 splitCWG <- function( patient ) {
   
   lbl <- readNifti( patient[ 2 ] )
-  flair <- readNifti( patient[ 1 ] )
-  t2 <- readNifti( patient[ 5 ] )
-  t1ce <- readNifti( patient[ 4 ] )
+  flair_ <- readNifti( patient[ 1 ] )
+  t2_ <- readNifti( patient[ 5 ] )
+  t1ce_ <- readNifti( patient[ 4 ] )
   
-  img <- list( flair = flair, t1ce = t1ce, t2 = t2 )
+  img <- list( flair = flair_, t1ce = t1ce_, t2 = t2_ )
   
-  non_valid <- lbl != 0
-  
-  flair[ non_valid ] <-NaN
-  t2[ non_valid ] <- NaN
-  t1ce[ non_valid ] <- NaN
+  # non_valid <- lbl != 0
+  # 
+  # flair[ non_valid ] <-NaN
+  # t2[ non_valid ] <- NaN
+  # t1ce[ non_valid ] <- NaN
+  flair <- changeA( flair_, lbl )
+  t2 <- changeA( t2_, lbl )
+  t1ce <- changeA( t1ce_, lbl )
   
   # Find csf & necrosis
   q_flair <- quantile( flair, probs = c( .20, .40, .50, .01 ), na.rm = T, 
