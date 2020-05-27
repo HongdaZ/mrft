@@ -20,7 +20,7 @@ extern "C" {
     front.push( ptr_start[ 0 ] );
     region.push( ptr_start[ 0 ] );
     ptr_label[ 2 * ptr_start[ 0 ] - 1 ] = 1;
-    search( ptr_label, ptr_nidx, front, l, region, NA_INTEGER );
+    search( ptr_label, ptr_nidx, front, l, region );
     int len = region.size();
     SEXP res = PROTECT( allocVector( INTSXP, len ) );
     int *ptr_res = INTEGER( res );

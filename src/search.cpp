@@ -1,7 +1,7 @@
 #include "search.h"
 extern "C" {
   void search( int *label, int *nidx, 
-               queue<int>& front, const int& l, stack<int>& region, int na ) {
+               queue<int>& front, const int& l, stack<int>& region ) {
     while( !front.empty() ) {
       int index = front.front();
       front.pop();
@@ -9,7 +9,7 @@ extern "C" {
       for( int i = 0; i < 6; ++ i ) {
         n_idx = nidx[ 6 * ( index - 1 ) + i ];
         // Don't use R constants in recursive function, i.e. NA_INTEGER
-        if( n_idx !=  na ) { 
+        if( n_idx !=  NA_INTEGER ) { 
           
           if( label[ 2 * ( n_idx - 1 ) ] == l &&
               label[ 2 * n_idx - 1 ] != 1 ) {
