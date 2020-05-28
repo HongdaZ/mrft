@@ -25,19 +25,19 @@ splitCWG <- function( patient ) {
   
   # csf <- flair < q_flair[ 1 ] & t2 > q_t2[ 1 ]
   # lbl[ csf ] <- -1L
-  changeB( lbl, flair, q_flair[ 1 ], t2, q_t2[ 1 ], -1L )
+  lbl <- changeB( lbl, flair, q_flair[ 1 ], t2, q_t2[ 1 ], -1L )
   
   # Find white matter
   q_t1ce <- quantile( t1ce, probs = c( .60, .50, .01 ), na.rm = T, names = F )
   
   # wm <- flair < q_flair[ 2 ] & t1ce > q_t1ce[ 1 ]
   # lbl[ wm ] <- -2L
-  changeB( lbl, flair, q_flair[ 2 ], t1ce, q_t1ce[ 1 ], -2L )
+  lbl <- changeB( lbl, flair, q_flair[ 2 ], t1ce, q_t1ce[ 1 ], -2L )
   
   # Find grey matter
   # gm <- t1ce < q_t1ce[ 2 ] & flair > q_flair[ 3 ]
   # lbl[ gm ] <- -3L
-  changeB( lbl, t1ce, q_t1ce[ 2 ], flair, q_flair[ 3 ], -3L )
+  lbl <- changeB( lbl, t1ce, q_t1ce[ 2 ], flair, q_flair[ 3 ], -3L )
   
   # Remove the darkest 1% of the voxels
   # lbl_flair <- lbl
