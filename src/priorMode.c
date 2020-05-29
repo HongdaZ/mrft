@@ -14,23 +14,24 @@ SEXP priorMode( SEXP intst, SEXP seg ) {
   firstprivate( len, ptr_seg, ptr_intst )                     \
     reduction( +: sum[ : 4 ], n[ : 4 ] )
     for( int i = 0; i < len; ++ i ) {
-      if( ptr_seg[ 2 * i ] > 0 ) {
+      switch( ptr_seg[ 2 * i ] ) {
+      case -1 :
+        n[ 0 ] += 1;
+        sum[ 0 ] += ptr_intst[ i ];
+        break;
+      case -2 :
+        n[ 1 ] += 1;
+        sum[ 1 ] += ptr_intst[ i ];
+        break;
+      case -3 :
+        n[ 2 ] +=1;
+        sum[ 2 ] += ptr_intst[ i ];
+        break;
+      case 0 :
+        break;
+      default :
         n[ 3 ] += 1;
         sum[ 3 ] += ptr_intst[ i ];
-      } else {
-        switch( ptr_seg[ 2 * i ] ) {
-        case -1 :
-          n[ 0 ] += 1;
-          sum[ 0 ] += ptr_intst[ i ];
-          break;
-        case -2 :
-          n[ 1 ] += 1;
-          sum[ 1 ] += ptr_intst[ i ];
-          break;
-        case -3 :
-          n[ 2 ] +=1;
-          sum[ 2 ] += ptr_intst[ i ];
-        }
       }
     }
     SEXP ans = PROTECT( allocVector( REALSXP, 4 ) );
