@@ -11,6 +11,8 @@ SEXP changeB( SEXP label, SEXP image1, SEXP q1, SEXP image2, SEXP q2,
   int l = INTEGER( k )[ 0 ];
   int len = length( label );
   SEXP ans = PROTECT( allocVector( INTSXP, len ) );
+  SEXP dim = getAttrib( label, R_DimSymbol );
+  setAttrib( ans, R_DimSymbol, dim );
   int *ptr_ans = INTEGER( ans );
 
   for( int i = 0; i < len; ++ i ) {

@@ -7,6 +7,8 @@ SEXP changeA( SEXP img, SEXP label ) {
   int *lbl = INTEGER( label );
   int len = length( label );
   SEXP ans = PROTECT( allocVector( REALSXP, len ) );
+  SEXP dim = getAttrib( img, R_DimSymbol );
+  setAttrib( ans, R_DimSymbol, dim );
   double *ptr_ans = REAL( ans );
   for( int i = 0; i < len; ++ i ) {
     if( lbl[ i ] == 0 ) {

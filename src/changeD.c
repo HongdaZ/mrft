@@ -9,6 +9,8 @@ SEXP changeD( SEXP old, SEXP a, SEXP b ) {
   int len = length( old );
   
   SEXP ans = PROTECT( allocVector( INTSXP, len ) );
+  SEXP dim = getAttrib( old, R_DimSymbol );
+  setAttrib( ans, R_DimSymbol, dim );
   int *ptr_ans = INTEGER( ans );
   
   for( int i = 0; i < len; ++ i ) {
