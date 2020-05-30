@@ -9,5 +9,9 @@ trainModel <- function( patient, delta = 8, gamma = 1,
   l_intst <- splitCWG( patient )
   flair_model <- initTrn( l_intst$intensity$flair, 
                     l_intst$label$flair, "flair" )
+  # -1, -2, -3, > 0
   m <- priorMode( flair_model$info$intst, flair_model$seg )
+  b <- getB( m, a )
+  par_flair <- estParm( flair_model, delta, gamma, 
+                        alpha, beta, lambda, a, b, m, nu )
 }

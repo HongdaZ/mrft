@@ -1,7 +1,7 @@
 #include "search.h"
 extern "C" {
   void search( int *label, int *nidx, 
-               queue<int>& front, const int& l, stack<int>& region ) {
+               queue<int>& front, const int& l, list<int>& region ) {
     while( !front.empty() ) {
       int index = front.front();
       front.pop();
@@ -15,7 +15,7 @@ extern "C" {
               label[ 2 * n_idx - 1 ] != 1 ) {
             // Rprintf( "neighbor = %d \n", n_idx );
             front.push( n_idx );
-            region.push( n_idx );
+            region.push_back( n_idx );
             label[ 2 * n_idx - 1 ] = 1;
           }
         }
