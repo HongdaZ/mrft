@@ -22,7 +22,7 @@ map<int, list<int>> initRegion( int *ptr_seg, int *ptr_nidx, int len ) {
       tumor[ tumor_label ] = region;
       for( list<int>::iterator it = region.begin(); it != region.end(); 
       ++ it ) {
-        ptr_seg[ 2 * *it ] = tumor_label;
+        ptr_seg[ 2 * ( *it - 1 ) ] = tumor_label;
       }
       -- tumor_label;
     }
