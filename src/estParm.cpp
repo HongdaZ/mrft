@@ -8,6 +8,7 @@
 #include "search.h"
 #include "findRegion.h"
 #include "helper.h"
+#include "initRegion.h"
 
 using std::stack;
 using std::queue;
@@ -20,17 +21,22 @@ extern "C" {
     SEXP info = getListElement( model, "info" );
     SEXP seg = getListElement( model, "seg" );
     
-    int *ptr_label = INTEGER( seg );
+    int *ptr_seg = INTEGER( seg );
     
     SEXP idx = getListElement( info, "idx" );
     SEXP nidx = getListElement( info, "nidx" );
     SEXP intst = getListElement( info, "intst" );
     SEXP nintst = getListElement( info, "nintst" );
     
+    int *ptr_idx = INTEGER( idx );
     int *ptr_nidx = INTEGER( nidx );
+    double *ptr_intst = REAL( intst );
+    double *ptr_nintst = REAL( nintst );
     
-    int start = 433655;
-    list<int> region = findRegion( ptr_label, ptr_nidx, start );
-    return nintst;
+    int len = length( idx );
+    
+    map<int, list<int>> tumor_regions = initRegion( ptr_seg, ptr_nidx, len );
+    
+    return seg;
   }
 } // extern "C"
