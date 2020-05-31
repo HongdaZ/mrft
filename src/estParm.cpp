@@ -35,7 +35,7 @@ extern "C" {
     
     int len = length( idx );
     list<int> tumor_labels;
-    list<int> ootlier_labels;
+    list<int> out_labels;
     
     map<int, list<int>> tumor_regions = initRegion( ptr_seg, ptr_nidx, len,
                                                     tumor_labels );
