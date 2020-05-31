@@ -34,9 +34,11 @@ extern "C" {
     double *ptr_nintst = REAL( nintst );
     
     int len = length( idx );
+    list<int> tumor_labels;
+    list<int> ootlier_labels;
     
-    map<int, list<int>> tumor_regions = initRegion( ptr_seg, ptr_nidx, len );
-    
+    map<int, list<int>> tumor_regions = initRegion( ptr_seg, ptr_nidx, len,
+                                                    tumor_labels );
     return seg;
   }
 } // extern "C"

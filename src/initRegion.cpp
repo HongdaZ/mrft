@@ -10,7 +10,8 @@
 using::std::map;
 using::std::list;
 
-map<int, list<int>> initRegion( int *ptr_seg, int *ptr_nidx, int len ) {
+map<int, list<int>> initRegion( int *ptr_seg, int *ptr_nidx, int len,
+                                list<int> &labels ) {
   
   map<int, list<int>> tumor;
   list<int> region;
@@ -24,6 +25,7 @@ map<int, list<int>> initRegion( int *ptr_seg, int *ptr_nidx, int len ) {
       ++ it ) {
         ptr_seg[ 2 * ( *it - 1 ) ] = tumor_label;
       }
+      labels.push_back( tumor_label );
       -- tumor_label;
     }
   }

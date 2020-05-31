@@ -6,6 +6,7 @@
 using std::list;
 using std::map;
 
-map<int, list<int>> initRegion( int *ptr_seg, int *ptr_nidx, int len );
+map<int, list<int>> initRegion( int *ptr_seg, int *ptr_nidx, int len, 
+                                list<int> &labels );
 
 #endif
