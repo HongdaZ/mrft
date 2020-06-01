@@ -28,14 +28,24 @@ extern "C" {
     SEXP intst = getListElement( info, "intst" );
     SEXP nintst = getListElement( info, "nintst" );
     
-    int *ptr_idx = INTEGER( idx );
-    int *ptr_nidx = INTEGER( nidx );
-    double *ptr_intst = REAL( intst );
-    double *ptr_nintst = REAL( nintst );
+    const int *ptr_idx = INTEGER( idx );
+    const int *ptr_nidx = INTEGER( nidx );
+    const double *ptr_intst = REAL( intst );
+    const double *ptr_nintst = REAL( nintst );
+    
+    const double *ptr_delta = REAL( delta );
+    const double *ptr_gamma = REAL( gamma );
+    const double *ptr_alpha = REAL( alpha );
+    const double *ptr_beta = REAL( beta );
+    const double *ptr_lambda = REAL( lambda );
+    const double *ptr_a = REAL( a );
+    const double *ptr_b = REAL( b );
+    const double *ptr_m = REAL( m );
+    const double *ptr_nu = REAL( nu );
     
     int len = length( idx );
     list<int> tumor_labels;
-    list<int> out_labels;
+    list<int> outl_labels;
 
     
     map<int, list<int>> tumor_regions = initRegion( ptr_seg, ptr_nidx, len,
