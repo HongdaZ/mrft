@@ -10,10 +10,10 @@
 using::std::map;
 using::std::list;
 
-map<int, list<int>> initRegion( int *ptr_seg, const int *ptr_nidx, int len,
+void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
+                                map<int, list<int>> &tumor,
                                 list<int> &labels ) {
   
-  map<int, list<int>> tumor;
   list<int> region;
   int tumor_label = - 4;
   
@@ -29,5 +29,5 @@ map<int, list<int>> initRegion( int *ptr_seg, const int *ptr_nidx, int len,
       -- tumor_label;
     }
   }
-  return tumor;
+  return;
 }

@@ -4,6 +4,7 @@
 #include <list>
 #include <queue>
 #include <stack>
+#include <vector>
 
 #include "search.h"
 #include "findRegion.h"
@@ -13,6 +14,7 @@
 using std::stack;
 using std::queue;
 using std::list;
+using std::vector;
 
 extern "C" {
   SEXP estParm( SEXP model, SEXP delta, SEXP gamma, 
@@ -46,10 +48,14 @@ extern "C" {
     int len = length( idx );
     list<int> tumor_labels;
     list<int> outl_labels;
+    map<int, vector<double>> health_parm;
+    map<int, vector<double>> tumor_parm;
+    map<int, vector<double>> outl_parm;
 
     
-    map<int, list<int>> tumor_regions = initRegion( ptr_seg, ptr_nidx, len,
-                                                    tumor_labels );
+    map<int, list<int>> tumor_regions;
+    initRegion( ptr_seg, ptr_nidx, len,
+                tumor_regions, tumor_labels );
     return seg;
   }
 } // extern "C"
