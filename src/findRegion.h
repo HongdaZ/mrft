@@ -3,6 +3,6 @@
 #include <list>
 using std::list;
 
-list<int> findRegion( int *ptr_label, int *ptr_nidx, int start );
+list<int> findRegion( int *ptr_label, const int *ptr_nidx, int start );
 
 #endif

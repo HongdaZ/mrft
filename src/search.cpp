@@ -1,6 +1,6 @@
 #include "search.h"
 extern "C" {
-  void search( int *label, int *nidx, 
+  void search( int *label, const int *nidx, 
                queue<int>& front, const int& l, list<int>& region ) {
     while( !front.empty() ) {
       int index = front.front();

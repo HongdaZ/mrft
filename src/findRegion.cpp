@@ -5,7 +5,7 @@
 #include "search.h"
 #include "findRegion.h"
 
-list<int> findRegion( int *ptr_label, int *ptr_nidx , int start ) {
+list<int> findRegion( int *ptr_label, const int *ptr_nidx , int start ) {
 
   queue<int> front;
   list<int> region;
