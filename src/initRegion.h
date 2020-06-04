@@ -1,12 +1,12 @@
 #ifndef INITREGION_H
 #define INITREGION_H
-#include <list>
+#include <set>
 #include <map>
 
-using std::list;
+using std::set;
 using std::map;
 
 void initRegion( int *ptr_seg, const int *ptr_nidx, int len, 
-                 map<int, list<int>> &tumor, list<int> &labels );
+                 map<int, set<int>> &tumor, set<int> &labels );
 
 #endif

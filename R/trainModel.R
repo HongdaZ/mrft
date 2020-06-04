@@ -6,7 +6,7 @@ trainModel <- function( patient, delta = 8, gamma = 1,
                         a = 5,
                         nu = rep( .5, 3 ) ) {
   
-  l_intst <- splitCWG( patient )
+  l_intst <- splitCWG( patient ) # splitCWGX for testing
   flair_model <- initTrn( l_intst$intensity$flair, 
                     l_intst$label$flair, "flair" )
   # -1, -2, -3, > 0

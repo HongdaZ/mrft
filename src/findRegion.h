@@ -1,8 +1,8 @@
 #ifndef FINDREGION_H
 #define FINDREGION_H
-#include <list>
-using std::list;
+#include <set>
+using std::set;
 
-list<int> findRegion( int *ptr_label, const int *ptr_nidx, int start );
+set<int> findRegion( int *ptr_label, const int *ptr_nidx, int start );
 
 #endif

@@ -1,31 +1,31 @@
 #include <R.h>
 #include <Rinternals.h>
 
-#include <map>
 #include <list>
 
 #include "findRegion.h"
 #include "initRegion.h"
 
-using::std::map;
-using::std::list;
+using std::map;
+using std::set;
+using std::list;
 
 void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
-                                map<int, list<int>> &tumor,
-                                list<int> &labels ) {
+                                map<int, set<int>> &tumor,
+                                set<int> &labels ) {
   
-  list<int> region;
+  set<int> region;
   int tumor_label = - 4;
   
   for( int i = 0; i < len; ++ i ) {
     if( ptr_seg[ 2 * i ] > 0 ) {
       region = findRegion( ptr_seg, ptr_nidx, i + 1 );
       tumor[ tumor_label ] = region;
-      for( list<int>::iterator it = region.begin(); it != region.end(); 
+      for( set<int>::iterator it = region.begin(); it != region.end(); 
       ++ it ) {
         ptr_seg[ 2 * ( *it - 1 ) ] = tumor_label;
       }
-      labels.push_back( tumor_label );
+      labels.insert( tumor_label );
       -- tumor_label;
     }
   }
