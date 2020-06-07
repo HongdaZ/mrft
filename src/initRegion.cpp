@@ -21,6 +21,16 @@ void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
     if( ptr_seg[ 2 * i ] > 0 ) {
       region = findRegion( ptr_seg, ptr_nidx, i + 1 );
       tumor[ tumor_label ] = region;
+      // // Debug
+      // if( tumor_label < -20 ) {
+      //   for( set<int>::iterator it = region.begin(); it != region.end(); ++ it ) {
+      //     Rprintf("region index: %d\n", *it );
+      //   }
+      //   for( set<int>::iterator it = tumor[ tumor_label ].begin(); it != tumor[ tumor_label ].end(); ++ it ) {
+      //     Rprintf("tumor regions index: %d\n", *it );
+      //   }
+      // }
+      // //////////////////////////////////////////////////////////
       for( set<int>::iterator it = region.begin(); it != region.end(); 
       ++ it ) {
         ptr_seg[ 2 * ( *it - 1 ) ] = tumor_label;
