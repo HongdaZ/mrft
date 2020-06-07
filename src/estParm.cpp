@@ -59,35 +59,21 @@ extern "C" {
                 tumor_regions, tumor_labels );
     
     list< map<int, int>> regions;
- 
-    // // Debug
-    // ptr_seg[ 2 * ( 1032015 - 1 ) ] = 1;
-    // ///////////////////////////////////////////////////
+    
+    // For testing scTrn
     int flag = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
                       ptr_nidx, 1032015 );
-
-    // // Debug
-    // int n[ 4 ] = { -32, -31, -30, -29 };
-    // for( int i = 0; i < 4; ++ i ) {
-    //   set<int> tmp = tumor_regions[ n[ i ] ];
-    //   for( set<int>::iterator it = tmp.begin(); it != tmp.end(); ++ it ) {
-    //     Rprintf( "regions: %d;", *it );
-    //   }
-    //   Rprintf( "\n");
-    // }
-    // ///////////////////////////////////////////////////
-    // // Debug
-    // Rprintf( "combine or split: %d \n", flag );
-    // for( list<map<int, int>>::iterator it = regions.begin();
-    //      it != regions.end(); ++ it ) {
-    //   map<int, int> tmp_region = *it;
-    //   for( map<int, int>::iterator itr = tmp_region.begin();
-    //        itr != tmp_region.end(); ++ itr ) {
-    //     Rprintf( "index = %d, label = %d;", itr->first, itr->second );
-    //   }
-    //   Rprintf("\n");
-    // }
-    // ///////////////////////////////////////////////////////////////
+    Rprintf( "combine or split: %d \n", flag );
+    for( list<map<int, int>>::iterator it = regions.begin();
+         it != regions.end(); ++ it ) {
+      map<int, int> tmp_region = *it;
+      for( map<int, int>::iterator itr = tmp_region.begin();
+           itr != tmp_region.end(); ++ itr ) {
+        Rprintf( "index = %d, label = %d;", itr->first, itr->second );
+      }
+      Rprintf("\n");
+    }
+    ///////////////////////////////////////////////////////////////
     return seg;
   }
 } // extern "C"
