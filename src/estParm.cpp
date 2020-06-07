@@ -60,20 +60,11 @@ extern "C" {
     
     list< map<int, int>> regions;
     
-    // For testing scTrn
-    int flag = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
-                      ptr_nidx, 1032015 );
-    Rprintf( "combine or split: %d \n", flag );
-    for( list<map<int, int>>::iterator it = regions.begin();
-         it != regions.end(); ++ it ) {
-      map<int, int> tmp_region = *it;
-      for( map<int, int>::iterator itr = tmp_region.begin();
-           itr != tmp_region.end(); ++ itr ) {
-        Rprintf( "index = %d, label = %d;", itr->first, itr->second );
-      }
-      Rprintf("\n");
-    }
-    ///////////////////////////////////////////////////////////////
+    // // For testing scTrn
+    // int flag = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
+    //                   ptr_nidx, 1032015 );
+    // Rprintf( "combine or split: %d \n", flag );
+    // ///////////////////////////////////////////////////////////////
     return seg;
   }
 } // extern "C"
