@@ -67,7 +67,7 @@ int scTrn( list< map<int, int>> &regions,
              it != contaguous_region.end(); ++ it ) {
           sub_region[ *it ] = region_label;
         }
-        sub_region[ start ] = NA_INTEGER;
+        // sub_region[ start ] = NA_INTEGER;
         regions.push_back( sub_region );
       }
       // restore the value of seg[ 2, ] to 0;
@@ -83,6 +83,7 @@ int scTrn( list< map<int, int>> &regions,
           whole[ *it ] = current;
     
         }
+        whole[ start ] = current;
         regions.push_front( whole );
         return 1;
       }
@@ -103,7 +104,7 @@ int scTrn( list< map<int, int>> &regions,
              itr != contaguous_region.end(); ++ itr ) {
           sub_region[ *itr ] = *it;
         }
-        sub_region[ start ] = NA_INTEGER;
+        // sub_region[ start ] = NA_INTEGER;
         regions.push_back( sub_region );
         whole.insert( sub_region.begin(), sub_region.end() );
       }
@@ -112,6 +113,7 @@ int scTrn( list< map<int, int>> &regions,
            itr!= whole.end(); ++ itr) {
         itr->second = combine_label;
       }
+      whole[ start ] = combine_label;
       regions.push_front( whole );
       return 2;
     }
