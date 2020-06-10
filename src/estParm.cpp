@@ -11,6 +11,7 @@
 #include "helper.h"
 #include "initRegion.h"
 #include "scTrn.h"
+#include "updateMu.h"
 
 using std::stack;
 using std::queue;
@@ -59,12 +60,32 @@ extern "C" {
                 tumor_regions, tumor_labels );
     
     list< map<int, int>> regions;
-    
     // // For testing scTrn
     // int flag = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
     //                   ptr_nidx, 1032015 );
     // Rprintf( "combine or split: %d \n", flag );
     // ///////////////////////////////////////////////////////////////
+    // // Debug updateMu
+    // for( int j = 1; j < 4; ++ j ) {
+    //   set<int> region_h;
+    //   for( int i = 0; i < len; ++ i ) {
+    //     if( ptr_seg[ 2 * i ] == - j ) {
+    //       region_h.insert( i + 1 ); // region starts from 1
+    //     }
+    //   }
+    //   double sigma2 = 2;
+    //   double m = 3;
+    //   double nu2 = 2;
+    //   vector<double> theta;
+    //   for( int k = 0; k < 6; ++ k ) {
+    //     theta.push_back( .01 + k * .01 );
+    //   }
+    //   double mu = updateMu( region_h, sigma2, m, nu2, theta, ptr_intst );
+    //   Rprintf( " region %d, mu = %f", j, mu );
+    // }
+    //////////////////////////////////////////////////////////////////
+    // Debug updateMu for tumor
+    
     return seg;
   }
 } // extern "C"
