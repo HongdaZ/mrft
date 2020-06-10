@@ -75,6 +75,9 @@ double updateMu( map<int, int> &region,
   double dif =  r - l;
   double p = ( l + r ) / 2;
   double tol = ( mk - m ) / 1000 ;
+  
+  Rprintf( "mean_y = %f \n", mean_y );
+  
   while( abs( dif ) > tol && i < max_itr &&
          derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk ) != 0 ) {
     double fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk );
@@ -87,6 +90,7 @@ double updateMu( map<int, int> &region,
     dif = r - l;
     p = ( r + l ) / 2;
     ++ i;
+    Rprintf( "fp= %f\n", fp );
   }
   return p;
 }

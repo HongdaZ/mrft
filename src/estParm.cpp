@@ -85,7 +85,18 @@ extern "C" {
     // }
     //////////////////////////////////////////////////////////////////
     // Debug updateMu for tumor
-    
+    map<int, int> tumor_34;
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_seg[ 2 * i ] == -34 ) {
+        tumor_34[ i + 1 ] = -34;
+      }
+    }
+    vector<double> theta;
+    for( int k = 0; k < 6; ++ k ) {
+      theta.push_back( .01 + k * .01 );
+    }
+    double mu = updateMu( tumor_34, 2, 1, 2, 5, 6, theta, ptr_intst );
+    Rprintf( " Tumor region -34, mu = %f", mu );
     return seg;
   }
 } // extern "C"
