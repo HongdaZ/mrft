@@ -25,5 +25,13 @@ double updateMu( map<int, int> &region,
                  double b,
                  vector<double> theta,
                  const double *ptr_intst );
+// update mu for outliers
+double updateMu( map<int, int> &region,  
+                 double sigma2,
+                 double m,
+                 double mk,
+                 double a,
+                 double b,
+                 const double *ptr_intst );
 
 #endif

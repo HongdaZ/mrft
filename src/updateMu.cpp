@@ -76,12 +76,17 @@ double updateMu( map<int, int> &region,
   double p = ( l + r ) / 2;
   double tol = ( mk - m ) / 1000 ;
   
-  Rprintf( "mean_y = %f \n", mean_y );
-  
+  // Rprintf( "mean_y = %f \n", mean_y );
+  double fr = derivative( r, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+  double fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+  if( fl < 0 && fr < 0 ) {
+    return l;
+  }
+  double fp;
   while( abs( dif ) > tol && i < max_itr &&
          derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk ) != 0 ) {
-    double fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk );
-    double fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+    fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+    fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, m, mk );
     if( fp * fl < 0 ) {
       r = p;
     } else {
@@ -90,7 +95,60 @@ double updateMu( map<int, int> &region,
     dif = r - l;
     p = ( r + l ) / 2;
     ++ i;
-    Rprintf( "fp= %f\n", fp );
+    // Rprintf( "fp= %f\n", fp );
+  }
+  return p;
+}
+
+// update mu for outliers
+double updateMu( map<int, int> &region,  
+                 double sigma2,
+                 double m,
+                 double mk,
+                 double a,
+                 double b,
+                 const double *ptr_intst ) {
+  int n = region.size();
+  double sum_theta = 0;
+  double sum_y = 0;
+  for( map<int, int>::iterator it = region.begin(); it != region.end();
+  ++ it ) {
+    sum_y += ptr_intst[ it->first - 1 ]; 
+  }
+  int max_itr = 100;
+  double l, r;
+  double mean_y = sum_y / n;
+  if( mean_y > m ) {
+    l = mean_y;
+  } else {
+    l = m + ( mk - m ) / 1000;
+  }
+  r = mk;
+  int i = 0;
+  double dif =  r - l;
+  double p = ( l + r ) / 2;
+  double tol = ( mk - m ) / 1000 ;
+  
+  // Rprintf( "mean_y = %f \n", mean_y );
+  double fr = derivative( r, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+  double fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+  if( fl < 0 && fr < 0 ) {
+    return l;
+  }
+  double fp;
+  while( abs( dif ) > tol && i < max_itr &&
+         derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk ) != 0 ) {
+    fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+    fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+    if( fp * fl < 0 ) {
+      r = p;
+    } else {
+      l = p;
+    }
+    dif = r - l;
+    p = ( r + l ) / 2;
+    ++ i;
+    // Rprintf( "fp= %f\n", fp );
   }
   return p;
 }
