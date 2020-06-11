@@ -12,6 +12,7 @@
 #include "initRegion.h"
 #include "scTrn.h"
 #include "updateMu.h"
+#include "updateTheta.h"
 
 using std::stack;
 using std::queue;
@@ -97,6 +98,14 @@ extern "C" {
     // }
     // double mu = updateMu( tumor_34, 2, 1, 2, 5, 6, theta, ptr_intst );
     // Rprintf( " Tumor region -34, mu = %f", mu );
+    // Debug updateTheta 
+    set<int> region_h;
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_seg[ 2 * i ] == - 23 ) {
+        region_h.insert( i + 1 ); // region starts from 1
+      }
+    }
+    updateTheta( region_h, 1, 0, 0, ptr_seg, ptr_nidx, ptr_intst, ptr_nintst );
     return seg;
   }
 } // extern "C"
