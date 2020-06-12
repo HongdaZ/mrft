@@ -105,7 +105,7 @@ extern "C" {
         region_h.insert( i + 1 ); // region starts from 1
       }
     }
-    updateTheta( region_h, 1, 0, 0, ptr_seg, ptr_nidx, ptr_intst, ptr_nintst );
+    updateTheta( region_h, 1, 2, 3, ptr_seg, ptr_nidx, ptr_intst, ptr_nintst );
     return seg;
   }
 } // extern "C"
