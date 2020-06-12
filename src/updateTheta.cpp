@@ -15,14 +15,17 @@ using std::vector;
 
 // region starts from 1
 // updateTheta for health regions
-vector<double> updateTheta( set<int> &region,
+void updateTheta( set<int> &region,
                             double mu,
-                            double sigma2,
+                            double &sigma2,
                             double lambda2,
                             const int *ptr_seg,
                             const int *ptr_nidx,
                             const double *ptr_intst,
-                            const double *ptr_nintst ) {
+                            const double *ptr_nintst,
+                            vector<double> &theta,
+                            double alphal,
+                            double betal ) {
   int nrow = region.size();
   int ncol = 6;
   double *yln = new double[ nrow * ncol ];
@@ -107,7 +110,6 @@ vector<double> updateTheta( set<int> &region,
   alpha = 1;
   F77_CALL( dgemv )( "t", &ncol, &ncol, &alpha, I, &ncol, tmp, &incx, &beta, 
             vtheta, &incx );
-  vector<double> theta;
   for( int i = 0; i < ncol; ++ i ) {
     theta.push_back( vtheta[ i ] );
   }
@@ -116,6 +118,25 @@ vector<double> updateTheta( set<int> &region,
   //   Rprintf( "%f\t", theta[ i ] );
   // }
   // ////////////////////////////////////
+  
+  // update sigma2
+  // yl - yln * thetal
+  alpha = - 1;
+  beta = 1;
+  F77_CALL( dgemv )( "n", &nrow, &ncol, &alpha, yln, &nrow, vtheta, &incx, &beta, 
+            yl, &incx );
+  // // debug matrix vector multiply
+  // for( int i = 0; i < nrow; ++ i ) {
+  //   Rprintf( "%f\t", yl[ i ] );
+  // }
+  // Rprintf( "\n");
+  // ////////////////////////////////////
+  double sum = betal;
+  for( int i = 0; i < nrow; ++ i ) {
+    sum += pow( yl[ i ], 2 ) / 2;
+  }
+  sigma2 = sum / ( nrow / 2 + alphal + 1 );
+  
   delete [] yln;
   delete [] yl;
   delete [] I;
@@ -124,6 +145,6 @@ vector<double> updateTheta( set<int> &region,
   delete [] work;
   delete [] ipiv;
   
-  return theta;
+  return;
   
 }

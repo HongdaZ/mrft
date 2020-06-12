@@ -7,13 +7,16 @@
 using std::set;
 using std::vector;
 
-vector<double> updateTheta( set<int> &region,
+void updateTheta( set<int> &region,
                             double mu,
-                            double sigma2,
+                            double &sigma2,
                             double lambda2,
                             const int *ptr_seg,
                             const int *ptr_nidx,
                             const double *ptr_intst,
-                            const double *ptr_nintst );
+                            const double *ptr_nintst,
+                            vector<double> &theta,
+                            double alphal,
+                            double betal );
 
 #endif
