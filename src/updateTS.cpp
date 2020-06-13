@@ -135,7 +135,8 @@ void updateTS( set<int> &region,
   for( int i = 0; i < nrow; ++ i ) {
     sum += pow( yl[ i ], 2 ) / 2;
   }
-  sigma2 = sum / ( nrow / 2 + alphal + 1 );
+  double hr = nrow / 2;
+  sigma2 = sum / ( hr + alphal + 1 );
   
   delete [] yln;
   delete [] yl;
