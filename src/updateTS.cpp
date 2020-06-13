@@ -14,7 +14,7 @@ using std::vector;
 
 
 // region starts from 1
-// updateTheta for health regions
+// updateTheta for health and tumorous regions
 void updateTS( set<int> &region,
                double mu,
                double &sigma2,
