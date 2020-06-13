@@ -6,7 +6,7 @@
 #include <set>
 #include <vector>
 
-#include "updateTheta.h"
+#include "updateTS.h"
 
 using std::set;
 using std::vector;
@@ -15,17 +15,17 @@ using std::vector;
 
 // region starts from 1
 // updateTheta for health regions
-void updateTheta( set<int> &region,
-                            double mu,
-                            double &sigma2,
-                            double lambda2,
-                            const int *ptr_seg,
-                            const int *ptr_nidx,
-                            const double *ptr_intst,
-                            const double *ptr_nintst,
-                            vector<double> &theta,
-                            double alphal,
-                            double betal ) {
+void updateTS( set<int> &region,
+               double mu,
+               double &sigma2,
+               double lambda2,
+               const int *ptr_seg,
+               const int *ptr_nidx,
+               const double *ptr_intst,
+               const double *ptr_nintst,
+               vector<double> &theta,
+               double alphal,
+               double betal ){
   int nrow = region.size();
   int ncol = 6;
   double *yln = new double[ nrow * ncol ];

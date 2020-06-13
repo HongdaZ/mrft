@@ -12,7 +12,8 @@
 #include "initRegion.h"
 #include "scTrn.h"
 #include "updateMu.h"
-#include "updateTheta.h"
+#include "updateTS.h"
+#include "updateSigma.h"
 
 using std::stack;
 using std::queue;
@@ -107,8 +108,9 @@ extern "C" {
     }
     double sigma2 = 2;
     vector<double> theta;
-    updateTheta( region_h, 1, sigma2, 3, ptr_seg, ptr_nidx, ptr_intst, ptr_nintst,
+    updateTS( region_h, 1, sigma2, 3, ptr_seg, ptr_nidx, ptr_intst, ptr_nintst,
                  theta, 1, .00001 );
+    updateSigma( 20, 1, ptr_intst, 2, .5, sigma2 );
     return seg;
   }
 } // extern "C"
