@@ -14,6 +14,7 @@
 #include "updateMu.h"
 #include "updateTS.h"
 #include "updateSigma.h"
+#include "energyY.h"
 
 using std::stack;
 using std::queue;
@@ -99,7 +100,7 @@ extern "C" {
     // }
     // double mu = updateMu( tumor_34, 2, 1, 2, 5, 6, theta, ptr_intst );
     // Rprintf( " Tumor region -34, mu = %f", mu );
-    // Debug updateTheta 
+    // Debug updateTS
     set<int> region_h;
     for( int i = 0; i < len; ++ i ) {
       if( ptr_seg[ 2 * i ] == - 23 ) {
@@ -108,9 +109,19 @@ extern "C" {
     }
     double sigma2 = 2;
     vector<double> theta;
-    updateTS( region_h, -23, 1, sigma2, 3, ptr_seg, ptr_nidx, ptr_intst, ptr_nintst,
-                 theta, 1, .00001 );
-    updateSigma( 20, 1, ptr_intst, 2, .5, sigma2 );
+    updateTS( region_h, -23, 1, sigma2, 3, ptr_seg, ptr_nidx, ptr_intst, 
+              ptr_nintst, theta, 1, .00001 );
+    // updateSigma( 20, 1, ptr_intst, 2, .5, sigma2 );
+    // Rprintf( "sigma2 = %f\n", sigma2 );
+    // for( int k = 0; k < 6; ++ k ) {
+    //   Rprintf( "theta = %f\t", theta[ k ] );
+    // }
+    // Rprintf( "\n" );
+    //////////////////////////////////////////////////////////////////////////
+    double energy = energyY( region_h, 1, .5, sigma2, 3, ptr_seg, ptr_nidx,
+                             ptr_intst, ptr_nintst, theta, 
+                             1, .00001, ptr_a[ 0 ], ptr_b[ 0 ] );
+    // Rprintf( "energyY = %f\n", energy );
     return seg;
   }
 } // extern "C"

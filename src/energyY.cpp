@@ -57,18 +57,23 @@ double energyY( const set<int> &region,
   int incx = 1;
   double alpha = - 1;
   double beta = 1;
-  F77_CALL( dgemv )( "n", &nrow, &ncol, &alpha, yln, &nrow, vtheta, &incx, &beta, 
-            yl, &incx );
+  F77_CALL( dgemv )( "n", &nrow, &ncol, &alpha, yln, &nrow, vtheta, &incx,
+            &beta, yl, &incx );
 
   double energy = 0;
   for( int i = 0; i < nrow; ++ i ) {
-    energy += pow( yl[ i ], 2 ) / ( 2 * sigma2 );
+    energy += pow( yl[ i ], 2 );
   }
+  energy /=  ( 2 * sigma2 );
+  
   energy += log( sigma2 ) * nrow / (double)2;
+  
   energy = energy + ( a + 1 ) * log( mu - mk1 ) + b / ( mu - mk1 ) - 
     log( pow( b, a ) / tgamma( a ) );
+  
   energy = energy + ( alphak + 1 ) * log( sigma2 ) + betak / sigma2 -
     log( pow( betak, alphak ) / tgamma( alphak ) );
+  // Rprintf( "energy = %f\n", energy );
   double pi = 3.1415926;
   double sum_theta = 0;
   if( nrow > 1) {

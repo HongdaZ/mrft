@@ -14,7 +14,7 @@ using std::vector;
 
 
 // region starts from 1
-// updateTheta for health and tumorous regions
+// updateTheta and sigma2 for health and tumorous regions
 void updateTS( set<int> &region, int current_label,
                double mu,
                double &sigma2,
@@ -134,8 +134,8 @@ void updateTS( set<int> &region, int current_label,
   // yl - yln * thetal
   alpha = - 1;
   beta = 1;
-  F77_CALL( dgemv )( "n", &nrow, &ncol, &alpha, yln, &nrow, vtheta, &incx, &beta, 
-            yl, &incx );
+  F77_CALL( dgemv )( "n", &nrow, &ncol, &alpha, yln, &nrow, vtheta, &incx, 
+            &beta, yl, &incx );
   // // debug matrix vector multiply
   // for( int i = 0; i < nrow; ++ i ) {
   //   Rprintf( "%f\t", yl[ i ] );
