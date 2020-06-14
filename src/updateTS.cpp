@@ -15,7 +15,7 @@ using std::vector;
 
 // region starts from 1
 // updateTheta for health and tumorous regions
-void updateTS( set<int> &region,
+void updateTS( set<int> &region, int current_label,
                double mu,
                double &sigma2,
                double lambda2,
@@ -39,17 +39,28 @@ void updateTS( set<int> &region,
     idx = *it;
     yl[ j ] = ptr_intst[ idx - 1 ] - mu;
     for( int i = 0; i < 6; ++ i ) {
+      // healthy
       int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      if( nidx != NA_INTEGER ) {
-        int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
-        if( nlabel == label ) {
+      if( current_label < 0 && current_label > - 4 ) {
+        if( nidx != NA_INTEGER ) {
+          int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
+          if( nlabel == label ) {
+            yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
+          } else {
+            yln[ i * nrow + j ] = 0;
+          }
+        } else {
+          yln[ i * nrow + j ] = 0;
+        }
+        // tumor
+      } else {
+        if( region.count( nidx ) ) {
           yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
         } else {
           yln[ i * nrow + j ] = 0;
         }
-      } else {
-        yln[ i * nrow + j ] = 0;
       }
+      
     }
   }
   // for( int i = 0; i < nrow; ++ i ) {
@@ -136,7 +147,7 @@ void updateTS( set<int> &region,
     sum += pow( yl[ i ], 2 ) / 2;
   }
   sigma2 = sum / ( nrow / (double)2 + alphal + 1 );
-  
+
   delete [] yln;
   delete [] yl;
   delete [] I;

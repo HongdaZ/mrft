@@ -108,7 +108,7 @@ extern "C" {
     }
     double sigma2 = 2;
     vector<double> theta;
-    updateTS( region_h, 1, sigma2, 3, ptr_seg, ptr_nidx, ptr_intst, ptr_nintst,
+    updateTS( region_h, -23, 1, sigma2, 3, ptr_seg, ptr_nidx, ptr_intst, ptr_nintst,
                  theta, 1, .00001 );
     updateSigma( 20, 1, ptr_intst, 2, .5, sigma2 );
     return seg;

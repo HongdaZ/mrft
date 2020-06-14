@@ -7,7 +7,7 @@
 using std::set;
 using std::vector;
 
-void updateTS( set<int> &region,
+void updateTS( set<int> &region, int current_label,
                double mu,
                double &sigma2,
                double lambda2,
