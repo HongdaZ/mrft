@@ -127,9 +127,13 @@ extern "C" {
     for( int i = 0; i < 6; ++ i ) {
       theta.push_back( vtheta[ i ] ) ;
     }
-    double energy = energyY( -1, 1208, 1, 0.13, ptr_seg, 
-                             ptr_nidx, ptr_intst, ptr_nintst, theta );
-    Rprintf( "energyY = %f\n", energy);
+    // double energy = energyY( -1, 1208, 1, 0.13, ptr_seg, 
+    //                          ptr_nidx, ptr_intst, ptr_nintst, theta );
+    // Rprintf( "energyY = %f\n", energy);
+    double energy = energyY( 1, 504138, 1, .5, 0.13, 3, ptr_seg, 
+                             ptr_nidx, ptr_intst, ptr_nintst, theta,
+                             1, .00001, ptr_a[ 0 ], ptr_b[ 0 ] );
+    // Rprintf( "energyY = %f\n", energy);
     return seg;
   }
 } // extern "C"
