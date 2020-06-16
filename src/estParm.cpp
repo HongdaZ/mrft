@@ -15,6 +15,7 @@
 #include "updateTS.h"
 #include "updateSigma.h"
 #include "energyY.h"
+#include "energyX.h"
 
 using std::stack;
 using std::queue;
@@ -134,6 +135,11 @@ extern "C" {
                              ptr_nidx, ptr_intst, ptr_nintst, theta,
                              1, .00001, ptr_a[ 0 ], ptr_b[ 0 ] );
     // Rprintf( "energyY = %f\n", energy);
+    
+    
+    energy = energyX( 1, 507521, true,
+                    ptr_seg, ptr_nidx, ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+    Rprintf( "energyX = %f\n", energy);
     return seg;
   }
 } // extern "C"
