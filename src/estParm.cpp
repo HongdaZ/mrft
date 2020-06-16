@@ -16,6 +16,7 @@
 #include "updateSigma.h"
 #include "energyY.h"
 #include "energyX.h"
+#include "nbrLabel.h"
 
 using std::stack;
 using std::queue;
@@ -140,6 +141,10 @@ extern "C" {
     energy = energyX( 1, 507521, true,
                     ptr_seg, ptr_nidx, ptr_delta[ 0 ], ptr_gamma[ 0 ] );
     Rprintf( "energyX = %f\n", energy);
+    vector<int> nbr_label = nbrLabel( 1059, ptr_seg, ptr_nidx );
+    for( int i = 0; i < 6; ++ i ) {
+      Rprintf( "neighbor label:%d\n", nbr_label[ i ] );
+    }
     return seg;
   }
 } // extern "C"
