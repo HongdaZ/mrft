@@ -15,7 +15,7 @@ using std::vector;
 
 // region starts from 1
 // updateTheta and sigma2 for health and tumorous regions
-void updateTS( set<int> &region, int current_label,
+void updateTS( set<int> &region, int curr_label,
                double mu,
                double &sigma2,
                double lambda2,
@@ -41,7 +41,7 @@ void updateTS( set<int> &region, int current_label,
     for( int i = 0; i < 6; ++ i ) {
       // healthy
       int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      if( current_label < 0 && current_label > - 4 ) {
+      if( curr_label < 0 && curr_label > - 4 ) {
         if( nidx != NA_INTEGER ) {
           int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
           if( nlabel == label ) {

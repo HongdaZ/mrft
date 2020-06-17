@@ -7,7 +7,9 @@
 using std::set;
 using std::vector;
 
-void updateTS( set<int> &region, int current_label,
+// region starts from 1
+// updateTheta and sigma2 for health and tumorous regions
+void updateTS( set<int> &region, int curr_label,
                double mu,
                double &sigma2,
                double lambda2,
