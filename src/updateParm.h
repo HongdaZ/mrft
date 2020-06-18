@@ -25,7 +25,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  const double *ptr_nintst,
                  double alphal,
                  double betal,
-                 int maxit );
+                 int maxit = 20  );
 // update parameters for tumor regions
 void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  map<int, int> &region,
@@ -38,7 +38,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  const double *ptr_nintst,
                  double alphal,
                  double betal,
-                 int maxit );
+                 int maxit = 20  );
 // update parameters for outliers
 void updateParm( double &mu, double &sigma2,
                  map<int, int> &region,

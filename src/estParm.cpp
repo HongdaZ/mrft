@@ -148,15 +148,17 @@ extern "C" {
     // }
     // debug updateParm
     set<int> region_healthy;
+    int curr_label = - 23;
     for( int i = 0; i < len; ++ i ) {
-      if( ptr_seg[ 2 * i ] == - 1 ) {
+      if( ptr_seg[ 2 * i ] == curr_label ) {
         region_healthy.insert( i + 1 ); // region starts from 1
       }
     }
-    int curr_label = -1;
-    double mu = 0;
-    double sigma2 = 0;
-    updateParm( mu, theta, sigma2, region_healthy, )
+    double mu = 0.5639503;
+    double sigma2 = 1;
+    updateParm( mu, theta, sigma2, region_healthy, 1, .25, ptr_intst,
+                curr_label, 1.0 / 144, ptr_seg, ptr_nidx, ptr_nintst,
+                1.0, .00001, 20 );
     ////////////////////////////////////////////////////////////
     return seg;
   }
