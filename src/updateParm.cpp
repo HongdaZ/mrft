@@ -34,6 +34,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );
     mu = tmp;
+    sigma2 = 2;
     Rprintf( "lambda2 = %f, sigma2 = %f \n", lambda2, sigma2 );
     updateTS( region, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
               ptr_intst, ptr_nintst, theta, alphal, betal );

@@ -85,6 +85,8 @@ void updateTS( set<int> &region, int curr_label,
   // t( Yln ) Yln / sigma2 + I / lambda2 
   double alpha = 1 / sigma2;
   double beta = 1 / lambda2;
+  // Rprintf( "nrow = %d, ncol = %d, alpha = %f, beta = %f\n", 
+  //          nrow, ncol, alpha, beta );
   F77_CALL( dsyrk )( "u", "t", &ncol, &nrow, &alpha, yln, &nrow, &beta, 
             I, &ncol );
   for( int i = 0; i < ncol; ++ i ) {
@@ -122,7 +124,7 @@ void updateTS( set<int> &region, int curr_label,
   F77_CALL( dgemv )( "t", &ncol, &ncol, &alpha, I, &ncol, tmp, &incx, &beta, 
             vtheta, &incx );
   for( int i = 0; i < ncol; ++ i ) {
-    theta.push_back( vtheta[ i ] );
+    theta[ i ] = vtheta[ i ];
   }
   // // debug matrix vector multiply
   // for( int i = 0; i < ncol; ++ i ) {

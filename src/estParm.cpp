@@ -148,17 +148,23 @@ extern "C" {
     // }
     // debug updateParm
     set<int> region_healthy;
-    int curr_label = - 23;
+    int curr_label = - 4;
     for( int i = 0; i < len; ++ i ) {
       if( ptr_seg[ 2 * i ] == curr_label ) {
         region_healthy.insert( i + 1 ); // region starts from 1
       }
     }
     double mu = 0.5639503;
-    double sigma2 = 1;
-    updateParm( mu, theta, sigma2, region_healthy, 1, .25, ptr_intst,
-                curr_label, 1.0 / 144, ptr_seg, ptr_nidx, ptr_nintst,
-                1.0, .00001, 20 );
+    double sigma2 = 2;
+    // updateParm( mu, theta, sigma2, region_healthy, 1, .25, ptr_intst,
+    //             curr_label, 3.0, ptr_seg, ptr_nidx, ptr_nintst,
+    //             1.0, .00001, 20 );
+    updateTS( region_healthy, curr_label, 1, sigma2, 3, ptr_seg, ptr_nidx, ptr_intst,
+                        ptr_nintst, theta, 1, .00001 );
+    for( int k = 0; k < 6; ++ k ) {
+      Rprintf( "theta = %f\t", theta[ k ] );
+    }
+    Rprintf( "\n" );
     ////////////////////////////////////////////////////////////
     return seg;
   }
