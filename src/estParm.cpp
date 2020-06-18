@@ -17,6 +17,7 @@
 #include "energyY.h"
 #include "energyX.h"
 #include "nbrLabel.h"
+#include "updateParm.h"
 
 using std::stack;
 using std::queue;
@@ -140,11 +141,23 @@ extern "C" {
     
     energy = energyX( 1, 507521, true,
                     ptr_seg, ptr_nidx, ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-    Rprintf( "energyX = %f\n", energy);
+    // Rprintf( "energyX = %f\n", energy);
     vector<int> nbr_label = nbrLabel( 1059, ptr_seg, ptr_nidx );
-    for( int i = 0; i < 6; ++ i ) {
-      Rprintf( "neighbor label:%d\n", nbr_label[ i ] );
+    // for( int i = 0; i < 6; ++ i ) {
+    //   Rprintf( "neighbor label:%d\n", nbr_label[ i ] );
+    // }
+    // debug updateParm
+    set<int> region_healthy;
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_seg[ 2 * i ] == - 1 ) {
+        region_healthy.insert( i + 1 ); // region starts from 1
+      }
     }
+    int curr_label = -1;
+    double mu = 0;
+    double sigma2 = 0;
+    updateParm( mu, theta, sigma2, region_healthy, )
+    ////////////////////////////////////////////////////////////
     return seg;
   }
 } // extern "C"
