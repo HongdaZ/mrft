@@ -26,8 +26,8 @@ using std::set;
 
 extern "C" {
   SEXP estParm( SEXP model, SEXP delta, SEXP gamma, 
-                SEXP alpha, SEXP beta, SEXP lambda, 
-                SEXP a, SEXP b, SEXP m, SEXP nu ) {
+                SEXP alpha, SEXP beta, SEXP lambda2, 
+                SEXP a, SEXP b, SEXP m, SEXP nu2 ) {
     SEXP info = getListElement( model, "info" );
     SEXP seg = getListElement( model, "seg" );
     
@@ -47,11 +47,11 @@ extern "C" {
     const double *ptr_gamma = REAL( gamma );
     const double *ptr_alpha = REAL( alpha );
     const double *ptr_beta = REAL( beta );
-    const double *ptr_lambda = REAL( lambda );
+    const double *ptr_lambda2 = REAL( lambda2 );
     const double *ptr_a = REAL( a );
     const double *ptr_b = REAL( b );
     const double *ptr_m = REAL( m );
-    const double *ptr_nu = REAL( nu );
+    const double *ptr_nu2 = REAL( nu2 );
     
     int len = length( idx );
     set<int> tumor_labels;
@@ -148,24 +148,17 @@ extern "C" {
     // }
     // debug updateParm
     set<int> region_healthy;
-    int curr_label = - 4;
+    int curr_label = - 2;
     for( int i = 0; i < len; ++ i ) {
       if( ptr_seg[ 2 * i ] == curr_label ) {
         region_healthy.insert( i + 1 ); // region starts from 1
       }
     }
-    double mu = 0.5639503;
-    double sigma2 = 2;
-    // updateParm( mu, theta, sigma2, region_healthy, 1, .25, ptr_intst,
-    //             curr_label, 3.0, ptr_seg, ptr_nidx, ptr_nintst,
-    //             1.0, .00001, 20 );
-    updateTS( region_healthy, curr_label, 1, sigma2, 3, ptr_seg, ptr_nidx, ptr_intst,
-                        ptr_nintst, theta, 1, .00001 );
-    for( int k = 0; k < 6; ++ k ) {
-      Rprintf( "theta = %f\t", theta[ k ] );
-    }
-    Rprintf( "\n" );
-    ////////////////////////////////////////////////////////////
+    double mu = 1.0;
+    double sigma2 = 2.0;
+    updateParm( mu, theta, sigma2, region_healthy, ptr_m[ 1 ], ptr_nu2[ 1 ], 
+                ptr_intst, curr_label, ptr_lambda2[ 1 ], ptr_seg, ptr_nidx, 
+                ptr_nintst, ptr_alpha[ 1 ], ptr_beta[ 1 ], 20 );
     return seg;
   }
 } // extern "C"
