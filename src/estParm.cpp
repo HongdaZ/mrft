@@ -120,7 +120,7 @@ extern "C" {
     // //   Rprintf( "theta = %f\t", theta[ k ] );
     // // }
     // // Rprintf( "\n" );
-    // //////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////
     // double energy = energyY( region_h, 1, .5, sigma2, 3, ptr_seg, ptr_nidx,
     //                          ptr_intst, ptr_nintst, theta, 
     //                          1, .00001, ptr_a[ 0 ], ptr_b[ 0 ] );
@@ -160,19 +160,32 @@ extern "C" {
     //             ptr_intst, curr_label, ptr_lambda2[ 1 ], ptr_seg, ptr_nidx,
     //             ptr_nintst, ptr_alpha[ 1 ], ptr_beta[ 1 ], 20 );
     ////////////////////////////////////////////////////////////////////
-    // debug updateParm
-    map<int, int> region_t;
-    int curr_label = - 34;
-    for( int i = 0; i < len; ++ i ) {
-      if( ptr_seg[ 2 * i ] == curr_label ) {
-        region_t[ i + 1 ] = curr_label; // region starts from 1
-      }
-    }
+    // // debug updateParm
+    // map<int, int> region_t;
+    // int curr_label = - 34;
+    // for( int i = 0; i < len; ++ i ) {
+    //   if( ptr_seg[ 2 * i ] == curr_label ) {
+    //     region_t[ i + 1 ] = curr_label; // region starts from 1
+    //   }
+    // }
+    // double mu = 1.0;
+    // double sigma2 = 2.0;
+    // updateParm( mu, theta, sigma2, region_t, ptr_m[ 3 ], ptr_m[ 2 ], 
+    //             ptr_a[ 0 ],
+    //             ptr_b[ 0 ], ptr_intst, curr_label, ptr_lambda2[ 3 ], 
+    //             ptr_seg,
+    //             ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+    /////////////////////////////////////////////////////////////////////////
+    // Debug updateParm for outliers
+    int curr_label = 1;
+    map<int, int> region_o;
+    region_o[ 1060076 ] = curr_label;
     double mu = 1.0;
     double sigma2 = 2.0;
-    updateParm( mu, theta, sigma2, region_t, ptr_m[ 3 ], ptr_m[ 2 ], ptr_a[ 0 ],
-                ptr_b[ 0 ], ptr_intst, curr_label, ptr_lambda2[ 3 ], ptr_seg,
-                ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+    updateParm( mu, sigma2, region_o, ptr_m[ 3 ], ptr_m[ 2 ], ptr_a[ 0 ], 
+                ptr_b[ 0 ], ptr_intst, curr_label, ptr_lambda2[ 3 ], 
+                ptr_seg, ptr_nidx, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+    
     return seg;
   }
 } // extern "C"

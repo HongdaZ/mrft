@@ -40,18 +40,19 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  double betal,
                  int maxit = 20  );
 // update parameters for outliers
-void updateParm( double &mu, double &sigma2,
+void updateParm( double &mu, double &sigma2, 
                  map<int, int> &region,
-                 double m, double mk, double a, double b,
+                 double m,
+                 double mk_1,
+                 double a,
+                 double b,
                  const double *ptr_intst,
                  int curr_label,
                  double lambda2,
                  const int *ptr_seg,
                  const int *ptr_nidx,
-                 const double *ptr_nintst,
                  double alphal,
                  double betal,
-                 int idx,
-                 int maxit = 20 );
+                 int maxit );
 
 #endif
