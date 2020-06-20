@@ -29,7 +29,7 @@ double updateMu( map<int, int> &region,
 double updateMu( map<int, int> &region,  
                  double sigma2,
                  double m,
-                 double mk,
+                 double mk_1,
                  double a,
                  double b,
                  const double *ptr_intst );

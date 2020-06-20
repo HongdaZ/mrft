@@ -46,7 +46,7 @@ double derivative( double mu, double sigma2, double sum_theta,
 double updateMu( map<int, int> &region,  
                  double sigma2,
                  double m,
-                 double mk,
+                 double mk_1,
                  double a,
                  double b,
                  vector<double> theta,
@@ -65,28 +65,28 @@ double updateMu( map<int, int> &region,
   int max_itr = 100;
   double l, r;
   double mean_y = sum_y / n;
-  if( mean_y > m ) {
+  if( mean_y > mk_1 ) {
     l = mean_y;
   } else {
-    l = m + ( mk - m ) / 1000;
+    l = mk_1 + (  m- mk_1 ) / 1000;
   }
-  r = mk;
+  r = m;
   int i = 0;
   double dif =  r - l;
   double p = ( l + r ) / 2;
-  double tol = ( mk - m ) / 1000 ;
+  double tol = (  m- mk_1 ) / 1000 ;
   
   // Rprintf( "mean_y = %f \n", mean_y );
-  double fr = derivative( r, sigma2, sum_theta, mean_y, n, a, b, m, mk );
-  double fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+  double fr = derivative( r, sigma2, sum_theta, mean_y, n, a, b, mk_1,  m);
+  double fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, mk_1,  m);
   if( fl < 0 && fr < 0 ) {
     return l;
   }
   double fp;
   while( abs( dif ) > tol && i < max_itr &&
-         derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk ) != 0 ) {
-    fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk );
-    fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+         derivative( p, sigma2, sum_theta, mean_y, n, a, b, mk_1, m ) != 0 ) {
+    fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
+    fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
     if( fp * fl < 0 ) {
       r = p;
     } else {
@@ -104,7 +104,7 @@ double updateMu( map<int, int> &region,
 double updateMu( map<int, int> &region,  
                  double sigma2,
                  double m,
-                 double mk,
+                 double mk_1,
                  double a,
                  double b,
                  const double *ptr_intst ) {
@@ -118,28 +118,28 @@ double updateMu( map<int, int> &region,
   int max_itr = 100;
   double l, r;
   double mean_y = sum_y / n;
-  if( mean_y > m ) {
+  if( mean_y > mk_1 ) {
     l = mean_y;
   } else {
-    l = m + ( mk - m ) / 1000;
+    l = mk_1 + ( m - mk_1 ) / 1000;
   }
-  r = mk;
+  r = m;
   int i = 0;
   double dif =  r - l;
   double p = ( l + r ) / 2;
-  double tol = ( mk - m ) / 1000 ;
+  double tol = ( m - mk_1 ) / 1000 ;
   
   // Rprintf( "mean_y = %f \n", mean_y );
-  double fr = derivative( r, sigma2, sum_theta, mean_y, n, a, b, m, mk );
-  double fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+  double fr = derivative( r, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
+  double fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
   if( fl < 0 && fr < 0 ) {
     return l;
   }
   double fp;
   while( abs( dif ) > tol && i < max_itr &&
-         derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk ) != 0 ) {
-    fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, m, mk );
-    fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, m, mk );
+         derivative( p, sigma2, sum_theta, mean_y, n, a, b, mk_1, m ) != 0 ) {
+    fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
+    fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
     if( fp * fl < 0 ) {
       r = p;
     } else {
