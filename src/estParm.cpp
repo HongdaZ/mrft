@@ -176,15 +176,15 @@ extern "C" {
     //             ptr_seg,
     //             ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
     /////////////////////////////////////////////////////////////////////////
-    // Debug updateParm for outliers
-    int curr_label = 1;
-    map<int, int> region_o;
-    region_o[ 1060076 ] = curr_label;
-    double mu = 1.0;
-    double sigma2 = 2.0;
-    updateParm( mu, sigma2, region_o, ptr_m[ 3 ], ptr_m[ 2 ], ptr_a[ 0 ], 
-                ptr_b[ 0 ], ptr_intst, curr_label, ptr_lambda2[ 3 ], 
-                ptr_seg, ptr_nidx, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+    // // Debug updateParm for outliers
+    // int curr_label = 1;
+    // map<int, int> region_o;
+    // region_o[ 1060076 ] = curr_label;
+    // double mu = 1.0;
+    // double sigma2 = 2.0;
+    // updateParm( mu, sigma2, region_o, ptr_m[ 3 ], ptr_m[ 2 ], ptr_a[ 0 ], 
+    //             ptr_b[ 0 ], ptr_intst, curr_label, ptr_lambda2[ 3 ], 
+    //             ptr_seg, ptr_nidx, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
     
     return seg;
   }
