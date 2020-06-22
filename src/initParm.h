@@ -21,6 +21,6 @@ void initParm( map<int, vector<double>> &health_parm,
                const double *ptr_nintst, const double *ptr_alpha,
                const double *ptr_beta,
                map<int, set<int>> tumor_regions, 
-               double *ptr_a, double *ptr_b, int len, int maxit = 20 );
+               const double *ptr_a, const double *ptr_b, int len, int maxit = 20 );
 
 #endif

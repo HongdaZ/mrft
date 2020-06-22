@@ -18,6 +18,7 @@
 #include "energyX.h"
 #include "nbrLabel.h"
 #include "updateParm.h"
+#include "initParm.h"
 
 using std::stack;
 using std::queue;
@@ -125,24 +126,24 @@ extern "C" {
     //                          ptr_intst, ptr_nintst, theta, 
     //                          1, .00001, ptr_a[ 0 ], ptr_b[ 0 ] );
     // // Rprintf( "energyY = %f\n", energy );
-    vector<double> theta;
-    double vtheta[ 6 ] = { 0.1, 0.3, 0.4, 0.2, 0.5, 6.0 };
-    for( int i = 0; i < 6; ++ i ) {
-      theta.push_back( vtheta[ i ] ) ;
-    }
-    // double energy = energyY( -1, 1208, 1, 0.13, ptr_seg, 
-    //                          ptr_nidx, ptr_intst, ptr_nintst, theta );
-    // Rprintf( "energyY = %f\n", energy);
-    double energy = energyY( 1, 504138, 1, .5, 0.13, 3, ptr_seg, 
-                             ptr_nidx, ptr_intst, ptr_nintst, theta,
-                             1, .00001, ptr_a[ 0 ], ptr_b[ 0 ] );
-    // Rprintf( "energyY = %f\n", energy);
-    
-    
-    energy = energyX( 1, 507521, true,
-                    ptr_seg, ptr_nidx, ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-    // Rprintf( "energyX = %f\n", energy);
-    vector<int> nbr_label = nbrLabel( 1059, ptr_seg, ptr_nidx );
+    // vector<double> theta;
+    // double vtheta[ 6 ] = { 0.1, 0.3, 0.4, 0.2, 0.5, 6.0 };
+    // for( int i = 0; i < 6; ++ i ) {
+    //   theta.push_back( vtheta[ i ] ) ;
+    // }
+    // // double energy = energyY( -1, 1208, 1, 0.13, ptr_seg, 
+    // //                          ptr_nidx, ptr_intst, ptr_nintst, theta );
+    // // Rprintf( "energyY = %f\n", energy);
+    // double energy = energyY( 1, 504138, 1, .5, 0.13, 3, ptr_seg, 
+    //                          ptr_nidx, ptr_intst, ptr_nintst, theta,
+    //                          1, .00001, ptr_a[ 0 ], ptr_b[ 0 ] );
+    // // Rprintf( "energyY = %f\n", energy);
+    // 
+    // 
+    // energy = energyX( 1, 507521, true,
+    //                 ptr_seg, ptr_nidx, ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+    // // Rprintf( "energyX = %f\n", energy);
+    // vector<int> nbr_label = nbrLabel( 1059, ptr_seg, ptr_nidx );
     // for( int i = 0; i < 6; ++ i ) {
     //   Rprintf( "neighbor label:%d\n", nbr_label[ i ] );
     // }
@@ -186,6 +187,50 @@ extern "C" {
     //             ptr_b[ 0 ], ptr_intst, curr_label, ptr_lambda2[ 3 ], 
     //             ptr_seg, ptr_nidx, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
     
+    initParm( health_parm, tumor_parm, ptr_seg, ptr_m, ptr_nu2, ptr_intst,
+              ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
+              tumor_regions, ptr_a, ptr_b, len, 20 );
+    // for( map<int, vector<double>>::iterator it = health_parm.begin(); 
+    //      it!= health_parm.end(); ++ it) {
+    //   Rprintf( "label = %d", it->first );
+    //   for( int i = 0; i < 8; ++ i ) {
+    //     Rprintf( "\t%f", it->second[ i ] );
+    //   }
+    //   Rprintf( "\n" );
+    // }
+    // for( map<int, vector<double>>::iterator it = tumor_parm.begin(); 
+    //      it!= tumor_parm.end(); ++ it) {
+    //   Rprintf( "label = %d", it->first );
+    //   for( int i = 0; i < 8; ++ i ) {
+    //     Rprintf( "\t%f", it->second[ i ] );
+    //   }
+    //   Rprintf( "\n" );
+    // }
+    // 
+    // 
+    // // debug updateParm
+    // set<int> region_healthy;
+    // int curr_label = - 2;
+    // for( int i = 0; i < len; ++ i ) {
+    //   if( ptr_seg[ 2 * i ] == curr_label ) {
+    //     region_healthy.insert( i + 1 ); // region starts from 1
+    //   }
+    // }
+    // double mu = 1.0;
+    // double sigma2 = 2.0;
+    // vector<double> theta;
+    // for( int i = 0; i < 6; ++ i ) {
+    //   theta.push_back( 0 );
+    // }
+    // updateParm( mu, theta, sigma2, region_healthy, ptr_m[ 1 ], ptr_nu2[ 1 ],
+    //             ptr_intst, curr_label, ptr_lambda2[ 1 ], ptr_seg, ptr_nidx,
+    //             ptr_nintst, ptr_alpha[ 1 ], ptr_beta[ 1 ], 20 );
+    // 
+    // Rprintf( "label = %d\t%f\t%f\t", curr_label, mu, sigma2 );
+    // for( int i = 0; i < 6; ++ i ) {
+    //   Rprintf( "%f\t", theta[ i ] );
+    // }
+    // ///////////////////////////////////////////////////////////////////////
     return seg;
   }
 } // extern "C"

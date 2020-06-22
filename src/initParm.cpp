@@ -15,7 +15,7 @@ void initParm( map<int, vector<double>> &health_parm,
                const double *ptr_nintst, const double *ptr_alpha,
                const double *ptr_beta,
                map<int, set<int>> tumor_regions, 
-               double *ptr_a, double *ptr_b, int len, int maxit ) {
+               const double *ptr_a, const double *ptr_b, int len, int maxit ) {
   // update parameters for tumor regions
   for( map<int, set<int>>::iterator it = tumor_regions.begin();
        it != tumor_regions.end(); ++ it ) {
@@ -26,11 +26,12 @@ void initParm( map<int, vector<double>> &health_parm,
          set_it != set_region.end(); ++ set_it ) {
       region[ *set_it ] = curr_label;
     }
-    double mu, sigma2;
+    double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
     vector<double> theta;
     for( int i = 0; i < 6; ++ i ) {
       theta.push_back( 0 );
     }
+    
     updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ], ptr_a[ 0 ],
                 ptr_b[ 0 ], ptr_intst, curr_label, ptr_lambda2[ 3 ], ptr_seg,
                 ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
@@ -44,15 +45,16 @@ void initParm( map<int, vector<double>> &health_parm,
   // Initialize parameters for healthy regions
   for( int i = - 1; i > - 4;  -- i ) {
     int curr_label = i;
-    double mu, sigma2;
+    // Rprintf( "curr_label = %d \n", curr_label );
+    double mu = -1, sigma2 = 1;
     vector<double> theta;
-    for( int i = 0; i < 6; ++ i ) {
+    for( int  j = 0; j < 6; ++ j ) {
       theta.push_back( 0 );
     }
     set<int> region;
-    for( int i = 0; i < len; ++ i ) {
-      if( ptr_seg[ 2 * i ] == - curr_label ) {
-        region.insert( i + 1 ); // region starts from 1
+    for( int k = 0; k < len; ++ k ) {
+      if( ptr_seg[ 2 * k ] == curr_label ) {
+        region.insert( k + 1 ); // region starts from 1
       }
     }
     int h_idx =  - 1 - curr_label; // == 0, 1, 2
@@ -66,6 +68,6 @@ void initParm( map<int, vector<double>> &health_parm,
     
     h_parm.insert( h_parm.end(), theta.begin(), theta.end() );
     tumor_parm[ curr_label ] = h_parm;
-    return;
   }
+  return;
 }
