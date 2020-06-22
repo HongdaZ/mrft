@@ -13,7 +13,6 @@ using std::map;
 using std::list;
 
 // Initialize parameters
-// compare energy for training
 void initParm( map<int, vector<double>> &health_parm,
                map<int, vector<double>> &tumor_parm,
                const int *ptr_seg, const double *ptr_m,
@@ -22,6 +21,6 @@ void initParm( map<int, vector<double>> &health_parm,
                const double *ptr_nintst, const double *ptr_alpha,
                const double *ptr_beta,
                map<int, set<int>> tumor_regions, 
-               double *ptr_a, double *ptr_b, int maxit = 20 );
+               double *ptr_a, double *ptr_b, int len, int maxit = 20 );
 
 #endif
