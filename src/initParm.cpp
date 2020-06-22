@@ -1,10 +1,10 @@
 #include <R.h>
 #include <Rinternals.h>
 
-#include "cmpET.h"
+#include "initParm.h"
 
 // compare energy for training
-void cmpET( list<map<int, int >> &regions,
+void initParm( list<map<int, int >> &regions,
             map<int, set<int>> &tumor_regions, 
             set<int> &tumor_labels, set<int> &outl_labels,
             map<int, vector<double>> &health_parm,

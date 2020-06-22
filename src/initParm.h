@@ -1,5 +1,5 @@
-#ifndef CMPET_H
-#define CMPET_H
+#ifndef INITPARM_H
+#define INITPARM_H
 
 
 #include <set>
@@ -16,7 +16,7 @@ using std::vector;
 using std::map;
 using std::list;
 
-// compare energy for training
-void cmpET();
+// Initialize parameters
+void initParm();
 
 #endif
