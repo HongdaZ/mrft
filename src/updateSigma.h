@@ -2,11 +2,11 @@
 #define UPDATESIGMA_H
 
 // update sigma for outliers
-void updateSigma( int idx,
-                  double mu,
+void updateSigma( const int idx,
+                  const double mu,
                   const double *ptr_intst,
-                  double alphal,
-                  double betal,
+                  const double alphal,
+                  const double betal,
                   double &sigma2 );
 
 #endif

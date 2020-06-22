@@ -9,17 +9,17 @@ using std::abs;
 
 // update parameters for healthy cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 set<int> &region,
-                 double m,
-                 double nu2,
+                 const set<int> &region,
+                 const double m,
+                 const double nu2,
                  const double *ptr_intst,
                  int curr_label,
-                 double lambda2,
+                 const double lambda2,
                  const int *ptr_seg,
                  const int *ptr_nidx,
                  const double *ptr_nintst,
-                 double alphal,
-                 double betal,
+                 const double alphal,
+                 const double betal,
                  int maxit ) {
 
   for( int i = 0; i < 6; ++ i ) {
@@ -47,19 +47,19 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for tumor cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 map<int, int> &region,
-                 double m,
-                 double mk_1,
-                 double a,
-                 double b,
+                 const map<int, int> &region,
+                 const double m,
+                 const double mk_1,
+                 const double a,
+                 const double b,
                  const double *ptr_intst,
-                 int curr_label,
-                 double lambda2,
+                 const int curr_label,
+                 const double lambda2,
                  const int *ptr_seg,
                  const int *ptr_nidx,
                  const double *ptr_nintst,
-                 double alphal,
-                 double betal,
+                 const double alphal,
+                 const double betal,
                  int maxit ) {
   for( int i = 0; i < 6; ++ i ) {
     theta[ i ] = 0;
@@ -69,7 +69,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tmp = 0;
   mu = - 1;
   set<int> set_region;
-  for( map<int, int>::iterator it = region.begin(); 
+  for( map<int, int>::const_iterator it = region.begin(); 
        it != region.end(); ++ it ) {
     set_region.insert( it->first );
   }
@@ -91,24 +91,24 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for outliers
 void updateParm( double &mu, double &sigma2, 
-                 map<int, int> &region,
-                 double m,
-                 double mk_1,
-                 double a,
-                 double b,
+                 const map<int, int> &region,
+                 const double m,
+                 const double mk_1,
+                 const double a,
+                 const double b,
                  const double *ptr_intst,
                  int curr_label,
-                 double lambda2,
+                 const double lambda2,
                  const int *ptr_seg,
                  const int *ptr_nidx,
-                 double alphal,
-                 double betal,
+                 const double alphal,
+                 const double betal,
                  int maxit ) {
   int i = 0;
   double tol = 1;
   double tmp = 0;
   mu = - 1;
-  map<int, int>::iterator it = region.begin();
+  map<int, int>::const_iterator it = region.begin();
   int idx = it->first;
   while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
     tmp = updateMu( region, sigma2, m, mk_1, a, b, ptr_intst );

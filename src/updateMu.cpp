@@ -15,15 +15,15 @@ using std::abs;
 
 // region starts from 1
 // update mu for healthy cells
-double updateMu( set<int> &region,  
-           double sigma2,
-           double m,
-           double nu2,
-           vector<double> theta,
-           const double *ptr_intst ) {
+double updateMu( const set<int> &region,  
+                 const double sigma2,
+                 const double m,
+                 const double nu2,
+                 const vector<double> theta,
+                 const double *ptr_intst ) {
   int n = region.size();
   double sum_theta = 0;
-  for( vector<double>::iterator it = theta.begin(); it != theta.end(); 
+  for( vector<double>::const_iterator it = theta.begin(); it != theta.end(); 
     ++ it ) {
     sum_theta += *it;
   }
@@ -43,22 +43,22 @@ double derivative( double mu, double sigma2, double sum_theta,
     ( a + 1 ) / ( mu - m ) + b / pow( mu - m, 2 );
 }
 // update mu for tumor cells
-double updateMu( map<int, int> &region,  
-                 double sigma2,
-                 double m,
-                 double mk_1,
-                 double a,
-                 double b,
-                 vector<double> theta,
+double updateMu( const map<int, int> &region,  
+                 const double sigma2,
+                 const double m,
+                 const double mk_1,
+                 const double a,
+                 const double b,
+                 const vector<double> theta,
                  const double *ptr_intst ) {
   int n = region.size();
   double sum_theta = 0;
-  for( vector<double>::iterator it = theta.begin(); it != theta.end(); 
+  for( vector<double>::const_iterator it = theta.begin(); it != theta.end(); 
   ++ it ) {
     sum_theta += *it;
   }
   double sum_y = 0;
-  for( map<int, int>::iterator it = region.begin(); it != region.end();
+  for( map<int, int>::const_iterator it = region.begin(); it != region.end();
   ++ it ) {
     sum_y += ptr_intst[ it->first - 1 ]; 
   }
@@ -101,17 +101,17 @@ double updateMu( map<int, int> &region,
 }
 
 // update mu for outliers
-double updateMu( map<int, int> &region,  
-                 double sigma2,
-                 double m,
-                 double mk_1,
-                 double a,
-                 double b,
+double updateMu( const map<int, int> &region,  
+                 const double sigma2,
+                 const double m,
+                 const double mk_1,
+                 const double a,
+                 const double b,
                  const double *ptr_intst ) {
   int n = region.size();
   double sum_theta = 0;
   double sum_y = 0;
-  for( map<int, int>::iterator it = region.begin(); it != region.end();
+  for( map<int, int>::const_iterator it = region.begin(); it != region.end();
   ++ it ) {
     sum_y += ptr_intst[ it->first - 1 ]; 
   }

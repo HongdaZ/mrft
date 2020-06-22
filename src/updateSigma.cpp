@@ -3,11 +3,11 @@
 
 #include "updateSigma.h"
 
-void updateSigma( int idx,
-                  double mu,
+void updateSigma( const int idx,
+                  const double mu,
                   const double *ptr_intst,
-                  double alphal,
-                  double betal,
+                  const double alphal,
+                  const double betal,
                   double &sigma2 ) {
   double intst = ptr_intst[ idx - 1 ];
   sigma2 = ( betal + pow( intst - mu, 2 ) / 2 ) / 
