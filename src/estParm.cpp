@@ -66,7 +66,7 @@ extern "C" {
     initRegion( ptr_seg, ptr_nidx, len,
                 tumor_regions, tumor_labels );
     
-    list< map<int, int>> regions;
+    // list< map<int, int>> regions;
     // // For testing scTrn
     // int flag = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
     //                   ptr_nidx, 1032015 );
@@ -231,6 +231,11 @@ extern "C" {
     //   Rprintf( "%f\t", theta[ i ] );
     // }
     // ///////////////////////////////////////////////////////////////////////
+    list< map<int, int>> regions; //sub-regions
+    int flag = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
+                      ptr_nidx, 1032015 );
+    
+    
     return seg;
   }
 } // extern "C"
