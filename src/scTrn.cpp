@@ -40,12 +40,14 @@ int scTrn( list< map<int, int>> &regions,
     } else if( current <= - 4 ) {
       // remember to reset seg[ 2, ] == 0
       ptr_label[ 2 * start - 1  ] = 1;
+
       while( !tumor_nbr.empty() ) {
         
         int new_start = *tumor_nbr.begin();
         tumor_nbr.erase( new_start );
         set<int> contaguous_region = findRegion( ptr_label, ptr_nidx, new_start );
         vector<int> included;
+        
         for( set<int>::iterator it = tumor_nbr.begin(); 
              it!= tumor_nbr.end(); ++ it ) {
           if( contaguous_region.count( *it ) ) {
@@ -61,7 +63,14 @@ int scTrn( list< map<int, int>> &regions,
         if( regions.empty() ) {
           region_label = current;
         } else {
-          region_label = ( *tumor_labels.begin() ) - regions.size();
+          int count = 0;
+          region_label = - 3;
+          while( count < regions.size() ) {
+            -- region_label;
+            if( tumor_labels.find( region_label ) == tumor_labels.end() ) {
+              ++ count;
+            }
+          } 
         }
         for( set<int>::iterator it = contaguous_region.begin();
              it != contaguous_region.end(); ++ it ) {

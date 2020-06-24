@@ -61,7 +61,22 @@ void cmpET( int idx, int sc,
     }
     // outlier parameters
     double out_mu = - 1, out_sigma2 = 1;
-    int out_label = *( -- outl_labels.end() ) + 1;
+    int out_label;
+    if( outl_labels.empty() ) {
+      out_label = 1;
+    } else if( *( -- outl_labels.end() ) == outl_labels.size() ){
+      out_label = outl_labels.size() + 1;
+    } else {
+      int i = 0;
+      set<int>::iterator it_set = outl_labels.begin();
+      for( ; it_set != outl_labels.end(); ++ it_set, ++ i ) {
+        if( ( i + 1 ) < *it_set ) {
+          out_label = i + 1;
+          break;
+        }
+      }
+    }
+    
     map<int, int> out_region;
     out_region[ idx ] = out_label;
     updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], ptr_m[ 2 ], 
@@ -90,6 +105,13 @@ void cmpET( int idx, int sc,
     for( ++ it_nrg; it_nrg != nrg.end(); ++ it_nrg ) {
       split_nrg += *it_nrg;
     }
-    //if()
+    // update parameters for whole region
+    if( combine_nrg < split_nrg && sc == 1 ) {
+      vector<double> label_whole_parm = region_parm.front();
+      int whole_label = label_whole_parm[ 0 ];
+      vector<double> whole_parm( ++ label_whole_parm.begin(),
+                                 label_whole_parm.end() );
+      tumor_parm[ whole_label ].swap( whole_parm );
+    }
   }
 }
