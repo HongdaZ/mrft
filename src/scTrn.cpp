@@ -70,7 +70,9 @@ int scTrn( list< map<int, int>> &regions,
             if( tumor_labels.find( region_label ) == tumor_labels.end() ) {
               ++ count;
             }
-          } 
+          }
+          // region_label = ( *tumor_labels.begin() ) - regions.size();
+          
         }
         for( set<int>::iterator it = contaguous_region.begin();
              it != contaguous_region.end(); ++ it ) {
@@ -80,7 +82,7 @@ int scTrn( list< map<int, int>> &regions,
         regions.push_back( sub_region );
       }
       // restore the value of seg[ 2, ] to 0;
-      ptr_label[ 2 * start - 1  ] = 1;
+      ptr_label[ 2 * start - 1  ] = 0;
       if( regions.size() < 2 ) {
         regions.clear();
         return 0;

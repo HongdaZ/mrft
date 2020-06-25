@@ -231,9 +231,21 @@ extern "C" {
     //   Rprintf( "%f\t", theta[ i ] );
     // }
     // ///////////////////////////////////////////////////////////////////////
-    list< map<int, int>> regions; //sub-regions
-    int flag = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
-                      ptr_nidx, 1032015 );
+    
+    // tumor_labels.erase( -42 );
+    // list< map<int, int>> regions; //sub-regions
+    // int flag = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
+    //                   ptr_nidx, 1032015 );
+    // Rprintf( "size = %d\n", regions.size() );
+    // for( list<map<int, int>>::iterator it = regions.begin();
+    //      it != regions.end(); ++ it ) {
+    //   map<int, int> region = *it;
+    //   for( map<int, int>::iterator it_map = region.begin(); 
+    //        it_map != region.end(); ++ it_map ) {
+    //     Rprintf( "%d = %d;", it_map->first, it_map->second );
+    //   }
+    //   Rprintf( "\n" );
+    // }
     
     
     return seg;
