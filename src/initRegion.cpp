@@ -11,8 +11,7 @@ using std::set;
 using std::list;
 
 void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
-                                map<int, set<int>> &tumor,
-                                set<int> &labels ) {
+                 map<int, set<int>> &tumor, set<int> &labels ) {
   
   set<int> region;
   int tumor_label = - 4;
