@@ -307,7 +307,7 @@ void cmpET( int idx, int sc,
       // not have tumor  
       } else {
         if( curr_label > 0 ) {
-          // Find new tumor region label;
+          // Find a new tumor region label;
           int new_label;
           int count = 0;
           new_label = - 3;
@@ -326,9 +326,10 @@ void cmpET( int idx, int sc,
           map<int, int> new_region;
           new_region[ idx ] = new_label;
           
-          updateParm( mu, theta, sigma2, new_region, ptr_m[ 3 ], ptr_m[ 2 ], ptr_a[ 0 ],
-                      ptr_b[ 0 ], ptr_intst, new_label, ptr_lambda2[ 3 ], ptr_seg,
-                      ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+          updateParm( mu, theta, sigma2, new_region, ptr_m[ 3 ], ptr_m[ 2 ], 
+                      ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, new_label, 
+                      ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst, 
+                      ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
           vector<double> new_parm;
           new_parm.push_back( mu );
           new_parm.push_back( sigma2 );
