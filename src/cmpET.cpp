@@ -2,6 +2,7 @@
 #include <Rinternals.h>
 
 #include "cmpET.h"
+#include "nbrLabel.h"
 
 // compare energy for training
 void cmpET( int idx, int sc,
@@ -11,7 +12,7 @@ void cmpET( int idx, int sc,
             map<int, vector<double>> &health_parm,
             map<int, vector<double>> &tumor_parm, 
             map<int, vector<double>> &outl_parm,
-            int *ptr_seg, const int *ptr_idx, const int *ptr_nidx,
+            int *ptr_seg, const int *ptr_nidx,
             const double *ptr_intst, const double *ptr_nintst,
             const double *ptr_delta, const double *ptr_gamma, 
             const double *ptr_alpha, const double *ptr_beta, 
@@ -59,24 +60,31 @@ void cmpET( int idx, int sc,
                                ptr_beta[ 3 ], ptr_a[ 0 ], ptr_b[ 0 ] );
       nrg.push_back( energy );
     }
-    // outlier parameters
-    double out_mu = - 1, out_sigma2 = 1;
+    // New outlier label
     int out_label;
-    if( outl_labels.empty() ) {
-      out_label = 1;
-    } else if( *( -- outl_labels.end() ) == outl_labels.size() ){
-      out_label = outl_labels.size() + 1;
-    } else {
-      int i = 0;
-      set<int>::iterator it_set = outl_labels.begin();
-      for( ; it_set != outl_labels.end(); ++ it_set, ++ i ) {
-        if( ( i + 1 ) < *it_set ) {
-          out_label = i + 1;
-          break;
+    
+    // current label is tumor
+    if( ptr_seg[ 2 * ( idx - 1 ) ] < 0 ) {
+      if( outl_labels.empty() ) {
+        out_label = 1;
+      } else if( *( -- outl_labels.end() ) == outl_labels.size() ){
+        out_label = outl_labels.size() + 1;
+      } else {
+        int i = 0;
+        set<int>::iterator it_set = outl_labels.begin();
+        for( ; it_set != outl_labels.end(); ++ it_set, ++ i ) {
+          if( ( i + 1 ) < *it_set ) {
+            out_label = i + 1;
+            break;
+          }
         }
       }
+    } else {
+      out_label = ptr_seg[ 2 * ( idx - 1 ) ];
     }
     
+    // outlier parameters
+    double out_mu = - 1, out_sigma2 = 1;
     map<int, int> out_region;
     out_region[ idx ] = out_label;
     updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], ptr_m[ 2 ], 
@@ -112,6 +120,230 @@ void cmpET( int idx, int sc,
       vector<double> whole_parm( ++ label_whole_parm.begin(),
                                  label_whole_parm.end() );
       tumor_parm[ whole_label ].swap( whole_parm );
+    // remove old whole region and add new splitted regions and new outlier
+    } else if ( combine_nrg > split_nrg && sc == 1 ) {
+      vector<double> label_whole_parm = region_parm.front();
+      int whole_label = label_whole_parm[ 0 ];
+      
+      tumor_labels.erase( whole_label );
+      tumor_regions.erase( whole_label );
+      tumor_parm.erase( whole_label );
+      
+      list<vector<double>>::iterator it = ++ region_parm.begin();
+      list<map<int, int >>::iterator it_region = ++ regions.begin();
+      for( ; it != region_parm.end(); ++ it, ++ it_region ) {
+        vector<double>::iterator it_parm = it->begin();
+        int new_label = *it_parm;
+        vector<double> new_parm( ++ it_parm, it->end() );
+        set<int> new_region;
+        for( map<int, int>::iterator it_map = it_region->begin();
+             it_map != it_region->end(); ++ it_map ) {
+          new_region.insert( it_map->first );
+        }
+        tumor_labels.insert( new_label );
+        tumor_regions[ new_label ] = new_region;
+        tumor_parm[ new_label ] = new_parm;
+      }
+      ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
+      outl_labels.insert( out_label );
+      vector<double> new_outl_parm( ++ outlier_parm.begin(),
+                                    outlier_parm.end() );
+      outl_parm[ out_label ] = new_outl_parm;
+      
+      // remove old subregions, parameters and labels,
+      // add new whole regions label,region and parameters,
+      // set seg to tumor,
+      // remove outlier from outl_labels
+      // remove outl_parm
+    } else if( combine_nrg < split_nrg && sc == 2 ) {
+      for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
+           it_list != region_parm.end(); ++ it_list ) {
+        int sub_label = it_list->front();
+        tumor_labels.erase( sub_label );
+        tumor_regions.erase( sub_label );
+        tumor_parm.erase( sub_label );
+      }
+      
+      vector<double> label_whole_parm = region_parm.front();
+      int whole_label = label_whole_parm[ 0 ];
+      set<int> whole_region;
+      for( map<int, int>::iterator it_map = regions.begin()->begin();
+           it_map != regions.begin()->end(); ++ it_map ) {
+        whole_region.insert( it_map->first );
+      }
+      tumor_labels.insert( whole_label );
+      tumor_regions[ whole_label ] = whole_region;
+      vector<double> new_whole_parm( ++ region_parm.begin()->begin(),
+                                     region_parm.begin()->end() );
+      tumor_parm[ whole_label ] = new_whole_parm;
+      
+      ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
+      outl_labels.erase( out_label );
+      outl_parm.erase( out_label );
+    // update parameters for subregions
+    } else if( combine_nrg > split_nrg && sc == 2 ) {
+      for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
+           it_list != region_parm.end(); ++ it_list ) {
+        int sub_label = it_list->front();
+        vector<double> new_parm( ++ it_list->begin(), it_list->end() );
+        tumor_parm[ sub_label ] = new_parm;
+      }
+    }
+  // no split or combine
+  } else {
+    int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
+    if( curr_label > - 4 && curr_label < 1 ) {
+      double energy;
+      double min_energy;
+      int min_label;
+      vector<double> parm;
+      double mu;
+      double sigma2;
+      vector<double> theta;
+      for( int i = - 1; i > - 4; -- i ) {
+        theta.empty();
+        parm = health_parm[ i ]; 
+        mu = parm[ 0 ];
+        sigma2 = parm[ 1 ];
+        theta.insert( theta.begin(), parm.begin() + 2, parm.end() );
+        energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
+                              ptr_intst, ptr_nintst, theta );
+        energy += energyX( i, idx, false, ptr_seg, ptr_nidx, ptr_delta[ 0 ],
+                           ptr_gamma[ 0 ] );
+        if( i == - 1 ) {
+          min_energy = energy;
+          min_label = i;
+        } else {
+          if( energy < min_energy ) {
+            min_energy = energy;
+            min_label = i;
+          }
+        } 
+      }
+      ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+    // tumor or outlier
+    } else {
+      vector<int> nbr_label = nbrLabel( idx, ptr_seg, ptr_nidx );
+      bool have_tumor = false;
+      int t_label = 0;
+      for( int i = 0; i < 6; ++ i ) {
+        if( nbr_label[ i ] != NA_INTEGER && nbr_label[ i ] < - 3 ) {
+          have_tumor = true;
+          t_label = nbr_label[ i ];
+        }
+      }
+      if( have_tumor ) {
+        // tumor energy
+        vector<double> t_parm = tumor_parm[ t_label ];
+        double t_mu = t_parm[ 0 ];
+        double t_sigma2 = t_parm[ 1 ];
+        vector<double> t_theta( t_parm.begin() + 2, t_parm.end() );
+        double energy_t = energyY( t_label, idx, t_mu, ptr_m[ 2 ], t_sigma2, 
+                                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx,
+                                   ptr_intst, ptr_nintst, t_theta, 
+                                   ptr_alpha[ 3 ], ptr_beta[ 3 ], ptr_a[ 0 ],
+                                   ptr_b[ 0 ] );
+        energy_t += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
+                             ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+        // Outlier energy
+        // New outlier label
+        int out_label;
+        
+        // current label is tumor
+        if( ptr_seg[ 2 * ( idx - 1 ) ] < 0 ) {
+          if( outl_labels.empty() ) {
+            out_label = 1;
+          } else if( *( -- outl_labels.end() ) == outl_labels.size() ){
+            out_label = outl_labels.size() + 1;
+          } else {
+            int i = 0;
+            set<int>::iterator it_set = outl_labels.begin();
+            for( ; it_set != outl_labels.end(); ++ it_set, ++ i ) {
+              if( ( i + 1 ) < *it_set ) {
+                out_label = i + 1;
+                break;
+              }
+            }
+          }
+        } else {
+          out_label = ptr_seg[ 2 * ( idx - 1 ) ];
+        }
+        
+        // outlier parameters
+        double out_mu = - 1, out_sigma2 = 1;
+        map<int, int> out_region;
+        out_region[ idx ] = out_label;
+        updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], ptr_m[ 2 ], 
+                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, out_label,
+                    ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_alpha[ 3 ],
+                    ptr_beta[ 3 ], 20 );
+        
+        double out_energy = energyX( out_label, idx, true, ptr_seg, ptr_nidx,
+                                     ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+        vector<double> out_theta;
+        for( int i = 0; i < 6; ++ i ) {
+          out_theta.push_back( 0 );
+        }
+        
+        out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], out_sigma2,
+                               ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_intst,
+                               ptr_nintst, out_theta, ptr_alpha[ 3 ], 
+                               ptr_beta[ 3 ], ptr_a[ 0 ], ptr_b[ 0 ] );
+        vector<double> new_out_parm;
+        new_out_parm.push_back( out_mu );
+        new_out_parm.push_back( out_sigma2 );
+        if( curr_label > 0 && energy_t < out_energy ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = t_label;
+          tumor_regions[ t_label ].insert( idx );
+          outl_labels.erase( curr_label );
+          outl_parm.erase( curr_label );
+        } else if( curr_label < - 3 && energy_t > out_energy ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
+          tumor_regions[ t_label ].erase( idx );
+          outl_labels.insert( out_label );
+          
+          outl_parm[ out_label ] = new_out_parm;
+        }
+      // not have tumor  
+      } else {
+        if( curr_label > 0 ) {
+          // Find new tumor region label;
+          int new_label;
+          int count = 0;
+          new_label = - 3;
+          while( count < 1 ) {
+            -- new_label;
+            if( tumor_labels.find( new_label ) == tumor_labels.end() ) {
+              ++ count;
+            }
+          }
+          // new tumor region parameters
+          double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
+          vector<double> theta;
+          for( int i = 0; i < 6; ++ i ) {
+            theta.push_back( 0 );
+          }
+          map<int, int> new_region;
+          new_region[ idx ] = new_label;
+          
+          updateParm( mu, theta, sigma2, new_region, ptr_m[ 3 ], ptr_m[ 2 ], ptr_a[ 0 ],
+                      ptr_b[ 0 ], ptr_intst, new_label, ptr_lambda2[ 3 ], ptr_seg,
+                      ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+          vector<double> new_parm;
+          new_parm.push_back( mu );
+          new_parm.push_back( sigma2 );
+          
+          new_parm.insert( new_parm.end(), theta.begin(), theta.end() );
+          tumor_parm[ new_label ] = new_parm;
+
+          ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
+          tumor_regions[ new_label ].insert( idx ); 
+          
+          
+          outl_labels.erase( curr_label );
+          outl_parm.erase( curr_label );
+        }
+      }
     }
   }
 }
