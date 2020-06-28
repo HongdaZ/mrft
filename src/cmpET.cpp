@@ -4,6 +4,7 @@
 #include "cmpET.h"
 #include "nbrLabel.h"
 #include "findOutLabel.h"
+#include "newTumorLabel.h"
 
 // compare energy for training
 void cmpET( int idx, int sc,
@@ -269,15 +270,7 @@ void cmpET( int idx, int sc,
       } else {
         if( curr_label > 0 ) {
           // Find a new tumor region label;
-          int new_label;
-          int count = 0;
-          new_label = - 3;
-          while( count < 1 ) {
-            -- new_label;
-            if( tumor_labels.find( new_label ) == tumor_labels.end() ) {
-              ++ count;
-            }
-          }
+          int new_label = newTumorLabel( 1, tumor_labels );
           // new tumor region parameters
           double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
           vector<double> theta;

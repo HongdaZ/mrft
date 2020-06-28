@@ -6,6 +6,7 @@
 
 #include "scTrn.h"
 #include "findRegion.h"
+#include "newTumorLabel.h"
 
 using std::set;
 using std::vector;
@@ -63,14 +64,7 @@ int scTrn( list< map<int, int>> &regions,
         if( regions.empty() ) {
           region_label = current;
         } else {
-          int count = 0;
-          region_label = - 3;
-          while( count < regions.size() ) {
-            -- region_label;
-            if( tumor_labels.find( region_label ) == tumor_labels.end() ) {
-              ++ count;
-            }
-          }
+          region_label = newTumorLabel( regions.size(), tumor_labels );
           // region_label = ( *tumor_labels.begin() ) - regions.size();
           
         }
