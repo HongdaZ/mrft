@@ -101,7 +101,7 @@ void cmpET( int idx, int sc,
       int whole_label = label_whole_parm[ 0 ];
       vector<double> whole_parm( ++ label_whole_parm.begin(),
                                  label_whole_parm.end() );
-      tumor_parm[ whole_label ].swap( whole_parm );
+      tumor_parm[ whole_label ] = whole_parm;
     // remove old whole region and add new splitted regions and new outlier
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
       vector<double> label_whole_parm = region_parm.front();
