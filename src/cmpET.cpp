@@ -100,19 +100,16 @@ void cmpET( int idx, int sc,
     for( ++ it_nrg; it_nrg != nrg.end(); ++ it_nrg ) {
       split_nrg += *it_nrg;
     }
+    vector<double> label_whole_parm = region_parm.front();
+    int whole_label = label_whole_parm[ 0 ];
     // update parameters for whole region
-    if( combine_nrg < split_nrg && sc == 1 ) {
-      vector<double> label_whole_parm = region_parm.front();
-      int whole_label = label_whole_parm[ 0 ];
+    if( combine_nrg <= split_nrg && sc == 1 ) {
       vector<double> whole_parm( ++ label_whole_parm.begin(),
                                  label_whole_parm.end() );
       tumor_parm[ whole_label ] = whole_parm;
     // remove old whole region and add new splitted regions and new outlier
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
-      vector<double> label_whole_parm = region_parm.front();
-      int whole_label = label_whole_parm[ 0 ];
       eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm );
-      
       list<vector<double>> new_region_parm( ++ region_parm.begin() ,
                                             region_parm.end() );
       list<map<int, int >> new_regions( ++ regions.begin(), 
@@ -140,17 +137,15 @@ void cmpET( int idx, int sc,
       
       list<vector<double>> new_whole_parm;
       list<map<int,int>> new_whole_region;
-      new_whole_parm.push_back( region_parm.front() );
-      
+      new_whole_parm.push_back( label_whole_parm );
       new_whole_region.push_back( regions.front() );
       addRegion( new_whole_parm, new_whole_region, tumor_labels, 
                  tumor_regions, tumor_parm );
-      int whole_label = region_parm.front().front();
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       eraseOutl( out_label, outl_labels, outl_parm );
       
     // update parameters for subregions
-    } else if( combine_nrg > split_nrg && sc == 2 ) {
+    } else if( combine_nrg >= split_nrg && sc == 2 ) {
       for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
            it_list != region_parm.end(); ++ it_list ) {
         int sub_label = it_list->front();

@@ -253,8 +253,8 @@ extern "C" {
                       ptr_nidx, curr_idx );
     cmpET( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels, 
            health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst, 
-           ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta, ptr_lambda2,
-           ptr_a, ptr_b, ptr_m, ptr_nu2 );
+           ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta, 
+           ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
     
     return seg;
   }
