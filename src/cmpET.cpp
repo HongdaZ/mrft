@@ -202,29 +202,39 @@ void cmpET( int idx, int sc,
         double t_mu = t_parm[ 0 ];
         double t_sigma2 = t_parm[ 1 ];
         vector<double> t_theta( t_parm.begin() + 2, t_parm.end() );
-        double energy_t = energyY( t_label, idx, t_mu, ptr_m[ 2 ], 
+        double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ], 
                                    t_sigma2, ptr_lambda2[ 3 ], ptr_seg, 
                                    ptr_nidx, ptr_intst, ptr_nintst, 
                                    t_theta, ptr_alpha[ 3 ], ptr_beta[ 3 ], 
                                    ptr_a[ 0 ], ptr_b[ 0 ] );
-        energy_t += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
+        t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
                              ptr_delta[ 0 ], ptr_gamma[ 0 ] );
         // Outlier energy
         // New outlier label
         int out_label = findOutLabel( idx, ptr_seg, outl_labels );
         
+        
+        double out_energy = energyX( out_label, idx, false, ptr_seg, 
+                                     ptr_nidx, ptr_delta[ 0 ], 
+                                     ptr_gamma[ 0 ] );
         // outlier parameters
         double out_mu = - 1, out_sigma2 = 1;
         map<int, int> out_region;
         out_region[ idx ] = out_label;
-        updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], ptr_m[ 2 ], 
-                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, out_label,
-                    ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_alpha[ 3 ],
-                    ptr_beta[ 3 ], 20 );
-        
-        double out_energy = energyX( out_label, idx, true, ptr_seg, 
-                                     ptr_nidx, ptr_delta[ 0 ], 
-                                     ptr_gamma[ 0 ] );
+        vector<double> new_out_parm;
+        if( curr_label > 0 ) {
+          new_out_parm = outl_parm[ curr_label ];
+          out_mu = new_out_parm[ 0 ];
+          out_sigma2 = new_out_parm[ 1 ];
+        } else {
+          updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], 
+                      ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, 
+                      out_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
+                      ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+          new_out_parm.push_back( out_mu );
+          new_out_parm.push_back( out_sigma2 );
+        }
+
         vector<double> out_theta;
         for( int i = 0; i < 6; ++ i ) {
           out_theta.push_back( 0 );
@@ -235,17 +245,13 @@ void cmpET( int idx, int sc,
                                ptr_nidx, ptr_intst, ptr_nintst, out_theta, 
                                ptr_alpha[ 3 ],ptr_beta[ 3 ], ptr_a[ 0 ],
                                ptr_b[ 0 ] );
-        vector<double> new_out_parm;
-        new_out_parm.push_back( out_mu );
-        new_out_parm.push_back( out_sigma2 );
-        if( curr_label > 0 && energy_t < out_energy ) {
+        if( curr_label > 0 && t_energy <= out_energy ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = t_label;
           tumor_regions[ t_label ].insert( idx );
           eraseOutl( curr_label, outl_labels, outl_parm );
-        } else if( curr_label < - 3 && energy_t > out_energy ) {
+        } else if( curr_label < - 3 && t_energy >= out_energy ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
           tumor_regions[ t_label ].erase( idx );
-          
           addOutl( out_label, new_out_parm, outl_labels, outl_parm );
         }
         // not have tumor  
@@ -260,7 +266,9 @@ void cmpET( int idx, int sc,
             theta.push_back( 0 );
           }
           map<int, int> new_region;
+          list<map<int, int>> new_regions;
           new_region[ idx ] = new_label;
+          new_regions.push_back( new_region );
           
           updateParm( mu, theta, sigma2, new_region, ptr_m[ 3 ], 
                       ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], 
@@ -268,15 +276,16 @@ void cmpET( int idx, int sc,
                       ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], 
                       ptr_beta[ 3 ], 20 );
           vector<double> new_parm;
+          list<vector<double>> new_region_parm;
+          new_parm.push_back( new_label );
           new_parm.push_back( mu );
           new_parm.push_back( sigma2 );
-          
           new_parm.insert( new_parm.end(), theta.begin(), theta.end() );
-          tumor_parm[ new_label ] = new_parm;
+          new_region_parm.push_back( new_parm );
           
+          addRegion( new_region_parm, new_regions, tumor_labels, tumor_regions,
+                     tumor_parm );
           ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
-          tumor_regions[ new_label ].insert( idx ); 
-          
           eraseOutl( curr_label, outl_labels, outl_parm );
         }
       }
