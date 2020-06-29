@@ -7,6 +7,8 @@
 #include "newTumorLabel.h"
 #include "eraseRegion.h"
 #include "eraseOutl.h"
+#include "addRegion.h"
+#include "addOutl.h"
 
 // compare energy for training
 void cmpET( int idx, int sc,
@@ -110,26 +112,18 @@ void cmpET( int idx, int sc,
       int whole_label = label_whole_parm[ 0 ];
       eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm );
       
-      list<vector<double>>::iterator it = ++ region_parm.begin();
-      list<map<int, int >>::iterator it_region = ++ regions.begin();
-      for( ; it != region_parm.end(); ++ it, ++ it_region ) {
-        vector<double>::iterator it_parm = it->begin();
-        int new_label = *it_parm;
-        vector<double> new_parm( ++ it_parm, it->end() );
-        set<int> new_region;
-        for( map<int, int>::iterator it_map = it_region->begin();
-             it_map != it_region->end(); ++ it_map ) {
-          new_region.insert( it_map->first );
-        }
-        tumor_labels.insert( new_label );
-        tumor_regions[ new_label ] = new_region;
-        tumor_parm[ new_label ] = new_parm;
-      }
+      list<vector<double>> new_region_parm( ++ region_parm.begin() ,
+                                            region_parm.end() );
+      list<map<int, int >> new_regions( ++ regions.begin(), 
+                                        regions.end() );
+      addRegion( new_region_parm, new_regions, tumor_labels, tumor_regions, 
+                 tumor_parm );
+      
       ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
-      outl_labels.insert( out_label );
-      vector<double> new_outl_parm( ++ outlier_parm.begin(),
+      
+      vector<double> new_out_parm( ++ outlier_parm.begin(),
                                     outlier_parm.end() );
-      outl_parm[ out_label ] = new_outl_parm;
+      addOutl( out_label, new_out_parm, outl_labels, outl_parm );
       
       // remove old subregions, parameters and labels,
       // add new whole regions label,region and parameters,
@@ -143,19 +137,14 @@ void cmpET( int idx, int sc,
         eraseRegion( sub_label, tumor_labels, tumor_regions, tumor_parm );
       }
       
-      vector<double> label_whole_parm = region_parm.front();
-      int whole_label = label_whole_parm[ 0 ];
-      set<int> whole_region;
-      for( map<int, int>::iterator it_map = regions.begin()->begin();
-           it_map != regions.begin()->end(); ++ it_map ) {
-        whole_region.insert( it_map->first );
-      }
-      tumor_labels.insert( whole_label );
-      tumor_regions[ whole_label ] = whole_region;
-      vector<double> new_whole_parm( ++ region_parm.begin()->begin(),
-                                     region_parm.begin()->end() );
-      tumor_parm[ whole_label ] = new_whole_parm;
+      list<vector<double>> new_whole_parm;
+      list<map<int,int>> new_whole_region;
+      new_whole_parm.push_back( region_parm.front() );
       
+      new_whole_region.push_back( regions.front() );
+      addRegion( new_whole_parm, new_whole_region, tumor_labels, tumor_regions, 
+                 tumor_parm );
+      int whole_label = region_parm.front().front();
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       eraseOutl( out_label, outl_labels, outl_parm );
 
@@ -258,9 +247,8 @@ void cmpET( int idx, int sc,
         } else if( curr_label < - 3 && energy_t > out_energy ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
           tumor_regions[ t_label ].erase( idx );
-          outl_labels.insert( out_label );
           
-          outl_parm[ out_label ] = new_out_parm;
+          addOutl( out_label, new_out_parm, outl_labels, outl_parm );
         }
       // not have tumor  
       } else {

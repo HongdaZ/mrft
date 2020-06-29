@@ -9,7 +9,7 @@ using std::set;
 using std::map;
 using std::vector;
 
-// find an outlier label for current voxel
+// erase single tumor region
 void eraseRegion( const int tumor_label, 
                  set<int> &tumor_labels,
                  map<int, set<int>> &tumor_regions, 
