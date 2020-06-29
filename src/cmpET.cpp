@@ -5,6 +5,8 @@
 #include "nbrLabel.h"
 #include "findOutLabel.h"
 #include "newTumorLabel.h"
+#include "eraseRegion.h"
+#include "eraseOutl.h"
 
 // compare energy for training
 void cmpET( int idx, int sc,
@@ -106,10 +108,7 @@ void cmpET( int idx, int sc,
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
       vector<double> label_whole_parm = region_parm.front();
       int whole_label = label_whole_parm[ 0 ];
-      
-      tumor_labels.erase( whole_label );
-      tumor_regions.erase( whole_label );
-      tumor_parm.erase( whole_label );
+      eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm );
       
       list<vector<double>>::iterator it = ++ region_parm.begin();
       list<map<int, int >>::iterator it_region = ++ regions.begin();
@@ -141,9 +140,7 @@ void cmpET( int idx, int sc,
       for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
            it_list != region_parm.end(); ++ it_list ) {
         int sub_label = it_list->front();
-        tumor_labels.erase( sub_label );
-        tumor_regions.erase( sub_label );
-        tumor_parm.erase( sub_label );
+        eraseRegion( sub_label, tumor_labels, tumor_regions, tumor_parm );
       }
       
       vector<double> label_whole_parm = region_parm.front();
@@ -160,8 +157,8 @@ void cmpET( int idx, int sc,
       tumor_parm[ whole_label ] = new_whole_parm;
       
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
-      outl_labels.erase( out_label );
-      outl_parm.erase( out_label );
+      eraseOutl( out_label, outl_labels, outl_parm );
+
     // update parameters for subregions
     } else if( combine_nrg > split_nrg && sc == 2 ) {
       for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
@@ -257,8 +254,7 @@ void cmpET( int idx, int sc,
         if( curr_label > 0 && energy_t < out_energy ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = t_label;
           tumor_regions[ t_label ].insert( idx );
-          outl_labels.erase( curr_label );
-          outl_parm.erase( curr_label );
+          eraseOutl( curr_label, outl_labels, outl_parm );
         } else if( curr_label < - 3 && energy_t > out_energy ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
           tumor_regions[ t_label ].erase( idx );
@@ -294,9 +290,7 @@ void cmpET( int idx, int sc,
           ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
           tumor_regions[ new_label ].insert( idx ); 
           
-          
-          outl_labels.erase( curr_label );
-          outl_parm.erase( curr_label );
+          eraseOutl( curr_label, outl_labels, outl_parm );
         }
       }
     }
