@@ -123,7 +123,7 @@ void cmpET( int idx, int sc,
       ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
       
       vector<double> new_out_parm( ++ outlier_parm.begin(),
-                                    outlier_parm.end() );
+                                   outlier_parm.end() );
       addOutl( out_label, new_out_parm, outl_labels, outl_parm );
       
       // remove old subregions, parameters and labels,
@@ -148,18 +148,17 @@ void cmpET( int idx, int sc,
       int whole_label = region_parm.front().front();
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       eraseOutl( out_label, outl_labels, outl_parm );
-
+      
     // update parameters for subregions
     } else if( combine_nrg > split_nrg && sc == 2 ) {
-      for( list<vector<double>>::iterator it_list =  
-           ++ region_parm.begin();
+      for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
            it_list != region_parm.end(); ++ it_list ) {
         int sub_label = it_list->front();
         vector<double> new_parm( ++ it_list->begin(), it_list->end() );
         tumor_parm[ sub_label ] = new_parm;
       }
     }
-  // no split or combine
+    // no split or combine
   } else {
     int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
     if( curr_label > - 4 && curr_label < 1 ) {
@@ -177,7 +176,7 @@ void cmpET( int idx, int sc,
         sigma2 = parm[ 1 ];
         theta.insert( theta.begin(), parm.begin() + 2, parm.end() );
         energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
-                              ptr_intst, ptr_nintst, theta );
+                          ptr_intst, ptr_nintst, theta );
         energy += energyX( i, idx, false, ptr_seg, ptr_nidx, 
                            ptr_delta[ 0 ], ptr_gamma[ 0 ] );
         if( i == - 1 ) {
@@ -191,7 +190,7 @@ void cmpET( int idx, int sc,
         } 
       }
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-    // tumor or outlier
+      // tumor or outlier
     } else {
       vector<int> nbr_label = nbrLabel( idx, ptr_seg, ptr_nidx );
       bool have_tumor = false;
@@ -254,7 +253,7 @@ void cmpET( int idx, int sc,
           
           addOutl( out_label, new_out_parm, outl_labels, outl_parm );
         }
-      // not have tumor  
+        // not have tumor  
       } else {
         if( curr_label > 0 ) {
           // Find a new tumor region label;
@@ -279,7 +278,7 @@ void cmpET( int idx, int sc,
           
           new_parm.insert( new_parm.end(), theta.begin(), theta.end() );
           tumor_parm[ new_label ] = new_parm;
-
+          
           ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
           tumor_regions[ new_label ].insert( idx ); 
           
