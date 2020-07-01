@@ -67,7 +67,7 @@ void initParm( map<int, vector<double>> &health_parm,
     h_parm.push_back( sigma2 );
     
     h_parm.insert( h_parm.end(), theta.begin(), theta.end() );
-    tumor_parm[ curr_label ] = h_parm;
+    health_parm[ curr_label ] = h_parm;
   }
   return;
 }
