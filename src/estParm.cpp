@@ -191,9 +191,9 @@ extern "C" {
     initParm( health_parm, tumor_parm, ptr_seg, ptr_m, ptr_nu2, ptr_intst,
               ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
               tumor_regions, ptr_a, ptr_b, len, 20 );
-    // for( map<int, vector<double>>::iterator it = health_parm.begin(); 
+    // for( map<int, vector<double>>::iterator it = health_parm.begin();
     //      it!= health_parm.end(); ++ it) {
-    //   Rprintf( "label = %d", it->first );
+    //   Rprintf( "label = %d:", it->first );
     //   for( int i = 0; i < 8; ++ i ) {
     //     Rprintf( "\t%f", it->second[ i ] );
     //   }
@@ -248,12 +248,13 @@ extern "C" {
     //   Rprintf( "\n" );
     // }
     list< map<int, int>> regions;
-    int curr_idx = 1032015;
+    // int curr_idx = 1032015;
+    int curr_idx = 1032012;
     int sc = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
                       ptr_nidx, curr_idx );
-    cmpET( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels, 
-           health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst, 
-           ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta, 
+    cmpET( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels,
+           health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
+           ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
            ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
     
     return seg;
