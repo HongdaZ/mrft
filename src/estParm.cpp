@@ -20,6 +20,8 @@
 #include "updateParm.h"
 #include "initParm.h"
 #include "cmpET.h"
+#include "scPred.h"
+
 
 using std::stack;
 using std::queue;
@@ -248,7 +250,7 @@ extern "C" {
     //   Rprintf( "\n" );
     // }
     list< map<int, int>> regions;
-    // int curr_idx = 1032015;
+    // int curr_idx = 1032015;1032015
     int curr_idx = 1032012;
     int sc = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
                       ptr_nidx, curr_idx );
@@ -256,7 +258,19 @@ extern "C" {
            health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
            ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
            ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
-    
+    // debug scPred
+    curr_idx = 1032015;
+    sc = scPred( regions, tumor_labels, tumor_regions, ptr_seg,
+                 ptr_nidx, curr_idx );
+    Rprintf( "sc = %d\n", sc );
+    for( list<map<int, int>>::iterator it_list = regions.begin();
+         it_list != regions.end(); ++ it_list ) {
+      Rprintf( "\n" );
+      for( map<int, int>::iterator it_map = it_list->begin();
+           it_map != it_list->end(); ++ it_map ) {
+        Rprintf( "idx = %d; label = %d; ", it_map->first, it_map->second );
+      }
+    }
     return seg;
   }
 } // extern "C"
