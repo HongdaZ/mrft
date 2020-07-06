@@ -10,7 +10,7 @@
 #include "addRegion.h"
 #include "addOutl.h"
 
-// compare energy for training
+// compare energy for prediction
 void cmpEP( int idx, int sc,
             list<map<int, int >> &regions,
             map<int, set<int>> &tumor_regions, 
