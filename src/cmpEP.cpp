@@ -193,137 +193,209 @@ void cmpEP( int idx, int sc,
     }
     // no split or combine
   } else {
-    
-    if( curr_label > - 4 && curr_label < 1 ) {
-      double energy;
-      double min_energy;
-      int min_label;
-      vector<double> parm;
-      double mu;
-      double sigma2;
-      vector<double> theta;
-      for( int i = - 1; i > - 4; -- i ) {
-        theta.empty();
-        parm = health_parm[ i ]; 
-        mu = parm[ 0 ];
-        sigma2 = parm[ 1 ];
-        theta.insert( theta.begin(), parm.begin() + 2, parm.end() );
-        energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
-                          ptr_intst, ptr_nintst, theta );
-        energy += energyX( i, idx, false, ptr_seg, ptr_nidx, 
+    // check if having tumor neighbor
+    vector<int> nbr_label = nbrLabel( idx, ptr_seg, ptr_nidx );
+    bool have_tumor = false;
+    int t_label = 0;
+    for( int i = 0; i < 6; ++ i ) {
+      if( nbr_label[ i ] != NA_INTEGER && nbr_label[ i ] < - 3 ) {
+        have_tumor = true;
+        t_label = nbr_label[ i ];
+      }
+    }
+    // have tumor neighbor
+    if( have_tumor ) {
+      // tumor energy
+      vector<double> t_parm = tumor_parm[ t_label ];
+      double t_mu = t_parm[ 0 ];
+      double t_sigma2 = t_parm[ 1 ];
+      vector<double> t_theta( t_parm.begin() + 2, t_parm.end() );
+      double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
+                                 t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
+                                 ptr_nidx, ptr_intst, ptr_nintst,
+                                 t_theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
+                                 ptr_a[ 0 ], ptr_b[ 0 ] );
+      t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
                            ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-        if( i == - 1 ) {
-          min_energy = energy;
+      double min_energy = t_energy;
+      int min_label = t_label;
+      
+      // healthy cell
+      double h_energy;
+      vector<double> h_parm;
+      double h_mu;
+      double h_sigma2;
+      vector<double> h_theta;
+      for( int i = - 1; i > - 4; -- i ) {
+        h_theta.empty();
+        h_parm = health_parm[ i ];
+        h_mu = h_parm[ 0 ];
+        h_sigma2 = h_parm[ 1 ];
+        h_theta.insert( h_theta.begin(), h_parm.begin() + 2, h_parm.end() );
+        h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,
+                          ptr_intst, ptr_nintst, h_theta );
+        h_energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
+                           ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+        if( h_energy < min_energy ) {
+          min_energy = h_energy;
           min_label = i;
-        } else {
-          if( energy < min_energy ) {
-            min_energy = energy;
-            min_label = i;
-          }
-        } 
+        }
       }
-      ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-      // tumor or outlier
-    } else {
-      vector<int> nbr_label = nbrLabel( idx, ptr_seg, ptr_nidx );
-      bool have_tumor = false;
-      int t_label = 0;
+      // outlier energy
+      // outlier label
+      int out_label = findOutLabel( idx, ptr_seg, outl_labels );
+      
+      
+      double out_energy = energyX( out_label, idx, false, ptr_seg,
+                                   ptr_nidx, ptr_delta[ 0 ],
+                                   ptr_gamma[ 0 ] );
+      // outlier parameters
+      double out_mu = - 1, out_sigma2 = 1;
+      map<int, int> out_region;
+      out_region[ idx ] = out_label;
+      vector<double> new_out_parm;
+      if( curr_label > 0 ) {
+        new_out_parm = outl_parm[ curr_label ];
+        out_mu = new_out_parm[ 0 ];
+        out_sigma2 = new_out_parm[ 1 ];
+      } else {
+        updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ],
+                    ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
+                    out_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx,
+                    ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+        new_out_parm.push_back( out_mu );
+        new_out_parm.push_back( out_sigma2 );
+      }
+      
+      vector<double> out_theta;
       for( int i = 0; i < 6; ++ i ) {
-        if( nbr_label[ i ] != NA_INTEGER && nbr_label[ i ] < - 3 ) {
-          have_tumor = true;
-          t_label = nbr_label[ i ];
-        }
+        out_theta.push_back( 0 );
       }
-      if( have_tumor ) {
-        // tumor energy
-        vector<double> t_parm = tumor_parm[ t_label ];
-        double t_mu = t_parm[ 0 ];
-        double t_sigma2 = t_parm[ 1 ];
-        vector<double> t_theta( t_parm.begin() + 2, t_parm.end() );
-        double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ], 
-                                   t_sigma2, ptr_lambda2[ 3 ], ptr_seg, 
-                                   ptr_nidx, ptr_intst, ptr_nintst, 
-                                   t_theta, ptr_alpha[ 3 ], ptr_beta[ 3 ], 
-                                   ptr_a[ 0 ], ptr_b[ 0 ] );
-        t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
-                             ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-        // Outlier energy
-        // New outlier label
-        int out_label = findOutLabel( idx, ptr_seg, outl_labels );
-        
-        
-        double out_energy = energyX( out_label, idx, false, ptr_seg, 
-                                     ptr_nidx, ptr_delta[ 0 ], 
-                                                        ptr_gamma[ 0 ] );
-        // outlier parameters
-        double out_mu = - 1, out_sigma2 = 1;
-        map<int, int> out_region;
-        out_region[ idx ] = out_label;
-        vector<double> new_out_parm;
-        if( curr_label > 0 ) {
-          new_out_parm = outl_parm[ curr_label ];
-          out_mu = new_out_parm[ 0 ];
-          out_sigma2 = new_out_parm[ 1 ];
-        } else {
-          updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], 
-                      ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, 
-                      out_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
-                      ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
-          new_out_parm.push_back( out_mu );
-          new_out_parm.push_back( out_sigma2 );
-        }
-        
-        vector<double> out_theta;
-        for( int i = 0; i < 6; ++ i ) {
-          out_theta.push_back( 0 );
-        }
-        
-        out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], 
-                               out_sigma2, ptr_lambda2[ 3 ], ptr_seg, 
-                               ptr_nidx, ptr_intst, ptr_nintst, out_theta, 
-                               ptr_alpha[ 3 ],ptr_beta[ 3 ], ptr_a[ 0 ],
-                               ptr_b[ 0 ] );
-        if( curr_label > 0 && t_energy <= out_energy ) {
-          ptr_seg[ 2 * ( idx - 1 ) ] = t_label;
+      
+      out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ],
+                             out_sigma2, ptr_lambda2[ 3 ], ptr_seg,
+                             ptr_nidx, ptr_intst, ptr_nintst, out_theta,
+                             ptr_alpha[ 3 ],ptr_beta[ 3 ], ptr_a[ 0 ],
+                             ptr_b[ 0 ] );
+      
+      if( out_energy < min_energy ) {
+        min_label = out_label;
+      }
+      if( min_label <= - 4 ) {
+        if( curr_label >= - 3 && curr_label <= 0 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           tumor_regions[ t_label ].insert( idx );
-          eraseOutl( curr_label, outl_labels, outl_parm );
-        } else if( curr_label < - 3 && t_energy >= out_energy ) {
-          ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
+        } else if( curr_label >= 1 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+          eraseOutl( out_label, outl_labels, outl_parm );
+          tumor_regions[ t_label ].insert( idx );
+        }
+      } else if( min_label >= - 3 && min_label <= -1 ) {
+        if( curr_label == 0 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+        } else if( curr_label <= - 4 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+          tumor_regions[ t_label ].erase( idx );
+        } else if( curr_label >= 1 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+          eraseOutl( out_label, outl_labels, outl_parm );
+        }
+      } else if( min_label >= 1 ) {
+        if( curr_label  <= - 4 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           tumor_regions[ t_label ].erase( idx );
           addOutl( out_label, new_out_parm, outl_labels, outl_parm );
+        } else if( curr_label >= - 3 && curr_label <= 0 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+          addOutl( out_label, new_out_parm, outl_labels, outl_parm );
         }
-        // not have tumor  
+      }
+      
+    // doesn't have tumor neighbor
+    } else {
+      // tumor energy
+      
+      if( curr_label <= - 4 ) {
+        t_label = curr_label;
       } else {
-        if( curr_label > 0 ) {
-          // Find a new tumor region label;
-          int new_label = newTumorLabel( 1, tumor_labels );
-          // new tumor region parameters
-          double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
-          vector<double> theta;
-          for( int i = 0; i < 6; ++ i ) {
-            theta.push_back( 0 );
-          }
-          map<int, int> new_region;
-          list<map<int, int>> new_regions;
-          new_region[ idx ] = new_label;
-          new_regions.push_back( new_region );
-          
-          updateParm( mu, theta, sigma2, new_region, ptr_m[ 3 ], 
-                      ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], 
-                      ptr_intst, new_label, ptr_lambda2[ 3 ], ptr_seg, 
-                      ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], 
-                      ptr_beta[ 3 ], 20 );
-          vector<double> new_parm;
-          list<vector<double>> new_region_parm;
-          new_parm.push_back( new_label );
-          new_parm.push_back( mu );
-          new_parm.push_back( sigma2 );
-          new_parm.insert( new_parm.end(), theta.begin(), theta.end() );
-          new_region_parm.push_back( new_parm );
-          
-          addRegion( new_region_parm, new_regions, tumor_labels, 
+        // Find a new tumor region label;
+        t_label = newTumorLabel( 1, tumor_labels );
+      }
+      // new tumor region parameters
+      double t_mu = -1, t_sigma2 = 1; // t_sigma2 has to be non-zero;
+      vector<double> t_theta;
+      for( int i = 0; i < 6; ++ i ) {
+        t_theta.push_back( 0 );
+      }
+      map<int, int> new_region;
+      list<map<int, int>> new_regions;
+      new_region[ idx ] = t_label;
+      new_regions.push_back( new_region );
+      
+      updateParm( t_mu, t_theta, t_sigma2, new_region, ptr_m[ 3 ],
+                  ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ],
+                  ptr_intst, t_label, ptr_lambda2[ 3 ], ptr_seg,
+                  ptr_nidx, ptr_nintst, ptr_alpha[ 3 ],
+                                                                              ptr_beta[ 3 ], 20 );
+      vector<double> new_parm;
+      list<vector<double>> new_region_parm;
+      new_parm.push_back( t_label );
+      new_parm.push_back( t_mu );
+      new_parm.push_back( t_sigma2 );
+      new_parm.insert( new_parm.end(), t_theta.begin(), t_theta.end() );
+      new_region_parm.push_back( new_parm );
+      
+      double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
+                                 t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
+                                 ptr_nidx, ptr_intst, ptr_nintst,
+                                 t_theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
+                                 ptr_a[ 0 ], ptr_b[ 0 ] );
+      t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
+                           ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+      
+      double min_energy = t_energy;
+      int min_label = t_label;
+      
+      // healthy cell
+      double h_energy;
+      vector<double> h_parm;
+      double h_mu;
+      double h_sigma2;
+      vector<double> h_theta;
+      for( int i = - 1; i > - 4; -- i ) {
+        h_theta.empty();
+        h_parm = health_parm[ i ];
+        h_mu = h_parm[ 0 ];
+        h_sigma2 = h_parm[ 1 ];
+        h_theta.insert( h_theta.begin(), h_parm.begin() + 2, h_parm.end() );
+        h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,
+                            ptr_intst, ptr_nintst, h_theta );
+        h_energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
+                             ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+        if( h_energy < min_energy ) {
+          min_energy = h_energy;
+          min_label = i;
+        }
+      }
+      if( min_label <= - 4 ) {
+        if( curr_label >= - 3 && curr_label <= 0 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+          addRegion( new_region_parm, new_regions, tumor_labels,
                      tumor_regions, tumor_parm );
-          ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
+        } else if( curr_label >= 1 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+          eraseOutl( curr_label, outl_labels, outl_parm );
+          addRegion( new_region_parm, new_regions, tumor_labels,
+                     tumor_regions, tumor_parm );
+        }
+      } else if( min_label >= - 3 && min_label <= - 1 ) {
+        if( curr_label == 0 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+        } else if( curr_label <= - 4 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+          eraseRegion( curr_label, tumor_labels, tumor_regions, tumor_parm );
+        } else if( curr_label >= 1 ) {
+          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           eraseOutl( curr_label, outl_labels, outl_parm );
         }
       }
