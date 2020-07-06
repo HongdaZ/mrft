@@ -393,7 +393,7 @@ void cmpEP( int idx, int sc,
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
         } else if( curr_label <= - 4 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          eraseRegion( curr_label, tumor_labels, tumor_regions, tumor_parm );
+          eraseRegion( t_label, tumor_labels, tumor_regions, tumor_parm );
         } else if( curr_label >= 1 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           eraseOutl( curr_label, outl_labels, outl_parm );
