@@ -11,6 +11,7 @@
 #include "helper.h"
 #include "initRegion.h"
 #include "scTrn.h"
+#include "scPred.h"
 #include "updateMu.h"
 #include "updateTS.h"
 #include "updateSigma.h"
@@ -20,7 +21,7 @@
 #include "updateParm.h"
 #include "initParm.h"
 #include "cmpET.h"
-#include "scPred.h"
+#include "cmpEP.h"
 
 
 using std::stack;
@@ -251,13 +252,13 @@ extern "C" {
     // }
     list< map<int, int>> regions;
     // int curr_idx = 1032015;1032015
-    int curr_idx = 1032012;
-    int sc = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
-                      ptr_nidx, curr_idx );
-    cmpET( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels,
-           health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
-           ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
-           ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
+    // int curr_idx = 1032012;
+    // int sc = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
+    //                   ptr_nidx, curr_idx );
+    // cmpET( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels,
+    //        health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
+    //        ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
+    //        ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
     // // debug scPred
     // curr_idx = 1032015;
     // sc = scPred( regions, tumor_labels, tumor_regions, ptr_seg,
@@ -272,6 +273,14 @@ extern "C" {
     //   }
     // }
     // //////////////
+    int curr_idx = 1032012;
+    int sc = scPred( regions, tumor_labels, tumor_regions, ptr_seg,
+                      ptr_nidx, curr_idx );
+    Rprintf( "sc = %d\n", sc );
+    cmpEP( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels,
+           health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
+           ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
+           ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
     return seg;
   }
 } // extern "C"

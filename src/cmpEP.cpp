@@ -248,7 +248,7 @@ void cmpEP( int idx, int sc,
       
       double out_energy = energyX( out_label, idx, false, ptr_seg,
                                    ptr_nidx, ptr_delta[ 0 ],
-                                                      ptr_gamma[ 0 ] );
+                                   ptr_gamma[ 0 ] );
       // outlier parameters
       double out_mu = - 1, out_sigma2 = 1;
       map<int, int> out_region;
