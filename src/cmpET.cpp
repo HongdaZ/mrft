@@ -114,7 +114,7 @@ void cmpET( int idx, int sc,
                                             region_parm.end() );
       list<map<int, int >> new_regions( ++ regions.begin(), 
                                         regions.end() );
-      addRegion( new_region_parm, new_regions, tumor_labels, tumor_regions, 
+      addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels, tumor_regions, 
                  tumor_parm );
       
       ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
@@ -139,7 +139,7 @@ void cmpET( int idx, int sc,
       list<map<int,int>> new_whole_region;
       new_whole_parm.push_back( label_whole_parm );
       new_whole_region.push_back( regions.front() );
-      addRegion( new_whole_parm, new_whole_region, tumor_labels, 
+      addRegion( ptr_seg, new_whole_parm, new_whole_region, tumor_labels, 
                  tumor_regions, tumor_parm );
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       eraseOutl( out_label, outl_labels, outl_parm );
@@ -283,7 +283,7 @@ void cmpET( int idx, int sc,
           new_parm.insert( new_parm.end(), theta.begin(), theta.end() );
           new_region_parm.push_back( new_parm );
           
-          addRegion( new_region_parm, new_regions, tumor_labels, tumor_regions,
+          addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels, tumor_regions,
                      tumor_parm );
           ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
           eraseOutl( curr_label, outl_labels, outl_parm );

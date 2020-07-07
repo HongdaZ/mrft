@@ -12,7 +12,8 @@ using std::map;
 using std::set;
 
 // add new tumor regions
-void addRegion( const list<vector<double>> &region_parm, 
+void addRegion( int *ptr_seg, 
+                const list<vector<double>> &region_parm, 
                 const list<map<int,int>> &regions, 
                 set<int> &tumor_labels,
                 map<int, set<int>> &tumor_regions, 

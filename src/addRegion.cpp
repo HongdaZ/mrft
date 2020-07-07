@@ -1,6 +1,7 @@
 #include "addRegion.h"
 // add new tumor regions
-void addRegion( const list<vector<double>> &region_parm, 
+void addRegion( int *ptr_seg, 
+                const list<vector<double>> &region_parm, 
                 const list<map<int,int>> &regions, 
                 set<int> &tumor_labels,
                 map<int, set<int>> &tumor_regions, 
@@ -16,6 +17,8 @@ void addRegion( const list<vector<double>> &region_parm,
     for( map<int, int>::const_iterator it_map = it_region->begin();
          it_map != it_region->end(); ++ it_map ) {
       new_region.insert( it_map->first );
+      // update ptr_seg
+      ptr_seg[ 2 * ( it_map->first - 1 ) ] = new_label;
     }
     tumor_labels.insert( new_label );
     tumor_regions[ new_label ] = new_region;
