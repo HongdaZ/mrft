@@ -140,8 +140,8 @@ void cmpEP( int idx, int sc,
                                             region_parm.end() );
       list<map<int, int >> new_regions( ++ regions.begin(), 
                                         regions.end() );
-      addRegion( new_region_parm, new_regions, tumor_labels, tumor_regions, 
-                 tumor_parm );
+      addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels,
+                 tumor_regions, tumor_parm );
       
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       if( min_label > 0 ) {
@@ -165,7 +165,7 @@ void cmpEP( int idx, int sc,
       list<map<int,int>> new_whole_region;
       new_whole_parm.push_back( label_whole_parm );
       new_whole_region.push_back( regions.front() );
-      addRegion( new_whole_parm, new_whole_region, tumor_labels, 
+      addRegion( ptr_seg, new_whole_parm, new_whole_region, tumor_labels, 
                  tumor_regions, tumor_parm );
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       if( curr_label > 0 ) {
@@ -186,7 +186,7 @@ void cmpEP( int idx, int sc,
         vector<double> new_out_parm( ++ outlier_parm.begin(),
                                      outlier_parm.end() );
         addOutl( out_label, new_out_parm, outl_labels, outl_parm );
-      // outlier to healthy
+        // outlier to healthy
       } else if( min_label < 0 && curr_label > 0 ) {
         eraseOutl( out_label, outl_labels, outl_parm );
       }
@@ -233,9 +233,9 @@ void cmpEP( int idx, int sc,
         h_sigma2 = h_parm[ 1 ];
         h_theta.insert( h_theta.begin(), h_parm.begin() + 2, h_parm.end() );
         h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,
-                          ptr_intst, ptr_nintst, h_theta );
+                            ptr_intst, ptr_nintst, h_theta );
         h_energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
-                           ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+                             ptr_delta[ 0 ], ptr_gamma[ 0 ] );
         if( h_energy < min_energy ) {
           min_energy = h_energy;
           min_label = i;
@@ -248,7 +248,7 @@ void cmpEP( int idx, int sc,
       
       double out_energy = energyX( out_label, idx, false, ptr_seg,
                                    ptr_nidx, ptr_delta[ 0 ],
-                                   ptr_gamma[ 0 ] );
+                                                      ptr_gamma[ 0 ] );
       // outlier parameters
       double out_mu = - 1, out_sigma2 = 1;
       map<int, int> out_region;
@@ -311,7 +311,7 @@ void cmpEP( int idx, int sc,
         }
       }
       
-    // doesn't have tumor neighbor
+      // doesn't have tumor neighbor
     } else {
       // tumor energy
       
@@ -336,7 +336,7 @@ void cmpEP( int idx, int sc,
                   ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ],
                   ptr_intst, t_label, ptr_lambda2[ 3 ], ptr_seg,
                   ptr_nidx, ptr_nintst, ptr_alpha[ 3 ],
-                                                                              ptr_beta[ 3 ], 20 );
+                  ptr_beta[ 3 ], 20 );
       vector<double> new_parm;
       list<vector<double>> new_region_parm;
       new_parm.push_back( t_label );
@@ -380,12 +380,12 @@ void cmpEP( int idx, int sc,
       if( min_label <= - 4 ) {
         if( curr_label >= - 3 && curr_label <= 0 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          addRegion( new_region_parm, new_regions, tumor_labels,
+          addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels,
                      tumor_regions, tumor_parm );
         } else if( curr_label >= 1 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           eraseOutl( curr_label, outl_labels, outl_parm );
-          addRegion( new_region_parm, new_regions, tumor_labels,
+          addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels,
                      tumor_regions, tumor_parm );
         }
       } else if( min_label >= - 3 && min_label <= - 1 ) {
