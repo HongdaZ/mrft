@@ -115,7 +115,8 @@ void updateParm( double &mu, double &sigma2,
     // Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );
     mu = tmp;
-    updateSigma( idx, mu, ptr_intst, alphal, betal, sigma2 );
+    // beta is 2.5 times as large as beta for tumor region;
+    updateSigma( idx, mu, ptr_intst, alphal, 2.5 * betal, sigma2 );
     // Rprintf( "\n" );
     // Rprintf( "sigma2 = %f\n", sigma2 );
     ++ i;

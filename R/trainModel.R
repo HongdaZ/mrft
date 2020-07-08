@@ -1,8 +1,9 @@
 # Train the model
 
 trainModel <- function( patient, delta = 8, gamma = 1, 
-                        alpha = rep( 1, 4 ), beta = rep( 1e-6, 4 ), 
-                        lambda2 = rep( .25 / 72, 4 ), 
+                        alpha = rep( 1, 4 ),
+                        beta = rep( 0.027, 4 ),
+                        lambda2 = rep( 1 / 36, 4 ), 
                         a = 5,
                         nu2 = rep( .25, 3 ) ) {
   
