@@ -273,7 +273,7 @@ extern "C" {
     //   }
     // }
     // //////////////
-    int curr_idx = 1032012;
+    int curr_idx = 1031683;
     int sc = scPred( regions, tumor_labels, tumor_regions, ptr_seg,
                       ptr_nidx, curr_idx );
     Rprintf( "sc = %d\n", sc );
