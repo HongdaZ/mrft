@@ -51,7 +51,7 @@ extern "C" {
     const double *ptr_delta = REAL( delta );
     const double *ptr_gamma = REAL( gamma );
     const double *ptr_alpha = REAL( alpha );
-    const double *ptr_beta = REAL( beta );
+    double *ptr_beta = REAL( beta );
     const double *ptr_lambda2 = REAL( lambda2 );
     const double *ptr_a = REAL( a );
     const double *ptr_b = REAL( b );
@@ -194,6 +194,24 @@ extern "C" {
     initParm( health_parm, tumor_parm, ptr_seg, ptr_m, ptr_nu2, ptr_intst,
               ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
               tumor_regions, ptr_a, ptr_b, len, 20 );
+    // update beta
+    for( int i = 0; i < 3; ++ i ){
+      double sigma2 = health_parm[ - i - 1 ][ 1 ];
+      ptr_beta[ i ] = ( ptr_alpha[ i ] + 1 ) * sigma2;
+    }
+    // update beta for tumor regions based on the date of 
+    // the biggest tumor region
+    int max_size = 0;
+    int max_label = 0;
+    for( map<int, set<int>>::iterator it = tumor_regions.begin();
+         it != tumor_regions.end(); ++ it ) {
+      if( it->second.size() > max_size ) {
+        max_size = it->second.size();
+        max_label = it->first;
+      }
+    }
+    double tumor_sigma2 = tumor_parm[ max_label ][ 1 ];
+    ptr_beta[ 3 ] = ( ptr_alpha[ 3 ] + 1 ) * tumor_sigma2;
     // for( map<int, vector<double>>::iterator it = health_parm.begin();
     //      it!= health_parm.end(); ++ it) {
     //   Rprintf( "label = %d:", it->first );
