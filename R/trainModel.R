@@ -1,5 +1,5 @@
 # Train the model
-
+# beta and nu2 influenced by normalization
 trainModel <- function( patient, delta = 3 ^ 2, gamma = 1, 
                         alpha = rep( 10, 4 ),
                         beta = rep( 1, 4 ),
