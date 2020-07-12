@@ -155,8 +155,10 @@ void updateTS( const set<int> &region, int curr_label,
   delete [] I;
   delete [] tmp;
   delete [] vtheta;
-  delete [] work;
   delete [] ipiv;
+  delete [] work;
+  delete [] x;
+  
   
   return;
   

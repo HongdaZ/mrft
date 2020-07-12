@@ -85,8 +85,10 @@ double energyY( const set<int> &region,
   energy = energy + log( 2 * pi ) * ncol / 2 + log( lambda2 ) * ncol / 2 + 
     sum_theta / ( 2 * lambda2 );
 
+  delete [] yln;
+  delete [] yl;
   delete [] vtheta;
-  
+
   return energy;
 }
 
