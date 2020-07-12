@@ -13,6 +13,6 @@ trainModel <- function( patient, delta = 3 ^ 2, gamma = 1,
   # -1, -2, -3, > 0
   m <- priorMode( flair_model$info$intst, flair_model$seg )
   b <- getB( m, a )
-  par_flair <- estParm( flair_model, delta, gamma, 
-                        alpha, beta, lambda2, a, b, m, nu2 )
+  system.time( par_flair <- estParm( flair_model, delta, gamma, 
+                        alpha, beta, lambda2, a, b, m, nu2 ) )
 }

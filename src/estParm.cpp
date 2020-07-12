@@ -22,7 +22,8 @@
 #include "initParm.h"
 #include "cmpET.h"
 #include "cmpEP.h"
-
+#include "updateBeta.h"
+#include "skip.h"
 
 using std::stack;
 using std::queue;
@@ -194,24 +195,30 @@ extern "C" {
     initParm( health_parm, tumor_parm, ptr_seg, ptr_m, ptr_nu2, ptr_intst,
               ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
               tumor_regions, ptr_a, ptr_b, len, 20 );
-    // update beta
-    for( int i = 0; i < 3; ++ i ){
-      double sigma2 = health_parm[ - i - 1 ][ 1 ];
-      ptr_beta[ i ] = ( ptr_alpha[ i ] + 1 ) * sigma2;
-    }
-    // update beta for tumor regions based on the date of 
-    // the biggest tumor region
-    int max_size = 0;
-    int max_label = 0;
-    for( map<int, set<int>>::iterator it = tumor_regions.begin();
-         it != tumor_regions.end(); ++ it ) {
-      if( it->second.size() > max_size ) {
-        max_size = it->second.size();
-        max_label = it->first;
-      }
-    }
-    double tumor_sigma2 = tumor_parm[ max_label ][ 1 ];
-    ptr_beta[ 3 ] = ( ptr_alpha[ 3 ] + 1 ) * tumor_sigma2;
+    // // update beta
+    // for( int i = 0; i < 3; ++ i ){
+    //   double sigma2 = health_parm[ - i - 1 ][ 1 ];
+    //   ptr_beta[ i ] = ( ptr_alpha[ i ] + 1 ) * sigma2;
+    // }
+    // // update beta for tumor regions based on the date of 
+    // // the biggest tumor region
+    // int max_size = 0;
+    // int max_label = 0;
+    // for( map<int, set<int>>::iterator it = tumor_regions.begin();
+    //      it != tumor_regions.end(); ++ it ) {
+    //   if( it->second.size() > max_size ) {
+    //     max_size = it->second.size();
+    //     max_label = it->first;
+    //   }
+    // }
+    // double tumor_sigma2 = tumor_parm[ max_label ][ 1 ];
+    // ptr_beta[ 3 ] = ( ptr_alpha[ 3 ] + 1 ) * tumor_sigma2;
+    updateBeta( ptr_beta, ptr_alpha, health_parm, tumor_regions, 
+                tumor_parm );
+    // for( int i = 0; i < 4; ++ i ) {
+    //   Rprintf( "beta = %f\t", ptr_beta[ i ] );
+    // }
+    // Rprintf( "\n" );
     // for( map<int, vector<double>>::iterator it = health_parm.begin();
     //      it!= health_parm.end(); ++ it) {
     //   Rprintf( "label = %d:", it->first );
@@ -268,7 +275,7 @@ extern "C" {
     //   }
     //   Rprintf( "\n" );
     // }
-    list< map<int, int>> regions;
+    // list< map<int, int>> regions;
     // int curr_idx = 1032015;1032015
     // int curr_idx = 1032012;
     // int sc = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
@@ -291,14 +298,63 @@ extern "C" {
     //   }
     // }
     // //////////////
-    int curr_idx = 1031683;
-    int sc = scPred( regions, tumor_labels, tumor_regions, ptr_seg,
-                      ptr_nidx, curr_idx );
-    Rprintf( "sc = %d\n", sc );
-    cmpEP( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels,
-           health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
-           ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
-           ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
+    
+    // list< map<int, int>> regions;
+    // int curr_idx = 579850;
+    // int sc = scPred( regions, tumor_labels, tumor_regions, ptr_seg,
+    //                   ptr_nidx, curr_idx );
+    // // Rprintf( "sc = %d\n", sc );
+    // cmpEP( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels,
+    //        health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
+    //        ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
+    //        ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
+    // return seg;
+    int maxit = 1;
+    bool skip_curr;
+    for( int i = 0; i < maxit; ++ i ) {
+      for( int j = 1; j <= len; ++ j ) {
+        skip_curr = skip( j, ptr_seg, ptr_nidx );
+        if( skip_curr ) {
+          continue;
+        } else {
+          list< map<int, int>> regions;
+          int sc = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
+                          ptr_nidx, j );
+          cmpET( j, sc, regions, tumor_regions, tumor_labels, outl_labels,
+                 health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
+                 ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
+                 ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
+        }
+        Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
+      }
+      // update parm for healthy regions
+      for( int i = - 1; i > - 4;  -- i ) {
+        int curr_label = i;
+        // Rprintf( "curr_label = %d \n", curr_label );
+        double mu = -1, sigma2 = 1;
+        vector<double> theta;
+        for( int  j = 0; j < 6; ++ j ) {
+          theta.push_back( 0 );
+        }
+        set<int> region;
+        for( int k = 0; k < len; ++ k ) {
+          if( ptr_seg[ 2 * k ] == curr_label ) {
+            region.insert( k + 1 ); // region starts from 1
+          }
+        }
+        int h_idx =  - 1 - curr_label; // == 0, 1, 2
+        updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], ptr_nu2[ h_idx ],
+                    ptr_intst, curr_label, ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx,
+                    ptr_nintst, ptr_alpha[ h_idx ], ptr_beta[ h_idx ], maxit );
+        
+        vector<double> h_parm;
+        h_parm.push_back( mu );
+        h_parm.push_back( sigma2 );
+        
+        h_parm.insert( h_parm.end(), theta.begin(), theta.end() );
+        health_parm[ curr_label ] = h_parm;
+      }
+    }
     return seg;
   }
 } // extern "C"
