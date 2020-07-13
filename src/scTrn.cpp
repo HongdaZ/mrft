@@ -19,7 +19,7 @@ int scTrn( list< map<int, int>> &regions,
            int *ptr_label, const int *ptr_nidx, int start ) {
   regions.clear();
   int current = ptr_label[ 2 * ( start - 1 ) ];
-  if( current <= - 1 && current >= -3 ) {
+  if( current <= 0 && current >= -3 ) {
     return 0;
   } else {
     // possibly split
