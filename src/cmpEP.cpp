@@ -36,10 +36,7 @@ void cmpEP( int idx, int sc,
     for( list<map<int, int>>::iterator it = regions.begin();
          it != regions.end(); ++ it ) {
       double mu = - 1, sigma2 = 1;
-      vector<double> theta;
-      for( int i = 0; i < 6; ++ i ) {
-        theta.push_back( 0 );
-      }
+      vector<double> theta( 6, 0 );
       map<int, int>::iterator it_map = it->begin();
       int curr_label = it_map->second;
       updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ], 
@@ -48,11 +45,12 @@ void cmpEP( int idx, int sc,
                   ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
       // curr_label, mu, sigma2, theta
       vector<double> tmp_parm; 
-      tmp_parm.push_back( curr_label );
-      tmp_parm.push_back( mu );
-      tmp_parm.push_back( sigma2 );
+      tmp_parm.reserve( 8 );
+      tmp_parm[ 0 ] = curr_label;
+      tmp_parm[ 1 ] = mu;
+      tmp_parm[ 2 ] = sigma2;
       
-      tmp_parm.insert( tmp_parm.end(), theta.begin(), theta.end() );
+      tmp_parm.insert( tmp_parm.begin() + 3, theta.begin(), theta.end() );
       region_parm.push_back( tmp_parm );
       
       // calculate energy
