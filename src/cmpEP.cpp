@@ -44,13 +44,14 @@ void cmpEP( int idx, int sc,
                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst, 
                   ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
       // curr_label, mu, sigma2, theta
-      vector<double> tmp_parm; 
-      tmp_parm.reserve( 8 );
+      vector<double> tmp_parm( 9, 0 ); 
       tmp_parm[ 0 ] = curr_label;
       tmp_parm[ 1 ] = mu;
       tmp_parm[ 2 ] = sigma2;
+      for( int i = 0; i < 6; ++ i ) {
+        tmp_parm[ i + 3 ] = theta[ i ];
+      }
       
-      tmp_parm.insert( tmp_parm.begin() + 3, theta.begin(), theta.end() );
       region_parm.push_back( tmp_parm );
       
       // calculate energy
