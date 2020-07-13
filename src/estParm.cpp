@@ -24,6 +24,7 @@
 #include "cmpEP.h"
 #include "updateBeta.h"
 #include "skip.h"
+#include "debug.h"
 
 using std::stack;
 using std::queue;
@@ -309,52 +310,54 @@ extern "C" {
     //        ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
     //        ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
     // return seg;
-    int maxit = 1;
-    bool skip_curr;
-    for( int i = 0; i < maxit; ++ i ) {
-      for( int j = 1; j <= len; ++ j ) {
-        skip_curr = skip( j, ptr_seg, ptr_nidx );
-        if( skip_curr ) {
-          continue;
-        } else {
-          list< map<int, int>> regions;
-          int sc = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
-                          ptr_nidx, j );
-          cmpET( j, sc, regions, tumor_regions, tumor_labels, outl_labels,
-                 health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
-                 ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
-                 ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
-        }
-        Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
-      }
-      // update parm for healthy regions
-      for( int i = - 1; i > - 4;  -- i ) {
-        int curr_label = i;
-        // Rprintf( "curr_label = %d \n", curr_label );
-        double mu = -1, sigma2 = 1;
-        vector<double> theta;
-        for( int  j = 0; j < 6; ++ j ) {
-          theta.push_back( 0 );
-        }
-        set<int> region;
-        for( int k = 0; k < len; ++ k ) {
-          if( ptr_seg[ 2 * k ] == curr_label ) {
-            region.insert( k + 1 ); // region starts from 1
-          }
-        }
-        int h_idx =  - 1 - curr_label; // == 0, 1, 2
-        updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], ptr_nu2[ h_idx ],
-                    ptr_intst, curr_label, ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx,
-                    ptr_nintst, ptr_alpha[ h_idx ], ptr_beta[ h_idx ], maxit );
-        
-        vector<double> h_parm;
-        h_parm.push_back( mu );
-        h_parm.push_back( sigma2 );
-        
-        h_parm.insert( h_parm.end(), theta.begin(), theta.end() );
-        health_parm[ curr_label ] = h_parm;
-      }
-    }
+    
+    // int maxit = 1;
+    // bool skip_curr;
+    // for( int i = 0; i < maxit; ++ i ) {
+    //   for( int j = 1; j <= len; ++ j ) {
+    //     skip_curr = skip( j, ptr_seg, ptr_nidx );
+    //     if( skip_curr ) {
+    //       continue;
+    //     } else {
+    //       list< map<int, int>> regions;
+    //       int sc = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
+    //                       ptr_nidx, j );
+    //       cmpET( j, sc, regions, tumor_regions, tumor_labels, outl_labels,
+    //              health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
+    //              ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
+    //              ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
+    //     }
+    //     Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
+    //   }
+    //   // update parm for healthy regions
+    //   for( int i = - 1; i > - 4;  -- i ) {
+    //     int curr_label = i;
+    //     // Rprintf( "curr_label = %d \n", curr_label );
+    //     double mu = -1, sigma2 = 1;
+    //     vector<double> theta;
+    //     for( int  j = 0; j < 6; ++ j ) {
+    //       theta.push_back( 0 );
+    //     }
+    //     set<int> region;
+    //     for( int k = 0; k < len; ++ k ) {
+    //       if( ptr_seg[ 2 * k ] == curr_label ) {
+    //         region.insert( k + 1 ); // region starts from 1
+    //       }
+    //     }
+    //     int h_idx =  - 1 - curr_label; // == 0, 1, 2
+    //     updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], ptr_nu2[ h_idx ],
+    //                 ptr_intst, curr_label, ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx,
+    //                 ptr_nintst, ptr_alpha[ h_idx ], ptr_beta[ h_idx ], maxit );
+    //     
+    //     vector<double> h_parm;
+    //     h_parm.push_back( mu );
+    //     h_parm.push_back( sigma2 );
+    //     
+    //     h_parm.insert( h_parm.end(), theta.begin(), theta.end() );
+    //     health_parm[ curr_label ] = h_parm;
+    //   }
+    // }
+    debug();
     return seg;
   }
 } // extern "C"
