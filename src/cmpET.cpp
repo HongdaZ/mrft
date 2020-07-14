@@ -28,18 +28,17 @@ void cmpET( int idx, int sc,
   
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier
-    vector<double> nrg; 
+    int len = regions.size();
+    vector<double> nrg( len + 1, 0 ); 
+    vector<double>::iterator it_nrg = nrg.begin();
     // parameters for regions
     list<vector<double>> region_parm;
     // parameters for outler
-    vector<double> outlier_parm;
+    vector<double> outlier_parm( 3, 0 );
     for( list<map<int, int>>::iterator it = regions.begin();
-         it != regions.end(); ++ it ) {
+         it != regions.end(); ++ it, ++ it_nrg ) {
       double mu = - 1, sigma2 = 1;
-      vector<double> theta;
-      for( int i = 0; i < 6; ++ i ) {
-        theta.push_back( 0 );
-      }
+      vector<double> theta( 6, 0 );
       map<int, int>::iterator it_map = it->begin();
       int curr_label = it_map->second;
       updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ], 
@@ -47,12 +46,13 @@ void cmpET( int idx, int sc,
                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst, 
                   ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
       // curr_label, mu, sigma2, theta
-      vector<double> tmp_parm; 
-      tmp_parm.push_back( curr_label );
-      tmp_parm.push_back( mu );
-      tmp_parm.push_back( sigma2 );
-      
-      tmp_parm.insert( tmp_parm.end(), theta.begin(), theta.end() );
+      vector<double> tmp_parm( 9, 0 ); 
+      tmp_parm[ 0 ] = curr_label;
+      tmp_parm[ 1 ] = mu;
+      tmp_parm[ 2] = sigma2;
+      for( int i = 0; i < 6; ++ i ) {
+        tmp_parm[ i + 3 ] = theta[ i ];
+      }
       region_parm.push_back( tmp_parm );
       
       // calculate energy
@@ -65,7 +65,7 @@ void cmpET( int idx, int sc,
                                ptr_intst, ptr_nintst, 
                                theta, ptr_alpha[ 3 ], ptr_beta[ 3 ], 
                                ptr_a[ 0 ], ptr_b[ 0 ] );
-      nrg.push_back( energy );
+      *it_nrg = energy;
     }
     // New outlier label
     int out_label = findOutLabel( idx, ptr_seg, outl_labels );
@@ -78,23 +78,20 @@ void cmpET( int idx, int sc,
                 ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, out_label,
                 ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_alpha[ 3 ],
                 ptr_beta[ 3 ], 20 );
-    outlier_parm.push_back( out_label );
-    outlier_parm.push_back( out_mu );
-    outlier_parm.push_back( out_sigma2 );
+    outlier_parm[ 0 ] = out_label;
+    outlier_parm[ 1 ] = out_mu;
+    outlier_parm[ 2 ] = out_sigma2;
     
     double out_energy = energyX( out_label, idx, true, ptr_seg, ptr_nidx,
                                  ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-    vector<double> out_theta;
-    for( int i = 0; i < 6; ++ i ) {
-      out_theta.push_back( 0 );
-    }
+    vector<double> out_theta( 6, 0 );
     
     out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], out_sigma2,
                            ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_intst,
                            ptr_nintst, out_theta, ptr_alpha[ 3 ], 
                            ptr_beta[ 3 ], ptr_a[ 0 ], ptr_b[ 0 ] );
-    nrg.push_back( out_energy );
-    vector<double>::iterator it_nrg = nrg.begin();
+    *it_nrg = out_energy;
+    it_nrg = nrg.begin();
     double combine_nrg = *it_nrg;
     double split_nrg = 0;
     for( ++ it_nrg; it_nrg != nrg.end(); ++ it_nrg ) {
@@ -221,7 +218,7 @@ void cmpET( int idx, int sc,
         double out_mu = - 1, out_sigma2 = 1;
         map<int, int> out_region;
         out_region[ idx ] = out_label;
-        vector<double> new_out_parm;
+        vector<double> new_out_parm( 2, 0 );
         if( curr_label > 0 ) {
           new_out_parm = outl_parm[ curr_label ];
           out_mu = new_out_parm[ 0 ];
@@ -231,14 +228,11 @@ void cmpET( int idx, int sc,
                       ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, 
                       out_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
                       ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
-          new_out_parm.push_back( out_mu );
-          new_out_parm.push_back( out_sigma2 );
+          new_out_parm[ 0 ] = out_mu;
+          new_out_parm[ 1 ] = out_sigma2;
         }
 
-        vector<double> out_theta;
-        for( int i = 0; i < 6; ++ i ) {
-          out_theta.push_back( 0 );
-        }
+        vector<double> out_theta( 6, 0 );
         
         out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], 
                                out_sigma2, ptr_lambda2[ 3 ], ptr_seg, 
@@ -275,12 +269,14 @@ void cmpET( int idx, int sc,
                       ptr_intst, new_label, ptr_lambda2[ 3 ], ptr_seg, 
                       ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], 
                       ptr_beta[ 3 ], 20 );
-          vector<double> new_parm;
+          vector<double> new_parm( 9, 0 );
           list<vector<double>> new_region_parm;
-          new_parm.push_back( new_label );
-          new_parm.push_back( mu );
-          new_parm.push_back( sigma2 );
-          new_parm.insert( new_parm.end(), theta.begin(), theta.end() );
+          new_parm[ 0 ] = new_label;
+          new_parm[ 1 ] = mu;
+          new_parm[ 2 ] = sigma2;
+          for( int i = 0; i < 6; ++ i ) {
+            new_parm[ i + 3 ] = theta[ i ];
+          }
           new_region_parm.push_back( new_parm );
           
           addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels, tumor_regions,
