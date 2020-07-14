@@ -24,7 +24,18 @@ void cmpEP( int idx, int sc,
             const double *ptr_alpha, const double *ptr_beta, 
             const double *ptr_lambda2, const double *ptr_a,
             const double *ptr_b, const double *ptr_m,
-            const double *ptr_nu2 ) {
+            const double *ptr_nu2,
+            // outlier_parm( 3, 0 )
+            vector<double> &outlier_parm,
+            // theta( 6, 0 )
+            vector<double> &theta,
+            // tmp_parm( 9, 0 )
+            vector<double> tmp_parm,
+            // out_theta( 6, 0 )
+            vector<double> &out_theta,
+            // new_out_parm( 2, 0 )
+            vector<double> &new_out_parm
+            ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier
@@ -34,11 +45,10 @@ void cmpEP( int idx, int sc,
     // parameters for regions
     list<vector<double>> region_parm;
     // parameters for outler
-    vector<double> outlier_parm( 3, 0 );
+    // vector<double> outlier_parm( 3, 0 );
     for( list<map<int, int>>::iterator it = regions.begin();
          it != regions.end(); ++ it, ++ it_nrg ) {
       double mu = - 1, sigma2 = 1;
-      vector<double> theta( 6, 0 );
       map<int, int>::iterator it_map = it->begin();
       int curr_label = it_map->second;
       updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ], 
@@ -46,7 +56,6 @@ void cmpEP( int idx, int sc,
                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst, 
                   ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
       // curr_label, mu, sigma2, theta
-      vector<double> tmp_parm( 9, 0 ); 
       tmp_parm[ 0 ] = curr_label;
       tmp_parm[ 1 ] = mu;
       tmp_parm[ 2 ] = sigma2;
@@ -85,8 +94,6 @@ void cmpEP( int idx, int sc,
     
     double out_energy = energyX( out_label, idx, true, ptr_seg, ptr_nidx,
                                  ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-    vector<double> out_theta( 6, 0 );
-    
     out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], out_sigma2,
                            ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_intst,
                            ptr_nintst, out_theta, ptr_alpha[ 3 ], 
@@ -96,16 +103,16 @@ void cmpEP( int idx, int sc,
     double energy;
     double min_energy = out_energy;
     int min_label = out_label;
-    vector<double> parm;
+    
     double mu;
     double sigma2;
-    vector<double> theta;
     for( int i = - 1; i > - 4; -- i ) {
-      theta.empty();
-      parm = health_parm[ i ]; 
+      vector<double> &parm = health_parm[ i ];
       mu = parm[ 0 ];
       sigma2 = parm[ 1 ];
-      theta.insert( theta.begin(), parm.begin() + 2, parm.end() );
+      for( int j = 0; j < 6; ++ j ) {
+        theta[ j ] = parm[ 2 + j ];
+      }
       energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
                         ptr_intst, ptr_nintst, theta );
       energy += energyX( i, idx, true, ptr_seg, ptr_nidx, 
@@ -123,7 +130,7 @@ void cmpEP( int idx, int sc,
     for( ++ it_nrg; it_nrg != nrg.end(); ++ it_nrg ) {
       split_nrg += *it_nrg;
     }
-    vector<double> label_whole_parm = region_parm.front();
+    vector<double> &label_whole_parm = region_parm.front();
     int whole_label = label_whole_parm[ 0 ];
     // update parameters for whole region
     if( combine_nrg <= split_nrg && sc == 1 ) {
@@ -143,8 +150,9 @@ void cmpEP( int idx, int sc,
       
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       if( min_label > 0 ) {
-        vector<double> new_out_parm( ++ outlier_parm.begin(),
-                                     outlier_parm.end() );
+        for( int i = 0; i < 2; ++ i ) {
+          new_out_parm[ i ] = outlier_parm[ 1 + i ];
+        }
         addOutl( out_label, new_out_parm, outl_labels, outl_parm );
       }
       // remove old subregions, parameters and labels,
@@ -181,8 +189,9 @@ void cmpEP( int idx, int sc,
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       // healthy to outlier
       if( min_label > 0 && curr_label < 1 ) {
-        vector<double> new_out_parm( ++ outlier_parm.begin(),
-                                     outlier_parm.end() );
+        for( int i = 0; i < 2; ++ i ) {
+          new_out_parm[ i ] = outlier_parm[ 1 + i ];
+        }
         addOutl( out_label, new_out_parm, outl_labels, outl_parm );
         // outlier to healthy
       } else if( min_label < 0 && curr_label > 0 ) {
@@ -204,10 +213,13 @@ void cmpEP( int idx, int sc,
     // have tumor neighbor
     if( have_tumor ) {
       // tumor energy
-      vector<double> t_parm = tumor_parm[ t_label ];
+      vector<double> &t_parm = tumor_parm[ t_label ];
       double t_mu = t_parm[ 0 ];
       double t_sigma2 = t_parm[ 1 ];
-      vector<double> t_theta( t_parm.begin() + 2, t_parm.end() );
+      vector<double> &t_theta = theta;
+      for( int i = 0; i < 6; ++ i ) {
+        t_theta[ i ] = t_parm[ i + 2 ];
+      }
       double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
                                  t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
                                  ptr_nidx, ptr_intst, ptr_nintst,
@@ -221,16 +233,17 @@ void cmpEP( int idx, int sc,
       //          t_label, t_energy, t_mu, t_sigma2 );
       // healthy cell
       double h_energy;
-      vector<double> h_parm;
+      
       double h_mu;
       double h_sigma2;
-      vector<double> h_theta;
+      vector<double> &h_theta = theta;
       for( int i = - 1; i > - 4; -- i ) {
-        h_theta.empty();
-        h_parm = health_parm[ i ];
+        vector<double> &h_parm = health_parm[ i ];
         h_mu = h_parm[ 0 ];
         h_sigma2 = h_parm[ 1 ];
-        h_theta.insert( h_theta.begin(), h_parm.begin() + 2, h_parm.end() );
+        for( int j = 0; j < 6; ++ j ) {
+          h_theta[ j ] = h_parm[ 2 + j ];
+        }
         h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,
                             ptr_intst, ptr_nintst, h_theta );
         h_energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
@@ -254,7 +267,6 @@ void cmpEP( int idx, int sc,
       double out_mu = - 1, out_sigma2 = 1;
       map<int, int> out_region;
       out_region[ idx ] = out_label;
-      vector<double> new_out_parm( 2, 0 );
       if( curr_label > 0 ) {
         new_out_parm = outl_parm[ curr_label ];
         out_mu = new_out_parm[ 0 ];
@@ -267,8 +279,6 @@ void cmpEP( int idx, int sc,
         new_out_parm[ 0 ]= out_mu;
         new_out_parm[ 1 ] = out_sigma2;
       }
-      
-      vector<double> out_theta( 6, 0 );
       out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ],
                              out_sigma2, ptr_lambda2[ 3 ], ptr_seg,
                              ptr_nidx, ptr_intst, ptr_nintst, out_theta,
@@ -321,7 +331,7 @@ void cmpEP( int idx, int sc,
       }
       // new tumor region parameters
       double t_mu = -1, t_sigma2 = 1; // t_sigma2 has to be non-zero;
-      vector<double> t_theta( 6, 0 );
+      vector<double> &t_theta = theta;
       map<int, int> new_region;
       list<map<int, int>> new_regions;
       new_region[ idx ] = t_label;
@@ -332,7 +342,7 @@ void cmpEP( int idx, int sc,
                   ptr_intst, t_label, ptr_lambda2[ 3 ], ptr_seg,
                   ptr_nidx, ptr_nintst, ptr_alpha[ 3 ],
                   ptr_beta[ 3 ], 20 );
-      vector<double> new_parm( 9, 0 );
+      vector<double> &new_parm = tmp_parm;
       list<vector<double>> new_region_parm;
       new_parm[ 0 ] = t_label;
       new_parm[ 1 ] = t_mu;
@@ -356,16 +366,17 @@ void cmpEP( int idx, int sc,
       
       // healthy cell
       double h_energy;
-      vector<double> h_parm;
+      
       double h_mu;
       double h_sigma2;
-      vector<double> h_theta;
+      vector<double> &h_theta = theta;
       for( int i = - 1; i > - 4; -- i ) {
-        h_theta.empty();
-        h_parm = health_parm[ i ];
+        vector<double> &h_parm = health_parm[ i ];
         h_mu = h_parm[ 0 ];
         h_sigma2 = h_parm[ 1 ];
-        h_theta.insert( h_theta.begin(), h_parm.begin() + 2, h_parm.end() );
+        for( int j = 0; j < 6; ++ j ) {
+          h_theta[ j ] = h_parm[ 2 + j ];
+        }
         h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,
                             ptr_intst, ptr_nintst, h_theta );
         h_energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
