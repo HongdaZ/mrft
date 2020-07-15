@@ -40,23 +40,23 @@ int scPred( list< map<int, int>> &regions,
   } else if( current <= - 4 ) {
     // remember to reset seg[ 2, ] == 0
     ptr_label[ 2 * start - 1  ] = 1;
-    
+    // remember to reset seg[ 2, ] == 0
+    for( set<int>::iterator it = tumor_nbr.begin();
+         it != tumor_nbr.end(); ++ it ) {
+      ptr_label[ 2 * *it - 1 ] = 2;
+    }
+    bool early_return = 0;
     while( !tumor_nbr.empty() ) {
       
       int new_start = *tumor_nbr.begin();
       tumor_nbr.erase( new_start );
-      set<int> contaguous_region = findRegion( ptr_label, ptr_nidx, new_start );
-      vector<int> included;
-      
-      for( set<int>::iterator it = tumor_nbr.begin();
-           it!= tumor_nbr.end(); ++ it ) {
-        if( contaguous_region.count( *it ) ) {
-          included.push_back( *it );
-        }
-      }
-      for( vector<int>::iterator it = included.begin();
-           it != included.end(); ++ it ){
-        tumor_nbr.erase( *it );
+      ptr_label[ 2 * new_start - 1 ] = 0;
+      set<int> contaguous_region = findRegion( ptr_label, ptr_nidx, false,
+                                               tumor_nbr, early_return,
+                                               new_start );
+      if( early_return ) {
+        ptr_label[ 2 * start - 1  ] = 0;
+        return 0;
       }
       map<int, int> sub_region;
       int region_label;

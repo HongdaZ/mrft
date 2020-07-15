@@ -18,7 +18,10 @@ void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
   
   for( int i = 0; i < len; ++ i ) {
     if( ptr_seg[ 2 * i ] > 0 ) {
-      region = findRegion( ptr_seg, ptr_nidx, i + 1 );
+      set<int> tumor_nbr;
+      bool early_return;
+      region = findRegion( ptr_seg, ptr_nidx, true, 
+                           tumor_nbr, early_return, i + 1 );
       tumor[ tumor_label ] = region;
       // // Debug
       // if( tumor_label < -20 ) {
