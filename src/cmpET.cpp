@@ -171,6 +171,8 @@ void cmpET( int idx, int sc,
                           ptr_intst, ptr_nintst, theta );
         energy += energyX( i, idx, false, ptr_seg, ptr_nidx, 
                            ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+        Rprintf( "h_label = %d; h_energy = %f; h_mu = %f; h_sigma2 = %f;\n",
+                 i, energy, mu, sigma2 );
         if( i == - 1 ) {
           min_energy = energy;
           min_label = i;
@@ -206,6 +208,8 @@ void cmpET( int idx, int sc,
                                    ptr_a[ 0 ], ptr_b[ 0 ] );
         t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
                              ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+        Rprintf( "t_label = %d; t_energy = %f; t_mu = %f; t_sigma2 = %f;\n",
+                 t_label, t_energy, t_mu, t_sigma2 );
         // Outlier energy
         // New outlier label
         int out_label = findOutLabel( idx, ptr_seg, outl_labels );
@@ -239,6 +243,8 @@ void cmpET( int idx, int sc,
                                ptr_nidx, ptr_intst, ptr_nintst, out_theta, 
                                ptr_alpha[ 3 ],ptr_beta[ 3 ], ptr_a[ 0 ],
                                ptr_b[ 0 ] );
+        Rprintf( "out_label = %d; out_energy = %f; out_mu = %f; out_sigma2 = %f\n",
+                 out_label, out_energy, out_mu, out_sigma2 );
         if( curr_label > 0 && t_energy <= out_energy ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = t_label;
           tumor_regions[ t_label ].insert( idx );

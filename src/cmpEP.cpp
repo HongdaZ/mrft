@@ -234,8 +234,8 @@ void cmpEP( int idx, int sc,
                            ptr_delta[ 0 ], ptr_gamma[ 0 ] );
       double min_energy = t_energy;
       int min_label = t_label;
-      // Rprintf( "t_label = %d; t_energy = %f; t_mu = %f; t_sigma2 = %f;\n",
-      //          t_label, t_energy, t_mu, t_sigma2 );
+      Rprintf( "t_label = %d; t_energy = %f; t_mu = %f; t_sigma2 = %f;\n",
+               t_label, t_energy, t_mu, t_sigma2 );
       // healthy cell
       double h_energy;
       
@@ -253,8 +253,8 @@ void cmpEP( int idx, int sc,
                             ptr_intst, ptr_nintst, h_theta );
         h_energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
                              ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-        // Rprintf( "h_label = %d; h_energy = %f; h_mu = %f; h_sigma2 = %f;\n",
-        //          i, h_energy, h_mu, h_sigma2 );
+        Rprintf( "h_label = %d; h_energy = %f; h_mu = %f; h_sigma2 = %f;\n",
+                 i, h_energy, h_mu, h_sigma2 );
         if( h_energy < min_energy ) {
           min_energy = h_energy;
           min_label = i;
@@ -289,8 +289,8 @@ void cmpEP( int idx, int sc,
                              ptr_nidx, ptr_intst, ptr_nintst, out_theta,
                              ptr_alpha[ 3 ],ptr_beta[ 3 ], ptr_a[ 0 ],
                              ptr_b[ 0 ] );
-      // Rprintf( "out_label = %d; out_energy = %f; out_mu = %f; out_sigma2 = %f\n",
-      //          out_label, out_energy, out_mu, out_sigma2 );
+      Rprintf( "out_label = %d; out_energy = %f; out_mu = %f; out_sigma2 = %f\n",
+               out_label, out_energy, out_mu, out_sigma2 );
       if( out_energy < min_energy ) {
         min_label = out_label;
       }
@@ -364,8 +364,8 @@ void cmpEP( int idx, int sc,
                                  ptr_a[ 0 ], ptr_b[ 0 ] );
       t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
                            ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-      // Rprintf( "t_label = %d; t_energy = %f; t_mu = %f; t_sigma2 = %f\n", 
-      //          t_label, t_energy, t_mu, t_sigma2 );
+      Rprintf( "t_label = %d; t_energy = %f; t_mu = %f; t_sigma2 = %f\n",
+               t_label, t_energy, t_mu, t_sigma2 );
       double min_energy = t_energy;
       int min_label = t_label;
       
@@ -386,8 +386,8 @@ void cmpEP( int idx, int sc,
                             ptr_intst, ptr_nintst, h_theta );
         h_energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
                              ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-        // Rprintf( "h_label = %d; h_energy = %f; h_mu = %f; h_sigma2 = %f\n",
-        //          i, h_energy, h_mu, h_sigma2 );
+        Rprintf( "h_label = %d; h_energy = %f; h_mu = %f; h_sigma2 = %f\n",
+                 i, h_energy, h_mu, h_sigma2 );
         if( h_energy < min_energy ) {
           min_energy = h_energy;
           min_label = i;
