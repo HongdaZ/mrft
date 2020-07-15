@@ -13,15 +13,15 @@
 // compare energy for prediction
 void cmpEP( int idx, int sc,
             list<map<int, int >> &regions,
-            map<int, set<int>> &tumor_regions, 
+            map<int, set<int>> &tumor_regions,
             set<int> &tumor_labels, set<int> &outl_labels,
             map<int, vector<double>> &health_parm,
-            map<int, vector<double>> &tumor_parm, 
+            map<int, vector<double>> &tumor_parm,
             map<int, vector<double>> &outl_parm,
             int *ptr_seg, const int *ptr_nidx,
             const double *ptr_intst, const double *ptr_nintst,
-            const double *ptr_delta, const double *ptr_gamma, 
-            const double *ptr_alpha, const double *ptr_beta, 
+            const double *ptr_delta, const double *ptr_gamma,
+            const double *ptr_alpha, const double *ptr_beta,
             const double *ptr_lambda2, const double *ptr_a,
             const double *ptr_b, const double *ptr_m,
             const double *ptr_nu2,
@@ -34,7 +34,9 @@ void cmpEP( int idx, int sc,
             // out_theta( 6, 0 )
             vector<double> &out_theta,
             // new_out_parm( 2, 0 )
-            vector<double> &new_out_parm
+            vector<double> &new_out_parm,
+            // whole_parm( 8, 0 )
+            vector<double> whole_parm
             ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   if( sc != 0 ) {  // split or combine
@@ -45,15 +47,14 @@ void cmpEP( int idx, int sc,
     // parameters for regions
     list<vector<double>> region_parm;
     // parameters for outler
-    // vector<double> outlier_parm( 3, 0 );
     for( list<map<int, int>>::iterator it = regions.begin();
          it != regions.end(); ++ it, ++ it_nrg ) {
       double mu = - 1, sigma2 = 1;
       map<int, int>::iterator it_map = it->begin();
       int curr_label = it_map->second;
-      updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ], 
-                  ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, curr_label, 
-                  ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst, 
+      updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ],
+                  ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, curr_label,
+                  ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
                   ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
       // curr_label, mu, sigma2, theta
       tmp_parm[ 0 ] = curr_label;
@@ -62,29 +63,29 @@ void cmpEP( int idx, int sc,
       for( int i = 0; i < 6; ++ i ) {
         tmp_parm[ i + 3 ] = theta[ i ];
       }
-      
+
       region_parm.push_back( tmp_parm );
-      
+
       // calculate energy
       set<int> t_region;
       for( ; it_map != it->end(); ++ it_map ) {
         t_region.insert( it_map->first );
-      } 
-      double energy = energyY( t_region, mu, ptr_m[ 2 ], sigma2, 
-                               ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
-                               ptr_intst, ptr_nintst, 
-                               theta, ptr_alpha[ 3 ], ptr_beta[ 3 ], 
+      }
+      double energy = energyY( t_region, mu, ptr_m[ 2 ], sigma2,
+                               ptr_lambda2[ 3 ], ptr_seg, ptr_nidx,
+                               ptr_intst, ptr_nintst,
+                               theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
                                ptr_a[ 0 ], ptr_b[ 0 ] );
       *it_nrg = energy;
     }
     // New outlier label
     int out_label = findOutLabel( idx, ptr_seg, outl_labels );
-    
+
     // outlier parameters
     double out_mu = - 1, out_sigma2 = 1;
     map<int, int> out_region;
     out_region[ idx ] = out_label;
-    updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], ptr_m[ 2 ], 
+    updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], ptr_m[ 2 ],
                 ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, out_label,
                 ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_alpha[ 3 ],
                 ptr_beta[ 3 ], 20 );
@@ -96,7 +97,7 @@ void cmpEP( int idx, int sc,
                                  ptr_delta[ 0 ], ptr_gamma[ 0 ] );
     out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], out_sigma2,
                            ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_intst,
-                           ptr_nintst, out_theta, ptr_alpha[ 3 ], 
+                           ptr_nintst, out_theta, ptr_alpha[ 3 ],
                            ptr_beta[ 3 ], ptr_a[ 0 ], ptr_b[ 0 ] );
     
     // single voxel energy ( -1, -2, -3 )
@@ -115,12 +116,12 @@ void cmpEP( int idx, int sc,
       }
       energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
                         ptr_intst, ptr_nintst, theta );
-      energy += energyX( i, idx, true, ptr_seg, ptr_nidx, 
+      energy += energyX( i, idx, true, ptr_seg, ptr_nidx,
                          ptr_delta[ 0 ], ptr_gamma[ 0 ] );
       if( energy < min_energy ) {
         min_energy = energy;
         min_label = i;
-      } 
+      }
     }
     
     *it_nrg = min_energy;
@@ -134,10 +135,11 @@ void cmpEP( int idx, int sc,
     int whole_label = label_whole_parm[ 0 ];
     // update parameters for whole region
     if( combine_nrg <= split_nrg && sc == 1 ) {
-      vector<double> whole_parm( ++ label_whole_parm.begin(),
-                                 label_whole_parm.end() );
+      for( int i = 0; i < 8; ++ i ) {
+        whole_parm[ i ] = label_whole_parm[ 1 + i ];
+      }
       tumor_parm[ whole_label ] = whole_parm;
-      // remove old whole region and add new splitted regions and 
+      // remove old whole region and add new splitted regions and
       // new outlier if min_label > 1
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
       eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm );
@@ -171,7 +173,7 @@ void cmpEP( int idx, int sc,
       list<map<int,int>> new_whole_region;
       new_whole_parm.push_back( label_whole_parm );
       new_whole_region.push_back( regions.front() );
-      addRegion( ptr_seg, new_whole_parm, new_whole_region, tumor_labels, 
+      addRegion( ptr_seg, new_whole_parm, new_whole_region, tumor_labels,
                  tumor_regions, tumor_parm );
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       if( curr_label > 0 ) {
@@ -183,7 +185,10 @@ void cmpEP( int idx, int sc,
       for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
            it_list != region_parm.end(); ++ it_list ) {
         int sub_label = it_list->front();
-        vector<double> new_parm( ++ it_list->begin(), it_list->end() );
+        vector<double> &new_parm = whole_parm; 
+        for( int i = 0; i < 8; ++ i ) {
+          new_parm[ i ] = *( it_list->begin() + i + 1); 
+        }
         tumor_parm[ sub_label ] = new_parm;
       }
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
