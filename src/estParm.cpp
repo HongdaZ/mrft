@@ -300,16 +300,20 @@ extern "C" {
     // }
     // //////////////
     
-    // list< map<int, int>> regions;
-    // int curr_idx = 579850;
-    // int sc = scPred( regions, tumor_labels, tumor_regions, ptr_seg,
-    //                   ptr_nidx, curr_idx );
-    // // Rprintf( "sc = %d\n", sc );
-    // cmpEP( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels,
-    //        health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
-    //        ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
-    //        ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
-    // return seg;
+    list< map<int, int>> regions;
+    int curr_idx = 579850;
+    int sc = scPred( regions, tumor_labels, tumor_regions, ptr_seg,
+                      ptr_nidx, curr_idx );
+    // Rprintf( "sc = %d\n", sc );
+    vector<double> outlier_parm( 3, 0 ), theta( 6, 0 ), tmp_parm( 9, 0 );
+    vector<double> out_theta( 6, 0 ), new_out_parm( 2, 0 );
+    vector<double> whole_parm( 8, 0 );
+    cmpEP( curr_idx, sc, regions, tumor_regions, tumor_labels, outl_labels,
+           health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
+           ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
+           ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2, outlier_parm,
+           theta, tmp_parm, out_theta, new_out_parm, whole_parm );
+    return seg;
     
     // int maxit = 1;
     // bool skip_curr;
@@ -348,16 +352,15 @@ extern "C" {
     //     updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], ptr_nu2[ h_idx ],
     //                 ptr_intst, curr_label, ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx,
     //                 ptr_nintst, ptr_alpha[ h_idx ], ptr_beta[ h_idx ], maxit );
-    //     
+    // 
     //     vector<double> h_parm;
     //     h_parm.push_back( mu );
     //     h_parm.push_back( sigma2 );
-    //     
+    // 
     //     h_parm.insert( h_parm.end(), theta.begin(), theta.end() );
     //     health_parm[ curr_label ] = h_parm;
     //   }
     // }
-    debug();
-    return seg;
+    //debug();
   }
 } // extern "C"
