@@ -16,7 +16,7 @@ double energyY( const set<int> &region,
                 const int *ptr_nidx,
                 const double *ptr_intst,
                 const double *ptr_nintst,
-                vector<double> theta,
+                const vector<double> &theta,
                 double alphak,
                 double betak,
                 double a, double b );
@@ -28,7 +28,7 @@ double energyY( const int current_label,
                 const int *ptr_nidx,
                 const double *ptr_intst,
                 const double *ptr_nintst,
-                vector<double> theta );
+                const vector<double> &theta );
 // Single point energyY for tumor or outlier
 double energyY( const int curr_label,
                 const int curr_idx,
@@ -40,7 +40,7 @@ double energyY( const int curr_label,
                 const int *ptr_nidx,
                 const double *ptr_intst,
                 const double *ptr_nintst,
-                vector<double> theta,
+                const vector<double> &theta,
                 double alphak,
                 double betak,
                 double a, double b );

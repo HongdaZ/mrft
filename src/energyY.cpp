@@ -24,7 +24,7 @@ double energyY( const set<int> &region,
                const int *ptr_nidx,
                const double *ptr_intst,
                const double *ptr_nintst,
-               vector<double> theta,
+               const vector<double> &theta,
                double alphak,
                double betak,
                double a, double b ){
@@ -101,7 +101,7 @@ double energyY( const int curr_label,
                 const int *ptr_nidx,
                 const double *ptr_intst,
                 const double *ptr_nintst,
-                vector<double> theta ) {
+                const vector<double> &theta ) {
   double curr_intst = ptr_intst[ curr_idx - 1 ];
   curr_intst -= mu;
   double nbr_intst[ 6 ];
@@ -139,7 +139,7 @@ double energyY( const int curr_label,
                 const int *ptr_nidx,
                 const double *ptr_intst,
                 const double *ptr_nintst,
-                vector<double> theta,
+                const vector<double> &theta,
                 double alphak,
                 double betak,
                 double a, double b ) {
