@@ -5,7 +5,7 @@
 #include "search.h"
 #include "findRegion.h"
 
-set<int> findRegion( int *ptr_label, const int *ptr_nidx, const bool init, 
+set<int> findRegion( const int n_region, int *ptr_label, const int *ptr_nidx, const bool init, 
                      set<int> &tumor_nbr, bool &early_return,
                      int start ) {
 
@@ -16,7 +16,7 @@ set<int> findRegion( int *ptr_label, const int *ptr_nidx, const bool init,
   front.push( start );
   region.insert( start );
   ptr_label[ 2 * start - 1 ] = 1;
-  search( init, ptr_label, ptr_nidx, front, l, region, tumor_nbr,
+  search( n_region, init, ptr_label, ptr_nidx, front, l, region, tumor_nbr,
           early_return );
   for( set<int>::iterator it = region.begin(); it != region.end(); ++ it ) {
     ptr_label[ 2 * *it - 1 ] = 0;

@@ -22,7 +22,7 @@ int scTrn( list< map<int, int>> &regions,
   if( current <= 0 && current >= -3 ) {
     return 0;
   } else {
-    // possibly split
+    
     set<int> tumor_nbr;
     set<int> nbr_label;
     // Add tumor neighbors to set
@@ -38,6 +38,7 @@ int scTrn( list< map<int, int>> &regions,
     }
     if( tumor_nbr.size() < 2 ) {
       return 0;
+      // possibly split
     } else if( current <= - 4 ) {
       // remember to reset seg[ 2, ] == 0
       ptr_label[ 2 * start - 1  ] = 1;
@@ -47,13 +48,13 @@ int scTrn( list< map<int, int>> &regions,
         ptr_label[ 2 * *it - 1 ] = 2;
       }
       bool early_return = 0;
-
+      int n_region;
       while( !tumor_nbr.empty() ) {
-        
+        n_region = regions.size();
         int new_start = *tumor_nbr.begin();
         tumor_nbr.erase( new_start );
         ptr_label[ 2 * new_start - 1 ] = 0;
-        set<int> contaguous_region = findRegion( ptr_label, ptr_nidx, false,
+        set<int> contaguous_region = findRegion( n_region, ptr_label, ptr_nidx, false,
                                                  tumor_nbr, early_return,
                                                  new_start );
         if( early_return ) {
@@ -94,6 +95,17 @@ int scTrn( list< map<int, int>> &regions,
         return 1;
       }
     } else {
+      bool all_equal = true;
+      int first_label = *nbr_label.begin();
+      for( set<int>::iterator it = ++ nbr_label.begin();
+           it != nbr_label.end(); ++ it ) {
+        if( first_label != *it ) {
+          all_equal = false;
+        }
+      }
+      if( all_equal ) {
+        return 0;
+      }
       map<int, int> sub_region;
       map<int, int> whole;
       // possibly combine 
