@@ -3,16 +3,16 @@
 
 #include <vector>
 #include <map>
-#include <set>
+#include <list>
 
 using std::vector;
 using std::map;
-using std::set;
+using std::list;
 
 // add new outlier
 void updateBeta( double *ptr_beta, const double *ptr_alpha, 
                  map<int, vector<double>> &health_parm,
-                 map<int, set<int>> &tumor_regions,
+                 map<int, list<int>> &tumor_regions,
                  map<int, vector<double>> &tumor_parm );
 
 #endif

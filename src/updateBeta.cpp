@@ -2,7 +2,7 @@
 // update beta
 void updateBeta( double *ptr_beta, const double *ptr_alpha, 
                  map<int, vector<double>> &health_parm,
-                 map<int, set<int>> &tumor_regions,
+                 map<int, list<int>> &tumor_regions,
                  map<int, vector<double>> &tumor_parm ) {
   
   for( int i = 0; i < 3; ++ i ){
@@ -13,7 +13,7 @@ void updateBeta( double *ptr_beta, const double *ptr_alpha,
   // the biggest tumor region
   int max_size = 0;
   int max_label = 0;
-  for( map<int, set<int>>::iterator it = tumor_regions.begin();
+  for( map<int, list<int>>::iterator it = tumor_regions.begin();
        it != tumor_regions.end(); ++ it ) {
     if( it->second.size() > max_size ) {
       max_size = it->second.size();
