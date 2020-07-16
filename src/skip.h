@@ -12,6 +12,7 @@ using std::vector;
 
 // whether skip current voxel
 bool skip( const int idx, const int *ptr_seg, const int *ptr_nidx, 
-           const double *ptr_intst, const double *ptr_m  );
+           const double *ptr_intst, const double threshold,
+           const int search, const int maxit );
 
 #endif

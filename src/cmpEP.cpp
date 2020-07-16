@@ -12,7 +12,7 @@
 
 // compare energy for prediction
 void cmpEP( int idx, int sc,
-            list<list<int>> &regions,
+            list<int> &labels, list<list<int>> &regions,
             map<int, list<int>> &tumor_regions,
             list<int> &tumor_labels, list<int> &outl_labels,
             map<int, vector<double>> &health_parm,
@@ -43,15 +43,15 @@ void cmpEP( int idx, int sc,
     // energy of whole region, subregions and outlier
     int len = regions.size();
     vector<double> nrg( len + 1, 0 ); 
-    vector<double>::iterator it_nrg = nrg.begin();
     // parameters for regions
     list<vector<double>> region_parm;
     // parameters for outler
-    for( list<list<int>>::iterator it = regions.begin();
-         it != regions.end(); ++ it, ++ it_nrg ) {
+    list<list<int>>::iterator it = regions.begin();
+    list<int>::iterator it_label = labels.begin();
+    vector<double>::iterator it_nrg = nrg.begin();
+    for( ; it != regions.end(); ++ it, ++ it_label, ++ it_nrg ) {
       double mu = - 1, sigma2 = 1;
-      map<int, int>::iterator it_map = it->begin();
-      int curr_label = it_map->second;
+      int curr_label = *it_label;
       updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ],
                   ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, curr_label,
                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
@@ -67,7 +67,7 @@ void cmpEP( int idx, int sc,
       region_parm.push_back( tmp_parm );
 
       // calculate energy
-      set<int> t_region;
+      list<int> t_region;
       for( ; it_map != it->end(); ++ it_map ) {
         t_region.insert( it_map->first );
       }

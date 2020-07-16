@@ -12,9 +12,9 @@
 
 // compare energy for training
 void cmpET( int idx, int sc,
-            list<map<int, int >> &regions,
-            map<int, set<int>> &tumor_regions, 
-            set<int> &tumor_labels, set<int> &outl_labels,
+            list<int> &labels, list<list<int>> &regions,
+            map<int, list> &tumor_regions, 
+            list<int> &tumor_labels, list<int> &outl_labels,
             map<int, vector<double>> &health_parm,
             map<int, vector<double>> &tumor_parm, 
             map<int, vector<double>> &outl_parm,

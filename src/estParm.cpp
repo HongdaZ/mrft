@@ -319,12 +319,17 @@ extern "C" {
     
     int maxit = 20;
     bool skip_curr;
+    vector<int> search( len, 0 );
+    double threshold = ptr_m[ 2 ];
     for( int i = 0; i < maxit; ++ i ) {
       for( int j = 1; j <= len; ++ j ) {
-        skip_curr = skip( j, ptr_seg, ptr_nidx );
+        
+        skip_curr = skip( j, ptr_seg, ptr_nidx, ptr_intst, threshold, 
+                          search[ j ], 10 );
         if( skip_curr ) {
           continue;
         } else {
+          ++ search[ j ];
           list<list<int>> regions;
           list<int> labels;
           int sc = scTrn( labels, regions, tumor_labels, tumor_regions, ptr_seg,
