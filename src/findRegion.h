@@ -1,9 +1,10 @@
 #ifndef FINDREGION_H
 #define FINDREGION_H
-#include <set>
-using std::set;
+#include <list>
+using std::list;
 
-set<int> findRegion( const int n_region, int *ptr_label, const int *ptr_nidx, const bool init,
-                     set<int> &tumor_nbr, bool &early_return,int start );
+list<int> findRegion( const int n_region, int *ptr_label, 
+                       const int *ptr_nidx, const bool init,
+                       list<int> &tumor_nbr, bool &early_return,int start );
 
 #endif

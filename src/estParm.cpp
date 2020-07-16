@@ -61,14 +61,14 @@ extern "C" {
     const double *ptr_nu2 = REAL( nu2 );
     
     int len = length( idx );
-    set<int> tumor_labels;
-    set<int> outl_labels;
+    list<int> tumor_labels;
+    list<int> outl_labels;
     map<int, vector<double>> health_parm;
     map<int, vector<double>> tumor_parm;
     map<int, vector<double>> outl_parm;
 
     
-    map<int, set<int>> tumor_regions;
+    map<int, list<int>> tumor_regions;
     initRegion( ptr_seg, ptr_nidx, len,
                 tumor_regions, tumor_labels );
     

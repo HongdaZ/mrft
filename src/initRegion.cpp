@@ -6,19 +6,15 @@
 #include "findRegion.h"
 #include "initRegion.h"
 
-using std::map;
-using std::set;
-using std::list;
-
 void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
-                 map<int, set<int>> &tumor, set<int> &labels ) {
+                 map<int, list<int>> &tumor, list<int> &labels ) {
   
-  set<int> region;
+  list<int> region;
   int tumor_label = - 4;
   int n_region = 1;
   for( int i = 0; i < len; ++ i ) {
     if( ptr_seg[ 2 * i ] > 0 ) {
-      set<int> tumor_nbr;
+      list<int> tumor_nbr;
       bool early_return;
       region = findRegion( n_region, ptr_seg, ptr_nidx, true, 
                            tumor_nbr, early_return, i + 1 );
@@ -33,11 +29,11 @@ void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
       //   }
       // }
       // //////////////////////////////////////////////////////////
-      for( set<int>::iterator it = region.begin(); it != region.end(); 
+      for( list<int>::iterator it = region.begin(); it != region.end(); 
       ++ it ) {
         ptr_seg[ 2 * ( *it - 1 ) ] = tumor_label;
       }
-      labels.insert( tumor_label );
+      labels.push_back( tumor_label );
       -- tumor_label;
     }
   }

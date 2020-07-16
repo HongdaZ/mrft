@@ -3,16 +3,17 @@
 
 #include <Rinternals.h>
 
-#include <set> 
+#include <list> 
 #include <queue>
 
-using std::set;
+using std::list;
 using std::queue;
 
 extern "C" {
-  void search( const int n_region, const bool init, int *label, const int *nidx, 
-               queue<int>& front, const int & l, set<int>& region,
-               set<int> &tumor_nbr, bool &early_return );
+  void search( const int n_region, const bool init, int *label,
+               const int *nidx, queue<int>& front, const int & l,
+               list<int>& region, list<int> &tumor_nbr, 
+               bool &early_return );
 
 } // extern "C"
 #endif
