@@ -332,12 +332,13 @@ extern "C" {
           ++ search[ j ];
           list<list<int>> regions;
           list<int> labels;
-          int sc = scTrn( labels, regions, tumor_labels, tumor_regions, ptr_seg,
-                          ptr_nidx, j );
-          cmpET( j, sc, regions, tumor_regions, tumor_labels, outl_labels,
-                 health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
-                 ptr_nintst, ptr_delta, ptr_gamma, ptr_alpha, ptr_beta,
-                 ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2 );
+          int sc = scTrn( labels, regions, tumor_labels, tumor_regions, 
+                          ptr_seg, ptr_nidx, j );
+          cmpET( j, sc, labels, regions, tumor_regions, tumor_labels, 
+                 outl_labels, health_parm, tumor_parm, outl_parm, ptr_seg,
+                 ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
+                 ptr_alpha, ptr_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
+                 ptr_nu2 );
         }
         // Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
       }
