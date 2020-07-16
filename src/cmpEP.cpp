@@ -265,8 +265,8 @@ void cmpEP( int idx, int sc,
                                    ptr_gamma[ 0 ] );
       // outlier parameters
       double out_mu = - 1, out_sigma2 = 1;
-      map<int, int> out_region;
-      out_region[ idx ] = out_label;
+      list<int> out_region;
+      out_region.push_back( idx );
       if( curr_label > 0 ) {
         new_out_parm = outl_parm[ curr_label ];
         out_mu = new_out_parm[ 0 ];
@@ -292,18 +292,18 @@ void cmpEP( int idx, int sc,
       if( min_label <= - 4 ) {
         if( curr_label >= - 3 && curr_label <= 0 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          tumor_regions[ t_label ].insert( idx );
+          tumor_regions[ t_label ].push_back( idx );
         } else if( curr_label >= 1 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           eraseOutl( out_label, outl_labels, outl_parm );
-          tumor_regions[ t_label ].insert( idx );
+          tumor_regions[ t_label ].push_back( idx );
         }
       } else if( min_label >= - 3 && min_label <= -1 ) {
         if( curr_label == 0 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
         } else if( curr_label <= - 4 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          tumor_regions[ t_label ].erase( idx );
+          tumor_regions[ t_label ].remove( idx );
         } else if( curr_label >= 1 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           eraseOutl( out_label, outl_labels, outl_parm );
@@ -311,7 +311,7 @@ void cmpEP( int idx, int sc,
       } else if( min_label >= 1 ) {
         if( curr_label  <= - 4 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          tumor_regions[ t_label ].erase( idx );
+          tumor_regions[ t_label ].remove( idx );
           addOutl( out_label, new_out_parm, outl_labels, outl_parm );
         } else if( curr_label >= - 3 && curr_label <= 0 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
@@ -332,9 +332,9 @@ void cmpEP( int idx, int sc,
       // new tumor region parameters
       double t_mu = -1, t_sigma2 = 1; // t_sigma2 has to be non-zero;
       vector<double> &t_theta = theta;
-      map<int, int> new_region;
-      list<map<int, int>> new_regions;
-      new_region[ idx ] = t_label;
+      list<int> new_region;
+      list<list<int>> new_regions;
+      new_region.push_back( idx );
       new_regions.push_back( new_region );
       
       updateParm( t_mu, t_theta, t_sigma2, new_region, ptr_m[ 3 ],
