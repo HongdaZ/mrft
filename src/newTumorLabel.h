@@ -1,11 +1,11 @@
 #ifndef NEWTUMORLABEL_H
 #define NEWTUMORLABEL_H
 
-#include <set>
+#include <list>
 
-using std::set;
+using std::list;
 
 // find an outlier label for current voxel
-int newTumorLabel( const int order, const set<int> &tumor_labels );
+int newTumorLabel( const int order, const list<int> &tumor_labels );
 
 #endif

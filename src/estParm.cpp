@@ -325,8 +325,9 @@ extern "C" {
         if( skip_curr ) {
           continue;
         } else {
-          list< map<int, int>> regions;
-          int sc = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
+          list<list<int>> regions;
+          list<int> labels;
+          int sc = scTrn( labels, regions, tumor_labels, tumor_regions, ptr_seg,
                           ptr_nidx, j );
           cmpET( j, sc, regions, tumor_regions, tumor_labels, outl_labels,
                  health_parm, tumor_parm, outl_parm, ptr_seg, ptr_nidx, ptr_intst,
