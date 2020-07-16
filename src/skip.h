@@ -11,6 +11,7 @@
 using std::vector;
 
 // whether skip current voxel
-bool skip( const int idx, const int *ptr_seg, const int *ptr_nidx );
+bool skip( const int idx, const int *ptr_seg, const int *ptr_nidx, 
+           const double *ptr_intst, const double *ptr_m  );
 
 #endif

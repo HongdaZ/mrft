@@ -10,7 +10,7 @@ using std::map;
 using std::set;
 
 // split or combine for prediction
-int scPred( list< map<int, int>> &regions, 
+int scPred( list<int> &labels, list<list<int>> &regions, 
            const set<int> &tumor_labels,
            map<int, set<int>> &tumor_regions, 
            int *label, const int *nidx, int start );
