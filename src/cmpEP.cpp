@@ -79,8 +79,8 @@ void cmpEP( int idx, int sc,
 
     // outlier parameters
     double out_mu = - 1, out_sigma2 = 1;
-    map<int, int> out_region;
-    out_region[ idx ] = out_label;
+    list<int> out_region;
+    out_region.push_back( idx );
     updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], ptr_m[ 2 ],
                 ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, out_label,
                 ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_alpha[ 3 ],
