@@ -186,16 +186,17 @@ void cmpET( int idx, int sc,
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       // tumor or outlier
     } else {
-      vector<int> nbr_label = nbrLabel( idx, ptr_seg, ptr_nidx );
-      bool have_tumor = false;
-      int t_label = 0;
-      for( int i = 0; i < 6; ++ i ) {
-        if( nbr_label[ i ] != NA_INTEGER && nbr_label[ i ] < - 3 ) {
-          have_tumor = true;
-          t_label = nbr_label[ i ];
-        }
-      }
+      // check if having tumor neighbor
+      list<int> nbr_label;
+      list<int> tumor_nbr;
+      nbrLabel( nbr_label, tumor_nbr, idx, ptr_seg, ptr_nidx );
+      bool have_tumor = tumor_nbr.size();
+      int t_label;
+      
+      // have tumor neighbor
       if( have_tumor ) {
+        int t_idx = tumor_nbr.front();
+        t_label = ptr_seg[ 2 * ( t_idx - 1 ) ];
         // tumor energy
         vector<double> t_parm = tumor_parm[ t_label ];
         double t_mu = t_parm[ 0 ];

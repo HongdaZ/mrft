@@ -1,23 +1,23 @@
 #include <R.h>
 #include <Rinternals.h>
 
-#include <set>
+#include <list>
 #include <vector>
 
 #include "scPred.h"
 #include "findRegion.h"
 #include "newTumorLabel.h"
 
-using std::set;
+using std::list;
 using std::vector;
 
 // start = 1 to length array
 // nidx also starts from 1
 
 // split or combine for prediction
-int scPred( list< map<int, int>> &regions,
-            const set<int> &tumor_labels,
-            map<int, set<int>> &tumor_regions,
+int scPred( list<int> &labels, list<list<int>> &regions, 
+            const list<int> &tumor_labels,
+            map<int, list<int>> &tumor_regions,
             int *ptr_label, const int *ptr_nidx, int start ) {
   regions.clear();
   int current = ptr_label[ 2 * ( start - 1 ) ];

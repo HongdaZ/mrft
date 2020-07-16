@@ -12,9 +12,9 @@
 
 // compare energy for prediction
 void cmpEP( int idx, int sc,
-            list<map<int, int >> &regions,
-            map<int, set<int>> &tumor_regions,
-            set<int> &tumor_labels, set<int> &outl_labels,
+            list<list<int>> &regions,
+            map<int, list<int>> &tumor_regions,
+            list<int> &tumor_labels, list<int> &outl_labels,
             map<int, vector<double>> &health_parm,
             map<int, vector<double>> &tumor_parm,
             map<int, vector<double>> &outl_parm,
@@ -47,7 +47,7 @@ void cmpEP( int idx, int sc,
     // parameters for regions
     list<vector<double>> region_parm;
     // parameters for outler
-    for( list<map<int, int>>::iterator it = regions.begin();
+    for( list<list<int>>::iterator it = regions.begin();
          it != regions.end(); ++ it, ++ it_nrg ) {
       double mu = - 1, sigma2 = 1;
       map<int, int>::iterator it_map = it->begin();
@@ -206,17 +206,16 @@ void cmpEP( int idx, int sc,
     // no split or combine
   } else {
     // check if having tumor neighbor
-    vector<int> nbr_label = nbrLabel( idx, ptr_seg, ptr_nidx );
-    bool have_tumor = false;
-    int t_label = 0;
-    for( int i = 0; i < 6; ++ i ) {
-      if( nbr_label[ i ] != NA_INTEGER && nbr_label[ i ] < - 3 ) {
-        have_tumor = true;
-        t_label = nbr_label[ i ];
-      }
-    }
+    list<int> nbr_label;
+    list<int> tumor_nbr;
+    nbrLabel( nbr_label, tumor_nbr, idx, ptr_seg, ptr_nidx );
+    bool have_tumor = tumor_nbr.size();
+    int t_label;
+    
     // have tumor neighbor
     if( have_tumor ) {
+      int t_idx = tumor_nbr.front();
+      t_label = ptr_seg[ 2 * ( t_idx - 1 ) ];
       // tumor energy
       vector<double> &t_parm = tumor_parm[ t_label ];
       double t_mu = t_parm[ 0 ];

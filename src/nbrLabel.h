@@ -1,11 +1,12 @@
 #ifndef NBRLABEL_H
 #define NBRLABEL_H
 
-#include <vector>
+#include <list>
 
-using std::vector;
+using std::list;
 
-vector<int> nbrLabel( const int curr_idx, 
-                 const int *ptr_seg, const int *ptr_nidx );
+void nbrLabel( list<int> &nbr_label, list<int> &tumor_nbr, 
+               const int curr_idx, const int *ptr_seg, 
+               const int *ptr_nidx );
                  
 #endif

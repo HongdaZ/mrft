@@ -14,7 +14,7 @@ using std::vector;
 using std::find;
 // start = 1 to length array
 // nidx also starts from 1
-int scTrn( list<int> labels, list<list<int>> &regions,  
+int scTrn( list<int> &labels, list<list<int>> &regions,  
            const list<int> &tumor_labels,
            map<int, list<int>> &tumor_regions,
            int *ptr_label, const int *ptr_nidx, int start ) {
@@ -56,14 +56,13 @@ int scTrn( list<int> labels, list<list<int>> &regions,
         int new_start = *tumor_nbr.begin();
         tumor_nbr.pop_front();
         ptr_label[ 2 * new_start - 1 ] = 0;
-        list<int> contaguous_region = findRegion( n_region, ptr_label, ptr_nidx, false,
+        list<int> sub_region = findRegion( n_region, ptr_label, ptr_nidx, false,
                                                  tumor_nbr, early_return,
                                                  new_start );
         if( early_return ) {
           ptr_label[ 2 * start - 1  ] = 0;
           return 0;
         }
-        list<int> sub_region;
         int region_label;
         if( regions.empty() ) {
           region_label = current;
@@ -73,7 +72,7 @@ int scTrn( list<int> labels, list<list<int>> &regions,
           
         }
         labels.push_back( region_label );
-        regions.push_back( contaguous_region );
+        regions.push_back( sub_region );
       }
       // restore the value of seg[ 2, ] to 0;
       ptr_label[ 2 * start - 1  ] = 0;
@@ -98,8 +97,10 @@ int scTrn( list<int> labels, list<list<int>> &regions,
       for( it = nbr_label.begin();
            it != nbr_label.end(); ++ it ) {
         sub_region = tumor_regions[ *it ];
-        regions.push_back( sub_region );
+        
         labels.push_back( *it );
+        regions.push_back( sub_region );
+        
         whole.insert( whole.end(), sub_region.begin(), sub_region.end() );
       }
       int combine_label = *( -- it );
