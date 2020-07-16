@@ -351,10 +351,10 @@ extern "C" {
         for( int  j = 0; j < 6; ++ j ) {
           theta.push_back( 0 );
         }
-        set<int> region;
+        list<int> region;
         for( int k = 0; k < len; ++ k ) {
           if( ptr_seg[ 2 * k ] == curr_label ) {
-            region.insert( k + 1 ); // region starts from 1
+            region.push_back( k + 1 ); // region starts from 1
           }
         }
         int h_idx =  - 1 - curr_label; // == 0, 1, 2
