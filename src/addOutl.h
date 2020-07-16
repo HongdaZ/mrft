@@ -3,16 +3,16 @@
 
 #include <vector>
 #include <map>
-#include <set>
+#include <list>
 
 using std::vector;
 using std::map;
-using std::set;
+using std::list;
 
 // add new outlier
 void addOutl( const int new_out_label,
               const vector<double> &new_out_parm, 
-              set<int> &outl_labels,
+              list<int> &outl_labels,
               map<int, vector<double>> &outl_parm );
 
 #endif
