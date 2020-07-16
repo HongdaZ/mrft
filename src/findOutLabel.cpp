@@ -2,7 +2,7 @@
 
 // find an outlier label for current voxel
 int findOutLabel( const int idx, const int *ptr_seg, 
-                 const set<int> &outl_labels ) {
+                  const list<int> &outl_labels ) {
   int out_label;
   // current label is not outlier
   if( ptr_seg[ 2 * ( idx - 1 ) ] < 1 ) {
@@ -12,9 +12,9 @@ int findOutLabel( const int idx, const int *ptr_seg,
       out_label = outl_labels.size() + 1;
     } else {
       int i = 0;
-      set<int>::iterator it_set = outl_labels.begin();
-      for( ; it_set != outl_labels.end(); ++ it_set, ++ i ) {
-        if( ( i + 1 ) < *it_set ) {
+      list<int>::const_iterator it = outl_labels.begin();
+      for( ; it != outl_labels.end(); ++ it, ++ i ) {
+        if( ( i + 1 ) < *it ) {
           out_label = i + 1;
           break;
         }

@@ -1,12 +1,12 @@
 #ifndef FINDOUTLABEL_H
 #define FINDOUTLABEL_H
 
-#include <set>
+#include <list>
 
-using std::set;
+using std::list;
 
 // find an outlier label for current voxel
 int findOutLabel( const int idx, const int *ptr_seg, 
-                 const set<int> &outl_labels );
+                 const list<int> &outl_labels );
 
 #endif
