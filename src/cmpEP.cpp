@@ -141,7 +141,7 @@ void cmpEP( int idx, int sc,
       eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm );
       list<vector<double>> new_region_parm( ++ region_parm.begin() ,
                                             region_parm.end() );
-      list<map<int, int >> new_regions( ++ regions.begin(), 
+      list<list<int>> new_regions( ++ regions.begin(), 
                                         regions.end() );
       addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels,
                  tumor_regions, tumor_parm );

@@ -2,26 +2,24 @@
 // add new tumor regions
 void addRegion( int *ptr_seg, 
                 const list<vector<double>> &region_parm, 
-                const list<map<int,int>> &regions, 
-                set<int> &tumor_labels,
-                map<int, set<int>> &tumor_regions, 
+                const list<list<int>> &regions, 
+                list<int> &tumor_labels,
+                map<int, list<int>> &tumor_regions, 
                 map<int, vector<double>> &tumor_parm ) {
   
   list<vector<double>>::const_iterator it = region_parm.begin();
-  list<map<int, int >>::const_iterator it_region = regions.begin();
+  list<list<int>>::const_iterator it_region = regions.begin();
   for( ; it != region_parm.end(); ++ it, ++ it_region ) {
     vector<double>::const_iterator it_parm = it->begin();
     int new_label = *it_parm;
     vector<double> new_parm( ++ it_parm, it->end() );
-    set<int> new_region;
-    for( map<int, int>::const_iterator it_map = it_region->begin();
-         it_map != it_region->end(); ++ it_map ) {
-      new_region.insert( it_map->first );
+    for( list<int>::const_iterator it_ = it_region->begin();
+         it_ != it_region->end(); ++ it_ ) {
       // update ptr_seg
-      ptr_seg[ 2 * ( it_map->first - 1 ) ] = new_label;
+      ptr_seg[ 2 * ( *it_ - 1 ) ] = new_label;
     }
-    tumor_labels.insert( new_label );
-    tumor_regions[ new_label ] = new_region;
+    tumor_labels.push_back( new_label );
+    tumor_regions[ new_label ] = *it_region;
     tumor_parm[ new_label ] = new_parm;
   }
   return;
