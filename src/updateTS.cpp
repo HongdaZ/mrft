@@ -3,19 +3,21 @@
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
 
-#include <set>
+#include <algorithm>
+
+#include <list>
 #include <vector>
 
 #include "updateTS.h"
 
-using std::set;
+using std::list;
 using std::vector;
-
+using std::find;
 
 
 // region starts from 1
 // updateTheta and sigma2 for health and tumorous regions
-void updateTS( const set<int> &region, int curr_label,
+void updateTS( const list<int> &region, int curr_label,
                const double mu,
                double &sigma2,
                const double lambda2,
@@ -31,7 +33,7 @@ void updateTS( const set<int> &region, int curr_label,
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
   
-  set<int>::iterator it = region.begin();
+  list<int>::const_iterator it = region.begin();
   int idx = *it;
   int label = ptr_seg[ 2 * ( idx - 1 ) ];
   // Initialize yln and yl;
@@ -54,7 +56,9 @@ void updateTS( const set<int> &region, int curr_label,
         }
         // tumor
       } else {
-        if( region.count( nidx ) ) {
+        list<int>::const_iterator it = find( region.begin(), 
+                                             region.end(), nidx );
+        if( it != region.end() ) {
           yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
         } else {
           yln[ i * nrow + j ] = 0;

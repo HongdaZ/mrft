@@ -9,7 +9,7 @@ using std::abs;
 
 // update parameters for healthy cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const set<int> &region,
+                 const list<int> &region,
                  const double m,
                  const double nu2,
                  const double *ptr_intst,
@@ -47,7 +47,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for tumor cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const map<int, int> &region,
+                 const list<int> &region,
                  const double m,
                  const double mk_1,
                  const double a,
@@ -68,17 +68,12 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tol = 1;
   double tmp = 0;
   mu = - 1;
-  set<int> set_region;
-  for( map<int, int>::const_iterator it = region.begin(); 
-       it != region.end(); ++ it ) {
-    set_region.insert( it->first );
-  }
   while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
     tmp = updateMu( region, sigma2, m, mk_1, a, b, theta, ptr_intst );
     // Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );
     mu = tmp;
-    updateTS( set_region, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
+    updateTS( region, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
               ptr_intst, ptr_nintst, theta, alphal, betal );
     // for( int j = 0; j < 6; ++ j ) {
     //   Rprintf( "%f\t", theta[ j ] );
@@ -91,7 +86,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for outliers
 void updateParm( double &mu, double &sigma2, 
-                 const map<int, int> &region,
+                 const list<int> &region,
                  const double m,
                  const double mk_1,
                  const double a,
@@ -108,8 +103,8 @@ void updateParm( double &mu, double &sigma2,
   double tol = 1;
   double tmp = 0;
   mu = - 1;
-  map<int, int>::const_iterator it = region.begin();
-  int idx = it->first;
+  list<int>::const_iterator it = region.begin();
+  int idx = *it;
   while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
     tmp = updateMu( region, sigma2, m, mk_1, a, b, ptr_intst );
     // Rprintf( "mu = %f \n", tmp );

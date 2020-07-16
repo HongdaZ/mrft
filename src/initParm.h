@@ -1,13 +1,10 @@
 #ifndef INITPARM_H
 #define INITPARM_H
 
-
-#include <set>
 #include <vector>
 #include <map>
 #include <list>
 
-using std::set;
 using std::vector;
 using std::map;
 using std::list;
@@ -20,7 +17,8 @@ void initParm( map<int, vector<double>> &health_parm,
                const double *lambda2, const int *ptr_nidx,
                const double *ptr_nintst, const double *ptr_alpha,
                const double *ptr_beta,
-               map<int, set<int>> tumor_regions, 
-               const double *ptr_a, const double *ptr_b, int len, int maxit = 20 );
+               map<int, list<int>> tumor_regions, 
+               const double *ptr_a, const double *ptr_b, int len, 
+               int maxit = 20 );
 
 #endif

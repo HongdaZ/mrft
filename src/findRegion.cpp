@@ -1,9 +1,11 @@
 #include <R.h>
 #include <Rinternals.h>
-#include <list>
+
 #include <queue>
 #include "search.h"
 #include "findRegion.h"
+
+using std::queue;
 
 list<int> findRegion( const int n_region, int *ptr_label, const int *ptr_nidx, const bool init, 
                      list<int> &tumor_nbr, bool &early_return,

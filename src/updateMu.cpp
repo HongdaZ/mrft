@@ -2,20 +2,20 @@
 #include <Rinternals.h>
 #include <cmath>   
 
-#include <set>
+#include <list>
 #include <vector>
 #include <map>
 
 #include "updateMu.h"
 
-using std::set;
+using std::list;
 using std::vector;
 using std::map;
 using std::abs;
 
 // region starts from 1
 // update mu for healthy cells
-double updateMu( const set<int> &region,  
+double updateMu( const list<int> &region,  
                  const double sigma2,
                  const double m,
                  const double nu2,
@@ -28,7 +28,7 @@ double updateMu( const set<int> &region,
     sum_theta += *it;
   }
   double sum_y = 0;
-  for( set<int>::iterator it = region.begin(); it != region.end();
+  for( list<int>::const_iterator it = region.begin(); it != region.end();
   ++ it ) {
     sum_y += ptr_intst[ *it - 1 ]; 
   }
@@ -43,7 +43,7 @@ double derivative( double mu, double sigma2, double sum_theta,
     ( a + 1 ) / ( mu - m ) + b / pow( mu - m, 2 );
 }
 // update mu for tumor cells
-double updateMu( const map<int, int> &region,  
+double updateMu( const list<int> &region,  
                  const double sigma2,
                  const double m,
                  const double mk_1,
@@ -58,9 +58,9 @@ double updateMu( const map<int, int> &region,
     sum_theta += *it;
   }
   double sum_y = 0;
-  for( map<int, int>::const_iterator it = region.begin(); it != region.end();
+  for( list<int>::const_iterator it = region.begin(); it != region.end();
   ++ it ) {
-    sum_y += ptr_intst[ it->first - 1 ]; 
+    sum_y += ptr_intst[ *it - 1 ]; 
   }
   int max_itr = 100;
   double l, r;
@@ -101,7 +101,7 @@ double updateMu( const map<int, int> &region,
 }
 
 // update mu for outliers
-double updateMu( const map<int, int> &region,  
+double updateMu( const list<int> &region,  
                  const double sigma2,
                  const double m,
                  const double mk_1,
@@ -111,9 +111,9 @@ double updateMu( const map<int, int> &region,
   int n = region.size();
   double sum_theta = 0;
   double sum_y = 0;
-  for( map<int, int>::const_iterator it = region.begin(); it != region.end();
+  for( list<int>::const_iterator it = region.begin(); it != region.end();
   ++ it ) {
-    sum_y += ptr_intst[ it->first - 1 ]; 
+    sum_y += ptr_intst[ *it - 1 ]; 
   }
   int max_itr = 100;
   double l, r;

@@ -1,15 +1,15 @@
 #ifndef UPDATETS_H
 #define UPDATETS_H
 
-#include <set>
+#include <list>
 #include <vector>
 
-using std::set;
+using std::list;
 using std::vector;
 
 // region starts from 1
 // updateTheta and sigma2 for health and tumorous regions
-void updateTS( const set<int> &region, int curr_label,
+void updateTS( const list<int> &region, int curr_label,
                const double mu,
                double &sigma2,
                const double lambda2,

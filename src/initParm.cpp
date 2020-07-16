@@ -14,23 +14,20 @@ void initParm( map<int, vector<double>> &health_parm,
                const double *ptr_lambda2, const int *ptr_nidx,
                const double *ptr_nintst, const double *ptr_alpha,
                const double *ptr_beta,
-               map<int, set<int>> tumor_regions, 
-               const double *ptr_a, const double *ptr_b, int len, int maxit ) {
+               map<int, list<int>> tumor_regions, 
+               const double *ptr_a, const double *ptr_b, int len, 
+               int maxit ) {
   // update parameters for tumor regions
-  for( map<int, set<int>>::iterator it = tumor_regions.begin();
+  for( map<int, list<int>>::iterator it = tumor_regions.begin();
        it != tumor_regions.end(); ++ it ) {
     int curr_label = it->first;
-    set<int> set_region = it->second;
-    map<int, int>  region;
-    for( set<int>::iterator set_it = set_region.begin();
-         set_it != set_region.end(); ++ set_it ) {
-      region[ *set_it ] = curr_label;
-    }
+    list<int> &region = it->second;
     double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
     vector<double> theta( 6, 0 );
-    updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ], ptr_a[ 0 ],
-                ptr_b[ 0 ], ptr_intst, curr_label, ptr_lambda2[ 3 ], ptr_seg,
-                ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
+    updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
+                ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, curr_label, 
+                ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
+                ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
     vector<double> t_parm( 8, 0 );
     t_parm[ 0 ] = mu;
     t_parm[ 1 ] = sigma2;
@@ -45,10 +42,10 @@ void initParm( map<int, vector<double>> &health_parm,
     // Rprintf( "curr_label = %d \n", curr_label );
     double mu = -1, sigma2 = 1;
     vector<double> theta( 6, 0 );
-    set<int> region;
+    list<int> region;
     for( int k = 0; k < len; ++ k ) {
       if( ptr_seg[ 2 * k ] == curr_label ) {
-        region.insert( k + 1 ); // region starts from 1
+        region.push_back( k + 1 ); // region starts from 1
       }
     }
     int h_idx =  - 1 - curr_label; // == 0, 1, 2
