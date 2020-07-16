@@ -166,7 +166,7 @@ void cmpEP( int idx, int sc,
       }
       
       list<vector<double>> new_whole_parm;
-      list<map<int,int>> new_whole_region;
+      list<list<int>> new_whole_region;
       new_whole_parm.push_back( label_whole_parm );
       new_whole_region.push_back( regions.front() );
       addRegion( ptr_seg, new_whole_parm, new_whole_region, tumor_labels,
