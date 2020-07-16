@@ -1,13 +1,13 @@
 #ifndef ENERGYY_H
 #define ENERGYY_H
 
-#include <set>
+#include <list>
 #include <vector>
 
-using std::set;
+using std::list;
 using std::vector;
 
-double energyY( const set<int> &region,
+double energyY( const list<int> &region,
                 double mu,
                 double mk1,
                 double sigma2,

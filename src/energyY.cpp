@@ -3,19 +3,20 @@
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
 
-#include <set>
+#include <list>
 #include <vector>
+#include <algorithm>
 
 #include "energyY.h"
 
-using std::set;
+using std::list;
 using std::vector;
-
+using std::find;
 
 
 // region starts from 1
 // calculate energy for tumor regions
-double energyY( const set<int> &region,
+double energyY( const list<int> &region,
                double mu,
                double mk1,
                double sigma2,
@@ -33,7 +34,7 @@ double energyY( const set<int> &region,
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
   
-  set<int>::iterator it = region.begin();
+  list<int>::const_iterator it = region.begin();
   int idx;
   // Initialize yln and yl;
   for( int j = 0; it!= region.end(); ++ it, ++ j ) {
@@ -41,7 +42,9 @@ double energyY( const set<int> &region,
     yl[ j ] = ptr_intst[ idx - 1 ] - mu;
     for( int i = 0; i < 6; ++ i ) {
       int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      if( region.count( nidx ) ) {
+      list<int>::const_iterator it = find( region.begin(), 
+                                           region.end(), nidx );
+      if( it != region.end() ) {
         yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
       } else {
         yln[ i * nrow + j ] = 0;

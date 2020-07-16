@@ -67,11 +67,7 @@ void cmpEP( int idx, int sc,
       region_parm.push_back( tmp_parm );
 
       // calculate energy
-      list<int> t_region;
-      for( ; it_map != it->end(); ++ it_map ) {
-        t_region.insert( it_map->first );
-      }
-      double energy = energyY( t_region, mu, ptr_m[ 2 ], sigma2,
+      double energy = energyY( *it, mu, ptr_m[ 2 ], sigma2,
                                ptr_lambda2[ 3 ], ptr_seg, ptr_nidx,
                                ptr_intst, ptr_nintst,
                                theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
