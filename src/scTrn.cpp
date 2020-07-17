@@ -9,10 +9,12 @@
 #include "findRegion.h"
 #include "newTumorLabel.h"
 #include "nbrLabel.h"
+#include "nonTumor.h"
 
 using std::list;
 using std::vector;
 using std::find;
+
 // start = 1 to length array
 // nidx also starts from 1
 int scTrn( list<int> &labels, list<list<int>> &regions,  
@@ -27,9 +29,11 @@ int scTrn( list<int> &labels, list<list<int>> &regions,
   } else {
     
     list<int> tumor_nbr;
-    list<int> nbr_label;
+    list<int> nbr_tumor_label;
     // Add tumor neighbors to set
-    nbrLabel( nbr_label, tumor_nbr, start, ptr_label, ptr_nidx );
+    nbrLabel( nbr_tumor_label, tumor_nbr, start, ptr_label, ptr_nidx );
+    // remove non-tumor labels
+    nbr_tumor_label.remove_if( nonTumor );
     if( tumor_nbr.size() < 2 ) {
       return 0;
       // possibly split
@@ -78,15 +82,15 @@ int scTrn( list<int> &labels, list<list<int>> &regions,
         return 1;
       }
     } else {
-      if( nbr_label.size() == 1 ) {
+      if( nbr_tumor_label.size() == 1 ) {
         return 0;
       }
       list<int> whole;
       // possibly combine 
       list<int>::iterator it;
       list<int> sub_region;
-      for( it = nbr_label.begin();
-           it != nbr_label.end(); ++ it ) {
+      for( it = nbr_tumor_label.begin();
+           it != nbr_tumor_label.end(); ++ it ) {
         sub_region = tumor_regions[ *it ];
         
         labels.push_back( *it );
