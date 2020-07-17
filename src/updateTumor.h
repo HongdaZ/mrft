@@ -13,10 +13,11 @@ using std::map;
 void updateTumor( list<int> &tumor_labels,
                   map<int, vector<double>> &tumor_parm, 
                   map<int, list<int>> &tumor_regions,
+                  const double *ptr_a, const double *ptr_b,
                   const int *ptr_seg, const double *ptr_m,
-                  const double *ptr_nu2, const double *ptr_intst,
-                  const double *ptr_lambda2, const int *ptr_nidx,
-                  const double *ptr_nintst, const double *ptr_alpha,
-                  const double *ptr_beta, const int &maxit );
+                  const double *ptr_intst, const double *ptr_lambda2,
+                  const int *ptr_nidx, const double *ptr_nintst,
+                  const double *ptr_alpha, const double *ptr_beta, 
+                  const int &maxit );
 
 #endif

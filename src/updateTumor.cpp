@@ -7,10 +7,10 @@ void updateTumor( list<int> &tumor_labels,
                   map<int, list<int>> &tumor_regions,
                   const double *ptr_a, const double *ptr_b,
                   const int *ptr_seg, const double *ptr_m,
-                  const double *ptr_nu2, const double *ptr_intst,
-                  const double *ptr_lambda2, const int *ptr_nidx,
-                  const double *ptr_nintst, const double *ptr_alpha,
-                  const double *ptr_beta, const int &maxit ) {
+                  const double *ptr_intst, const double *ptr_lambda2,
+                  const int *ptr_nidx, const double *ptr_nintst,
+                  const double *ptr_alpha, const double *ptr_beta, 
+                  const int &maxit ) {
   list<int>::iterator it_labels = tumor_labels.begin();
   for( ; it_labels != tumor_labels.end(); ++ it_labels ) {
     list<int> &region = tumor_regions[ *it_labels ];

@@ -26,6 +26,7 @@
 #include "skip.h"
 #include "debug.h"
 #include "updateHealth.h"
+#include "updateTumor.h"
 
 using std::stack;
 using std::queue;
@@ -341,13 +342,16 @@ extern "C" {
                  ptr_alpha, ptr_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
                  ptr_nu2 );
         }
-        // Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
+        Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
       }
       // update parm for healthy regions
       updateHealth( health_parm, ptr_seg, len, ptr_m, ptr_nu2, ptr_intst,
                     ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
                     maxit );
       // update parm for tumor_regions
+      updateTumor( tumor_labels, tumor_parm, tumor_regions, ptr_a, ptr_b,
+                   ptr_seg, ptr_m, ptr_intst, ptr_lambda2, ptr_nidx,
+                   ptr_nintst, ptr_alpha, ptr_beta, maxit );
     }
     return seg;
   }
