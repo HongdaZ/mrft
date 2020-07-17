@@ -15,7 +15,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  const double *ptr_intst,
                  int curr_label,
                  const double lambda2,
-                 const int *ptr_seg,
+                 int *ptr_seg,
                  const int *ptr_nidx,
                  const double *ptr_nintst,
                  const double alphal,
@@ -55,7 +55,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  const double *ptr_intst,
                  const int curr_label,
                  const double lambda2,
-                 const int *ptr_seg,
+                 int *ptr_seg,
                  const int *ptr_nidx,
                  const double *ptr_nintst,
                  const double alphal,
@@ -68,6 +68,12 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tol = 1;
   double tmp = 0;
   mu = - 1;
+  // the voxel in region is labelled as 3
+  for( list<int>::const_iterator it = region.begin();
+       it != region.end(); ++ it ) {
+    ptr_seg[ 2 * *it - 1 ] = 3;
+  }
+  
   while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
     tmp = updateMu( region, sigma2, m, mk_1, a, b, theta, ptr_intst );
     Rprintf( "mu = %f \n", tmp );
@@ -82,6 +88,12 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     Rprintf( "sigma2 = %f\n", sigma2 );
     ++ i;
   }
+  // change ptr_seg[ 2, region ] back
+  for( list<int>::const_iterator it = region.begin();
+       it != region.end(); ++ it ) {
+    ptr_seg[ 2 * *it - 1 ] = 0;
+  }
+  return;
 }
 
 // update parameters for outliers
@@ -94,7 +106,7 @@ void updateParm( double &mu, double &sigma2,
                  const double *ptr_intst,
                  int curr_label,
                  const double lambda2,
-                 const int *ptr_seg,
+                 int *ptr_seg,
                  const int *ptr_nidx,
                  const double alphal,
                  const double betal,

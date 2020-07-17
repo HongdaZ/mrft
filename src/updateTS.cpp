@@ -27,7 +27,11 @@ void updateTS( const list<int> &region, int curr_label,
                const double *ptr_nintst,
                vector<double> &theta,
                const double alphal,
-               const double betal ){
+               const double betal,
+               const double *yln_,
+               const double *yln_i,
+               const double *yl_,
+               const double *yl_i ){
   int nrow = region.size();
   int ncol = 6;
   double *yln = new double[ nrow * ncol ];
@@ -35,34 +39,32 @@ void updateTS( const list<int> &region, int curr_label,
   
   list<int>::const_iterator it = region.begin();
   int idx = *it;
-  int label = ptr_seg[ 2 * ( idx - 1 ) ];
   // Initialize yln and yl;
   for( int j = 0; it!= region.end(); ++ it, ++ j ) {
     idx = *it;
     yl[ j ] = ptr_intst[ idx - 1 ] - mu;
     for( int i = 0; i < 6; ++ i ) {
-      // healthy
       int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      if( curr_label < 0 && curr_label > - 4 ) {
-        if( nidx != NA_INTEGER ) {
+      if( nidx != NA_INTEGER ) {
+        // healthy
+        if( curr_label < 0 && curr_label > - 4 ) {
           int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
-          if( nlabel == label ) {
+          if( nlabel == curr_label ) {
             yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
           } else {
             yln[ i * nrow + j ] = 0;
           }
-        } else {
-          yln[ i * nrow + j ] = 0;
-        }
         // tumor
-      } else {
-        list<int>::const_iterator it = find( region.begin(), 
-                                             region.end(), nidx );
-        if( it != region.end() ) {
-          yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
         } else {
-          yln[ i * nrow + j ] = 0;
-        }
+          int nlabel = ptr_seg[ 2 * nidx - 1 ];
+          if( nlabel == 3 ) {
+            yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
+          } else {
+            yln[ i * nrow + j ] = 0;
+          }
+        } 
+      } else {
+        yln[ i * nrow + j ] = 0;
       }
       
     }

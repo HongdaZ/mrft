@@ -19,7 +19,11 @@ void updateTS( const list<int> &region, int curr_label,
                const double *ptr_nintst,
                vector<double> &theta,
                const double alphal,
-               const double betal );
+               const double betal,
+               const double *yln_,
+               const double *yln_i,
+               const double *yl_,
+               const double *yl_i );
                             
 
 #endif
