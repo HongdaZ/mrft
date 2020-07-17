@@ -73,7 +73,7 @@ extern "C" {
     map<int, list<int>> tumor_regions;
     initRegion( ptr_seg, ptr_nidx, len,
                 tumor_regions, tumor_labels );
-    
+    Rprintf( "initRegion finished!\n" );
     // list< map<int, int>> regions;
     // // For testing scTrn
     // int flag = scTrn( regions, tumor_labels, tumor_regions, ptr_seg,
@@ -198,6 +198,7 @@ extern "C" {
     initParm( health_parm, tumor_parm, ptr_seg, ptr_m, ptr_nu2, ptr_intst,
               ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
               tumor_regions, ptr_a, ptr_b, len, 20 );
+    Rprintf( "initParm finished!\n" );
     // // update beta
     // for( int i = 0; i < 3; ++ i ){
     //   double sigma2 = health_parm[ - i - 1 ][ 1 ];
@@ -218,6 +219,7 @@ extern "C" {
     // ptr_beta[ 3 ] = ( ptr_alpha[ 3 ] + 1 ) * tumor_sigma2;
     updateBeta( ptr_beta, ptr_alpha, health_parm, tumor_regions, 
                 tumor_parm );
+    Rprintf( "updateBeta finished!\n" );
     // for( int i = 0; i < 4; ++ i ) {
     //   Rprintf( "beta = %f\t", ptr_beta[ i ] );
     // }
@@ -323,6 +325,7 @@ extern "C" {
     bool skip_curr;
     vector<int> search( len, 0 );
     double threshold = ptr_m[ 2 ];
+    Rprintf( "Segmentation started!\n" );
     for( int i = 0; i < maxit; ++ i ) {
       for( int j = 1; j <= len; ++ j ) {
         
