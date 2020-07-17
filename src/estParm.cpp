@@ -25,6 +25,7 @@
 #include "updateBeta.h"
 #include "skip.h"
 #include "debug.h"
+#include "updateHealth.h"
 
 using std::stack;
 using std::queue;
@@ -343,34 +344,9 @@ extern "C" {
         // Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
       }
       // update parm for healthy regions
-      for( int i = - 1; i > - 4;  -- i ) {
-        int curr_label = i;
-        // Rprintf( "curr_label = %d \n", curr_label );
-        double mu = -1, sigma2 = 1;
-        vector<double> theta;
-        for( int  j = 0; j < 6; ++ j ) {
-          theta.push_back( 0 );
-        }
-        list<int> region;
-        for( int k = 0; k < len; ++ k ) {
-          if( ptr_seg[ 2 * k ] == curr_label ) {
-            region.push_back( k + 1 ); // region starts from 1
-          }
-        }
-        int h_idx =  - 1 - curr_label; // == 0, 1, 2
-        updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], 
-                    ptr_nu2[ h_idx ], ptr_intst, curr_label, 
-                    ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx,
-                    ptr_nintst, ptr_alpha[ h_idx ], ptr_beta[ h_idx ],
+      updateHealth( health_parm, ptr_seg, len, ptr_m, ptr_nu2, ptr_intst,
+                    ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
                     maxit );
-
-        vector<double> h_parm;
-        h_parm.push_back( mu );
-        h_parm.push_back( sigma2 );
-
-        h_parm.insert( h_parm.end(), theta.begin(), theta.end() );
-        health_parm[ curr_label ] = h_parm;
-      }
       // update parm for tumor_regions
     }
     return seg;
