@@ -83,13 +83,35 @@ extern "C" {
     //            it_region->second.size() );
     // }
     // Rprintf( "label = %d; idx = %d", -15, tumor_regions[ - 15 ].front() );
-    initParm( health_parm, tumor_parm, ptr_seg, ptr_m, ptr_nu2, ptr_intst,
-              ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
-              tumor_regions, ptr_a, ptr_b, len, 20 );
-    Rprintf( "initParm finished!\n" );
-    updateBeta( ptr_beta, ptr_alpha, health_parm, tumor_regions,
-                tumor_parm );
-    Rprintf( "updateBeta finished!\n" );
+    int curr_label = - 4;
+    int maxit = 20;
+    list<int> &region = tumor_regions[ - 4 ];
+    double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
+    vector<double> theta( 6, 0 );
+    updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
+                ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, curr_label, 
+                ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
+                ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
+    vector<double> t_parm( 8, 0 );
+    t_parm[ 0 ] = mu;
+    t_parm[ 1 ] = sigma2;
+    for( int i = 0; i < 6; ++ i ) {
+      t_parm[ i + 2 ] = theta[ i ];
+    }
+    // tumor_parm[ curr_label ] = t_parm;
+    // Rprintf( "label = %d; mu = %f; sigma2 = %f; theta = ", curr_label, mu,
+    //          sigma2 );
+    // for( int i = 0; i < 6; ++ i ) {
+    //   Rprintf( "%f, ", theta[ i ] );
+    // }
+    // Rprintf( "\n" );
+    // initParm( health_parm, tumor_parm, ptr_seg, ptr_m, ptr_nu2, ptr_intst,
+    //           ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
+    //           tumor_regions, ptr_a, ptr_b, len, 20 );
+    // Rprintf( "initParm finished!\n" );
+    // updateBeta( ptr_beta, ptr_alpha, health_parm, tumor_regions,
+    //             tumor_parm );
+    // Rprintf( "updateBeta finished!\n" );
     
     // int maxit = 20;
     // bool skip_curr;

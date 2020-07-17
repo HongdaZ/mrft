@@ -70,16 +70,16 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   mu = - 1;
   while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
     tmp = updateMu( region, sigma2, m, mk_1, a, b, theta, ptr_intst );
-    // Rprintf( "mu = %f \n", tmp );
+    Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );
     mu = tmp;
     updateTS( region, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
               ptr_intst, ptr_nintst, theta, alphal, betal );
-    // for( int j = 0; j < 6; ++ j ) {
-    //   Rprintf( "%f\t", theta[ j ] );
-    // }
-    // Rprintf( "\n" );
-    // Rprintf( "sigma2 = %f\n", sigma2 );
+    for( int j = 0; j < 6; ++ j ) {
+      Rprintf( "%f\t", theta[ j ] );
+    }
+    Rprintf( "\n" );
+    Rprintf( "sigma2 = %f\n", sigma2 );
     ++ i;
   }
 }
