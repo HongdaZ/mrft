@@ -7,9 +7,10 @@
 
 using std::queue;
 
-list<int> findRegion( const int n_region, int *ptr_label, const int *ptr_nidx, const bool init, 
-                     list<int> &tumor_nbr, bool &early_return,
-                     int start ) {
+list<int> findRegion( const int n_region, int *ptr_label, 
+                      const int *ptr_nidx, 
+                      const bool init, list<int> &tumor_nbr, 
+                      bool &early_return, int start ) {
 
   queue<int> front;
   list<int> region;

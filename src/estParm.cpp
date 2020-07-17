@@ -358,9 +358,11 @@ extern "C" {
           }
         }
         int h_idx =  - 1 - curr_label; // == 0, 1, 2
-        updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], ptr_nu2[ h_idx ],
-                    ptr_intst, curr_label, ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx,
-                    ptr_nintst, ptr_alpha[ h_idx ], ptr_beta[ h_idx ], maxit );
+        updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], 
+                    ptr_nu2[ h_idx ], ptr_intst, curr_label, 
+                    ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx,
+                    ptr_nintst, ptr_alpha[ h_idx ], ptr_beta[ h_idx ],
+                    maxit );
 
         vector<double> h_parm;
         h_parm.push_back( mu );

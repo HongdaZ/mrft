@@ -8,6 +8,7 @@
 #include "scTrn.h"
 #include "findRegion.h"
 #include "newTumorLabel.h"
+#include "nbrLabel.h"
 
 using std::list;
 using std::vector;
@@ -28,16 +29,7 @@ int scTrn( list<int> &labels, list<list<int>> &regions,
     list<int> tumor_nbr;
     list<int> nbr_label;
     // Add tumor neighbors to set
-    for( int i = 0; i < 6; ++ i ) {
-      int nbr_idx = ptr_nidx[ 6 * ( start - 1 ) + i ];
-      if( nbr_idx != NA_INTEGER ) {
-        int new_label = ptr_label[ 2 * ( nbr_idx - 1 ) ];
-        if(  new_label <= - 4 ) {
-          tumor_nbr.push_back( nbr_idx );
-          nbr_label.push_back( new_label );
-        }
-      }
-    }
+    nbrLabel( nbr_label, tumor_nbr, start, ptr_label, ptr_nidx );
     if( tumor_nbr.size() < 2 ) {
       return 0;
       // possibly split
@@ -81,12 +73,11 @@ int scTrn( list<int> &labels, list<list<int>> &regions,
         return 0;
       } else {
         list<int> current_tumor = tumor_regions[ current ];
+        labels.push_front( current );
         regions.push_front( current_tumor );
         return 1;
       }
     } else {
-      nbr_label.sort();
-      nbr_label.unique();
       if( nbr_label.size() == 1 ) {
         return 0;
       }

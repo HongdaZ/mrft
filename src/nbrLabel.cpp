@@ -22,6 +22,7 @@ void nbrLabel( list<int> &nbr_label, list<int> &tumor_nbr,
       nbr_label.push_back( label );
     }
   }
+  nbr_label.sort();
   nbr_label.unique();
   return;
 }
