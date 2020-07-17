@@ -37,5 +37,6 @@ void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
       -- tumor_label;
     }
   }
+  labels.sort();
   return;
 }
