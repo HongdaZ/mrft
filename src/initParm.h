@@ -17,7 +17,7 @@ void initParm( map<int, vector<double>> &health_parm,
                const double *lambda2, const int *ptr_nidx,
                const double *ptr_nintst, const double *ptr_alpha,
                const double *ptr_beta,
-               map<int, list<int>> tumor_regions, 
+               map<int, list<int>> &tumor_regions, 
                const double *ptr_a, const double *ptr_b, int len, 
                int maxit = 20 );
 
