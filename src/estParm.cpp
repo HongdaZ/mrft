@@ -25,8 +25,6 @@
 #include "updateBeta.h"
 #include "skip.h"
 #include "debug.h"
-#include "updateHealth.h"
-#include "updateTumor.h"
 
 using std::stack;
 using std::queue;
@@ -113,37 +111,38 @@ extern "C" {
                 tumor_parm );
     Rprintf( "updateBeta finished!\n" );
 
-    // int maxit = 20;
-    // bool skip_curr;
-    // vector<int> search( len, 0 );
-    // double threshold = ptr_m[ 2 ];
-    // Rprintf( "Segmentation started!\n" );
-    // for( int i = 0; i < maxit; ++ i ) {
-    //   for( int j = 1; j <= len; ++ j ) {
-    // 
-    //     skip_curr = skip( j, ptr_seg, ptr_nidx, ptr_intst, threshold,
-    //                       search[ j ], 10 );
-    //     if( skip_curr ) {
-    //       continue;
-    //     } else {
-    //       ++ search[ j ];
-    //       list<list<int>> regions;
-    //       list<int> labels;
-    //       int sc = scTrn( labels, regions, tumor_labels, tumor_regions,
-    //                       ptr_seg, ptr_nidx, j );
-    //       cmpET( j, sc, labels, regions, tumor_regions, tumor_labels,
-    //              outl_labels, health_parm, tumor_parm, outl_parm, ptr_seg,
-    //              ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
-    //              ptr_alpha, ptr_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
-    //              ptr_nu2 );
-    //     }
-    //     Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
-    //   }
-    //   // update parm for healthy and tumorous regions
-    //   initParm( false, health_parm, tumor_parm, ptr_seg, ptr_m, ptr_nu2, ptr_intst,
-    //             ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
-    //             tumor_regions, ptr_a, ptr_b, len, 20 );
-    // }
+    int maxit = 20;
+    bool skip_curr;
+    vector<int> search( len, 0 );
+    double threshold = ptr_m[ 2 ];
+    Rprintf( "Segmentation started!\n" );
+    for( int i = 0; i < maxit; ++ i ) {
+      for( int j = 1; j <= len; ++ j ) {
+
+        skip_curr = skip( j, ptr_seg, ptr_nidx, ptr_intst, threshold,
+                          search[ j ], 10 );
+        if( skip_curr ) {
+          continue;
+        } else {
+          ++ search[ j ];
+          list<list<int>> regions;
+          list<int> labels;
+          int sc = scTrn( labels, regions, tumor_labels, tumor_regions,
+                          ptr_seg, ptr_nidx, j );
+          cmpET( j, sc, labels, regions, tumor_regions, tumor_labels,
+                 outl_labels, health_parm, tumor_parm, outl_parm, ptr_seg,
+                 ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
+                 ptr_alpha, ptr_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
+                 ptr_nu2 );
+        }
+        Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
+      }
+      // update parm for healthy and tumorous regions
+      initParm( false, health_parm, tumor_parm, ptr_seg, ptr_m, ptr_nu2,
+                ptr_intst,
+                ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
+                tumor_regions, ptr_a, ptr_b, len, 20 );
+    }
     return seg;
   }
 } // extern "C"

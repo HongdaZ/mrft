@@ -30,13 +30,13 @@ void cmpEP( int idx, int sc,
             // theta( 6, 0 )
             vector<double> &theta,
             // tmp_parm( 9, 0 )
-            vector<double> tmp_parm,
+            vector<double> &tmp_parm,
             // out_theta( 6, 0 )
             vector<double> &out_theta,
             // new_out_parm( 2, 0 )
             vector<double> &new_out_parm,
             // whole_parm( 8, 0 )
-            vector<double> whole_parm
+            vector<double> &whole_parm 
             ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   if( sc != 0 ) {  // split or combine

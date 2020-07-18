@@ -28,6 +28,18 @@ void cmpET( int idx, int sc,
             const double *ptr_alpha, const double *ptr_beta, 
             const double *ptr_lambda2, const double *ptr_a,
             const double *ptr_b, const double *ptr_m,
-            const double *ptr_nu2 );
+            const double *ptr_nu2,
+            // outlier_parm( 3, 0 )
+            vector<double> &outlier_parm,
+            // theta( 6, 0 )
+            vector<double> &theta,
+            // tmp_parm( 9, 0 )
+            vector<double> &tmp_parm,
+            // out_theta( 6, 0 )
+            vector<double> &out_theta,
+            // new_out_parm( 2, 0 )
+            vector<double> &new_out_parm,
+            // whole_parm( 8, 0 )
+            vector<double> &whole_parm );
 
 #endif
