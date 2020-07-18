@@ -17,7 +17,7 @@ using std::find;
 
 // region starts from 1
 // updateTheta and sigma2 for health and tumorous regions
-void updateTS( const list<int> &region, int curr_label,
+void updateTS( const int nrow, int curr_label,
                const double mu,
                double &sigma2,
                const double lambda2,
@@ -28,45 +28,23 @@ void updateTS( const list<int> &region, int curr_label,
                vector<double> &theta,
                const double alphal,
                const double betal,
+               double *yl, double *yln,
                const double *yln_,
                const double *yln_i,
                const double *yl_,
                const double *yl_i ){
-  int nrow = region.size();
   int ncol = 6;
-  double *yln = new double[ nrow * ncol ];
-  double *yl = new double[ nrow ];
-  
-  list<int>::const_iterator it = region.begin();
-  int idx = *it;
+  for( int j = 0; j < nrow; ++ j ) {
+    yl[ j ] = yl_[ j ] - mu;
+  }
   // Initialize yln and yl;
-  for( int j = 0; it!= region.end(); ++ it, ++ j ) {
-    idx = *it;
-    yl[ j ] = ptr_intst[ idx - 1 ] - mu;
-    for( int i = 0; i < 6; ++ i ) {
-      int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      if( nidx != NA_INTEGER ) {
-        // healthy
-        if( curr_label < 0 && curr_label > - 4 ) {
-          int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
-          if( nlabel == curr_label ) {
-            yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
-          } else {
-            yln[ i * nrow + j ] = 0;
-          }
-        // tumor
-        } else {
-          int nlabel = ptr_seg[ 2 * nidx - 1 ];
-          if( nlabel == 3 ) {
-            yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
-          } else {
-            yln[ i * nrow + j ] = 0;
-          }
-        } 
+  for( int i = 0; i < 6; ++ i ) {
+    for( int j = 0; j < nrow; ++ j ) {
+      if( yl_i[ i * nrow + j ] == 1 ) {
+        yln[ i * nrow + j ] = yln_[ i * nrow + j ] - mu;
       } else {
         yln[ i * nrow + j ] = 0;
       }
-      
     }
   }
   // for( int i = 0; i < nrow; ++ i ) {
@@ -156,8 +134,6 @@ void updateTS( const list<int> &region, int curr_label,
   }
   sigma2 = sum / ( nrow / (double)2 + alphal + 1 );
 
-  delete [] yln;
-  delete [] yl;
   delete [] I;
   delete [] tmp;
   delete [] vtheta;

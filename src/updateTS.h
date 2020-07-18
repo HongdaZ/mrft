@@ -9,7 +9,7 @@ using std::vector;
 
 // region starts from 1
 // updateTheta and sigma2 for health and tumorous regions
-void updateTS( const list<int> &region, int curr_label,
+void updateTS( const int nrow, int curr_label,
                const double mu,
                double &sigma2,
                const double lambda2,
@@ -20,10 +20,10 @@ void updateTS( const list<int> &region, int curr_label,
                vector<double> &theta,
                const double alphal,
                const double betal,
+               double *yl, double *yln,
                const double *yln_,
                const double *yln_i,
-               const double *yl_,
-               const double *yl_i );
+               const double *yl_ );
                             
 
 #endif

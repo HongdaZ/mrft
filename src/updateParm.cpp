@@ -29,13 +29,70 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tol = 1;
   double tmp = 0;
   mu = - 1;
-  while( i < 2 || ( i < maxit && tol > .0001 ) ) {
-    tmp = updateMu( region, sigma2, m, nu2, theta, ptr_intst );
+  // Initialize matrices and vectors
+  int nrow = region.size();
+  int ncol = 6;
+  double *yln_ = new double[ nrow * ncol ];
+  double *yln_i = new double[ nrow * ncol ];
+  double *yl_ = new double[ nrow ];
+  
+  list<int>::const_iterator it = region.begin();
+  int idx;
+  double sum_y = 0;
+  for( int j = 0; j < nrow; ++ it, ++ j ) {
+    idx = *it;
+    yl_[ j ] = ptr_intst[ idx - 1 ];
+    sum_y += yl_[ j ];
+  }
+  for( int i = 0; i < 6; ++ i ) {
+    it = region.begin();
+    for( int j = 0; j < nrow; ++ it, ++ j ) {
+      idx = *it;
+      int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
+      if( nidx != NA_INTEGER ) {
+        // healthy
+        if( curr_label < 0 && curr_label > - 4 ) {
+          int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
+          if( nlabel == curr_label ) {
+            yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
+            yln_i[ i * nrow + j ] = 1;
+          } else {
+            yln_[ i * nrow + j ] = 0;
+            yln_i[ i * nrow + j ] = 0;
+          }
+          // tumor
+        } else {
+          int nlabel = ptr_seg[ 2 * nidx - 1 ];
+          if( nlabel == 3 ) {
+            yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
+            yln_i[ i * nrow + j ] = 1;
+          } else {
+            yln_[ i * nrow + j ] = 0;
+            yln_i[ i * nrow + j ] = 0;
+          }
+        } 
+      } else {
+        yln_[ i * nrow + j ] = 0;
+        yln_i[ i * nrow + j ] = 0;
+      }
+    }
+  }
+  double *yln = new double[ nrow * ncol ];
+  double *yl = new double[ nrow ];
+  
+  double sum_theta;
+  while( i < maxit && tol > .0001 ) {
+    sum_theta = 0;
+    for( int j = 0; j < 6; ++ j ) {
+      sum_theta += theta[ j ];
+    }
+    tmp = updateMu( nrow, sigma2, m, nu2, sum_theta, sum_y );
     // Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );
     mu = tmp;
-    updateTS( region, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
-              ptr_intst, ptr_nintst, theta, alphal, betal );
+    updateTS( nrow, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
+              ptr_intst, ptr_nintst, theta, alphal, betal, yl, yln,
+              yln_, yln_i, yl_ );
     // for( int j = 0; j < 6; ++ j ) {
     //   Rprintf( "%f\t", theta[ j ] );
     // }
@@ -74,13 +131,70 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     ptr_seg[ 2 * *it - 1 ] = 3;
   }
   
-  while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
-    tmp = updateMu( region, sigma2, m, mk_1, a, b, theta, ptr_intst );
+  // Initialize matrices and vectors
+  int nrow = region.size();
+  int ncol = 6;
+  double *yln_ = new double[ nrow * ncol ];
+  double *yln_i = new double[ nrow * ncol ];
+  double *yl_ = new double[ nrow ];
+  
+  list<int>::const_iterator it = region.begin();
+  int idx;
+  double sum_y = 0;
+  for( int j = 0; j < nrow; ++ it, ++ j ) {
+    idx = *it;
+    yl_[ j ] = ptr_intst[ idx - 1 ];
+    sum_y += yl_[ j ];
+  }
+  for( int i = 0; i < 6; ++ i ) {
+    it = region.begin();
+    for( int j = 0; j < nrow; ++ it, ++ j ) {
+      idx = *it;
+      int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
+      if( nidx != NA_INTEGER ) {
+        // healthy
+        if( curr_label < 0 && curr_label > - 4 ) {
+          int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
+          if( nlabel == curr_label ) {
+            yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
+            yln_i[ i * nrow + j ] = 1;
+          } else {
+            yln_[ i * nrow + j ] = 0;
+            yln_i[ i * nrow + j ] = 0;
+          }
+          // tumor
+        } else {
+          int nlabel = ptr_seg[ 2 * nidx - 1 ];
+          if( nlabel == 3 ) {
+            yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
+            yln_i[ i * nrow + j ] = 1;
+          } else {
+            yln_[ i * nrow + j ] = 0;
+            yln_i[ i * nrow + j ] = 0;
+          }
+        } 
+      } else {
+        yln_[ i * nrow + j ] = 0;
+        yln_i[ i * nrow + j ] = 0;
+      }
+    }
+  }
+  double *yln = new double[ nrow * ncol ];
+  double *yl = new double[ nrow ];
+
+  double sum_theta;
+  while(  i < maxit && tol > .0001 ) {
+    sum_theta = 0;
+    for( int j = 0; j < 6; ++ j ) {
+      sum_theta += theta[ j ];
+    }
+    tmp = updateMu( nrow, sigma2, m, mk_1, a, b, sum_theta, sum_y );
     Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );
     mu = tmp;
-    updateTS( region, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
-              ptr_intst, ptr_nintst, theta, alphal, betal );
+    updateTS( nrow, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
+              ptr_intst, ptr_nintst, theta, alphal, betal, yl, yln,
+              yln_, yln_i, yl_ );
     for( int j = 0; j < 6; ++ j ) {
       Rprintf( "%f\t", theta[ j ] );
     }
@@ -93,6 +207,11 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
        it != region.end(); ++ it ) {
     ptr_seg[ 2 * *it - 1 ] = 0;
   }
+  delete [] yln_;
+  delete [] yln_i;
+  delete [] yl_;
+  delete [] yln;
+  delete [] yl;
   return;
 }
 
