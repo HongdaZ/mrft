@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "updateTS.h"
+#include "initMV.h"
 
 using std::list;
 using std::vector;
@@ -33,15 +34,7 @@ void updateTS( const int nrow, int curr_label,
     yl[ j ] = yl_[ j ] - mu;
   }
   // Initialize yln and yl;
-  for( int i = 0; i < 6; ++ i ) {
-    for( int j = 0; j < nrow; ++ j ) {
-      if( yln_i[ i * nrow + j ] == 1 ) {
-        yln[ i * nrow + j ] = yln_[ i * nrow + j ] - mu;
-      } else {
-        yln[ i * nrow + j ] = 0;
-      }
-    }
-  }
+  initMV( yl, yl_, yln, yln_, yln_i, nrow, mu );
   // for( int i = 0; i < nrow; ++ i ) {
   //   Rprintf( "%f\n", yl[ i ] );
   // }

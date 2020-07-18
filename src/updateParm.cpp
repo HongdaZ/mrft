@@ -5,6 +5,7 @@
 
 #include "updateParm.h"
 #include "labelRegion.h" 
+#include "initMV.h"
 
 using std::abs;
 
@@ -39,48 +40,11 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double *yln_ = new double[ nrow * ncol ];
   double *yln_i = new double[ nrow * ncol ];
   double *yl_ = new double[ nrow ];
-  
-  list<int>::const_iterator it = region.begin();
-  int idx;
   double sum_y = 0;
-  for( int j = 0; j < nrow; ++ it, ++ j ) {
-    idx = *it;
-    yl_[ j ] = ptr_intst[ idx - 1 ];
-    sum_y += yl_[ j ];
-  }
-  for( int i = 0; i < 6; ++ i ) {
-    it = region.begin();
-    for( int j = 0; j < nrow; ++ it, ++ j ) {
-      idx = *it;
-      int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      if( nidx != NA_INTEGER ) {
-        // healthy
-        if( curr_label < 0 && curr_label > - 4 ) {
-          int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
-          if( nlabel == curr_label ) {
-            yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
-            yln_i[ i * nrow + j ] = 1;
-          } else {
-            yln_[ i * nrow + j ] = 0;
-            yln_i[ i * nrow + j ] = 0;
-          }
-          // tumor
-        } else {
-          int nlabel = ptr_seg[ 2 * nidx - 1 ];
-          if( nlabel == 3 ) {
-            yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
-            yln_i[ i * nrow + j ] = 1;
-          } else {
-            yln_[ i * nrow + j ] = 0;
-            yln_i[ i * nrow + j ] = 0;
-          }
-        } 
-      } else {
-        yln_[ i * nrow + j ] = 0;
-        yln_i[ i * nrow + j ] = 0;
-      }
-    }
-  }
+  
+  initMV( region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
+          ptr_seg, curr_label );
+  
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
   
@@ -146,47 +110,10 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double *yln_i = new double[ nrow * ncol ];
   double *yl_ = new double[ nrow ];
   
-  list<int>::const_iterator it = region.begin();
-  int idx;
   double sum_y = 0;
-  for( int j = 0; j < nrow; ++ it, ++ j ) {
-    idx = *it;
-    yl_[ j ] = ptr_intst[ idx - 1 ];
-    sum_y += yl_[ j ];
-  }
-  for( int i = 0; i < 6; ++ i ) {
-    it = region.begin();
-    for( int j = 0; j < nrow; ++ it, ++ j ) {
-      idx = *it;
-      int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      if( nidx != NA_INTEGER ) {
-        // healthy
-        if( curr_label < 0 && curr_label > - 4 ) {
-          int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
-          if( nlabel == curr_label ) {
-            yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
-            yln_i[ i * nrow + j ] = 1;
-          } else {
-            yln_[ i * nrow + j ] = 0;
-            yln_i[ i * nrow + j ] = 0;
-          }
-          // tumor
-        } else {
-          int nlabel = ptr_seg[ 2 * nidx - 1 ];
-          if( nlabel == 3 ) {
-            yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
-            yln_i[ i * nrow + j ] = 1;
-          } else {
-            yln_[ i * nrow + j ] = 0;
-            yln_i[ i * nrow + j ] = 0;
-          }
-        } 
-      } else {
-        yln_[ i * nrow + j ] = 0;
-        yln_i[ i * nrow + j ] = 0;
-      }
-    }
-  }
+  
+  initMV( region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
+          ptr_seg, curr_label );
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
 
