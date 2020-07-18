@@ -134,6 +134,8 @@ void updateTS( const int nrow, int curr_label,
   }
   sigma2 = sum / ( nrow / (double)2 + alphal + 1 );
 
+  delete [] yln;
+  delete [] yl;
   delete [] I;
   delete [] tmp;
   delete [] vtheta;
