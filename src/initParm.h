@@ -10,7 +10,7 @@ using std::map;
 using std::list;
 
 // Initialize parameters
-void initParm( map<int, vector<double>> &health_parm,
+void initParm( const bool first_run, map<int, vector<double>> &health_parm,
                map<int, vector<double>> &tumor_parm,
                int *ptr_seg, const double *ptr_m,
                const double *nu2, const double *ptr_intst, 

@@ -135,7 +135,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tol = 1;
   double tmp = 0;
   mu = - 1;
-  // the voxel in region is labelled as 3
+  // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
   for( list<int>::const_iterator it = region.begin();
        it != region.end(); ++ it ) {
     ptr_seg[ 2 * *it - 1 ] = 3;
@@ -199,17 +199,17 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
       sum_theta += theta[ j ];
     }
     tmp = updateMu( nrow, sigma2, m, mk_1, a, b, sum_theta, sum_y );
-    Rprintf( "mu = %f \n", tmp );
+    // Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );
     mu = tmp;
     updateTS( nrow, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
               ptr_intst, ptr_nintst, theta, alphal, betal, yl, yln,
               yln_, yln_i, yl_ );
-    for( int j = 0; j < 6; ++ j ) {
-      Rprintf( "%f\t", theta[ j ] );
-    }
-    Rprintf( "\n" );
-    Rprintf( "sigma2 = %f\n", sigma2 );
+    // for( int j = 0; j < 6; ++ j ) {
+    //   Rprintf( "%f\t", theta[ j ] );
+    // }
+    // Rprintf( "\n" );
+    // Rprintf( "sigma2 = %f\n", sigma2 );
     ++ i;
   }
   // change ptr_seg[ 2, region ] back

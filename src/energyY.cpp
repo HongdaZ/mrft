@@ -21,7 +21,7 @@ double energyY( const list<int> &region,
                double mk1,
                double sigma2,
                double lambda2,
-               const int *ptr_seg,
+               int *ptr_seg,
                const int *ptr_nidx,
                const double *ptr_intst,
                const double *ptr_nintst,
@@ -29,6 +29,11 @@ double energyY( const list<int> &region,
                double alphak,
                double betak,
                double a, double b ){
+  // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
+  for( list<int>::const_iterator it = region.begin();
+       it != region.end(); ++ it ) {
+    ptr_seg[ 2 * *it - 1 ] = 3;
+  }
   int nrow = region.size();
   int ncol = 6;
   double *yln = new double[ nrow * ncol ];
@@ -37,15 +42,22 @@ double energyY( const list<int> &region,
   list<int>::const_iterator it = region.begin();
   int idx;
   // Initialize yln and yl;
-  for( int j = 0; it!= region.end(); ++ it, ++ j ) {
+  for( int j = 0; j < nrow; ++ it, ++ j ) {
     idx = *it;
     yl[ j ] = ptr_intst[ idx - 1 ] - mu;
-    for( int i = 0; i < 6; ++ i ) {
+  }
+  for( int i = 0; i < 6; ++ i ) {
+    it = region.begin();
+    for( int j = 0; j < nrow; ++ it, ++ j ) {
+      idx = *it;
       int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      list<int>::const_iterator it = find( region.begin(), 
-                                           region.end(), nidx );
-      if( it != region.end() ) {
-        yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
+      if( nidx != NA_INTEGER ) {
+        int nlabel = ptr_seg[ 2 * nidx - 1 ];
+        if( nlabel == 3 ) {
+          yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
+        } else {
+          yln[ i * nrow + j ] = 0;
+        }
       } else {
         yln[ i * nrow + j ] = 0;
       }
@@ -87,6 +99,11 @@ double energyY( const list<int> &region,
   
   energy = energy + log( 2 * pi ) * ncol / 2 + log( lambda2 ) * ncol / 2 + 
     sum_theta / ( 2 * lambda2 );
+  // change ptr_seg[ 2, region ] back
+  for( list<int>::const_iterator it = region.begin();
+       it != region.end(); ++ it ) {
+    ptr_seg[ 2 * *it - 1 ] = 0;
+  }
 
   delete [] yln;
   delete [] yl;

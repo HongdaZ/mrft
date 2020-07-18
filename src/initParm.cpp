@@ -7,7 +7,7 @@
 #include "energyX.h"
 
 // Initialize parameters
-void initParm( map<int, vector<double>> &health_parm,
+void initParm( const bool first_run, map<int, vector<double>> &health_parm,
                map<int, vector<double>> &tumor_parm,
                int *ptr_seg, const double *ptr_m,
                const double *ptr_nu2, const double *ptr_intst, 
@@ -20,6 +20,9 @@ void initParm( map<int, vector<double>> &health_parm,
   // update parameters for tumor regions
   for( map<int, list<int>>::iterator it = tumor_regions.begin();
        it != tumor_regions.end(); ++ it ) {
+    if( ( ! first_run ) && it->second.size() == 1 ) {
+      continue;
+    }
     int curr_label = it->first;
     list<int> &region = it->second;
     double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
@@ -35,12 +38,12 @@ void initParm( map<int, vector<double>> &health_parm,
       t_parm[ i + 2 ] = theta[ i ];
     }
     tumor_parm[ curr_label ] = t_parm;
-    Rprintf( "label = %d; mu = %f; sigma2 = %f; theta = ", curr_label, mu,
-             sigma2 );
-    for( int i = 0; i < 6; ++ i ) {
-      Rprintf( "%f, ", theta[ i ] );
-    }
-    Rprintf( "\n" );
+    // Rprintf( "label = %d; mu = %f; sigma2 = %f; theta = ", curr_label, mu,
+    //          sigma2 );
+    // for( int i = 0; i < 6; ++ i ) {
+    //   Rprintf( "%f, ", theta[ i ] );
+    // }
+    // Rprintf( "\n" );
   }
   // Initialize parameters for healthy regions
   for( int i = - 1; i > - 4;  -- i ) {
@@ -65,12 +68,12 @@ void initParm( map<int, vector<double>> &health_parm,
     
     h_parm.insert( h_parm.end(), theta.begin(), theta.end() );
     health_parm[ curr_label ] = h_parm;
-    Rprintf( "label = %d; mu = %f; sigma2 = %f; theta = ", curr_label, mu,
-             sigma2 );
-    for( int i = 0; i < 6; ++ i ) {
-      Rprintf( "%f, ", theta[ i ] );
-    }
-    Rprintf( "\n" );
+    // Rprintf( "label = %d; mu = %f; sigma2 = %f; theta = ", curr_label, mu,
+    //          sigma2 );
+    // for( int i = 0; i < 6; ++ i ) {
+    //   Rprintf( "%f, ", theta[ i ] );
+    // }
+    // Rprintf( "\n" );
   }
   return;
 }
