@@ -3,8 +3,6 @@
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
 
-#include <algorithm>
-
 #include <list>
 #include <vector>
 
@@ -12,8 +10,6 @@
 
 using std::list;
 using std::vector;
-using std::find;
-
 
 // region starts from 1
 // updateTheta and sigma2 for health and tumorous regions
@@ -31,8 +27,7 @@ void updateTS( const int nrow, int curr_label,
                double *yl, double *yln,
                const double *yln_,
                const double *yln_i,
-               const double *yl_,
-               const double *yl_i ){
+               const double *yl_ ){
   int ncol = 6;
   for( int j = 0; j < nrow; ++ j ) {
     yl[ j ] = yl_[ j ] - mu;
@@ -40,7 +35,7 @@ void updateTS( const int nrow, int curr_label,
   // Initialize yln and yl;
   for( int i = 0; i < 6; ++ i ) {
     for( int j = 0; j < nrow; ++ j ) {
-      if( yl_i[ i * nrow + j ] == 1 ) {
+      if( yln_i[ i * nrow + j ] == 1 ) {
         yln[ i * nrow + j ] = yln_[ i * nrow + j ] - mu;
       } else {
         yln[ i * nrow + j ] = 0;

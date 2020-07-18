@@ -7,6 +7,9 @@
 
 using std::abs;
 
+// previous updateParm is slow because of using std::find with std::list
+// and extra times of copying matrices
+
 // update parameters for healthy cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
                  const list<int> &region,
@@ -100,6 +103,13 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     // Rprintf( "sigma2 = %f\n", sigma2 );
     ++ i;
   }
+  delete [] yln_;
+  delete [] yln_i;
+  delete [] yl_;
+  delete [] yln;
+  delete [] yl;
+  
+  return;
 }
 
 // update parameters for tumor cells
@@ -248,4 +258,5 @@ void updateParm( double &mu, double &sigma2,
     // Rprintf( "sigma2 = %f\n", sigma2 );
     ++ i;
   }
+  return;
 }
