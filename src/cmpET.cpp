@@ -44,21 +44,17 @@ void cmpET( int idx, int sc,
     vector<double> nrg( len + 1, 0 ); 
     // parameters for regions
     list<vector<double>> region_parm;
-    // parameters for outler
-    vector<double> outlier_parm( 3, 0 );
     list<list<int>>::iterator it = regions.begin();
     list<int>::iterator it_label = labels.begin();
     vector<double>::iterator it_nrg = nrg.begin();
     for( ; it != regions.end(); ++ it, ++ it_label, ++ it_nrg ) {
       double mu = - 1, sigma2 = 1;
-      vector<double> theta( 6, 0 );
       int curr_label = *it_label;
       updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ], 
                   ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, curr_label, 
                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst, 
                   ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
       // curr_label, mu, sigma2, theta
-      vector<double> tmp_parm( 9, 0 ); 
       tmp_parm[ 0 ] = curr_label;
       tmp_parm[ 1 ] = mu;
       tmp_parm[ 2] = sigma2;
@@ -105,12 +101,13 @@ void cmpET( int idx, int sc,
     for( ++ it_nrg; it_nrg != nrg.end(); ++ it_nrg ) {
       split_nrg += *it_nrg;
     }
-    vector<double> label_whole_parm = region_parm.front();
+    vector<double> &label_whole_parm = region_parm.front();
     int whole_label = label_whole_parm[ 0 ];
     // update parameters for whole region
     if( combine_nrg <= split_nrg && sc == 1 ) {
-      vector<double> whole_parm( ++ label_whole_parm.begin(),
-                                 label_whole_parm.end() );
+      for( int i = 0; i < 8; ++ i ) {
+        whole_parm[ i ] = label_whole_parm[ 1 + i ];
+      }
       tumor_parm[ whole_label ] = whole_parm;
     // remove old whole region and add new splitted regions and new outlier
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
@@ -124,8 +121,9 @@ void cmpET( int idx, int sc,
       
       ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
       
-      vector<double> new_out_parm( ++ outlier_parm.begin(),
-                                   outlier_parm.end() );
+      for( int i = 0; i < 2; ++ i ) {
+        new_out_parm[ i ] = outlier_parm[ 1 + i ];
+      }
       addOutl( out_label, new_out_parm, outl_labels, outl_parm );
       
       // remove old subregions, parameters and labels,
@@ -154,7 +152,10 @@ void cmpET( int idx, int sc,
       for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
            it_list != region_parm.end(); ++ it_list ) {
         int sub_label = it_list->front();
-        vector<double> new_parm( ++ it_list->begin(), it_list->end() );
+        vector<double> &new_parm = whole_parm; 
+        for( int i = 0; i < 8; ++ i ) {
+          new_parm[ i ] = *( it_list->begin() + i + 1); 
+        }
         tumor_parm[ sub_label ] = new_parm;
       }
     }
@@ -165,16 +166,15 @@ void cmpET( int idx, int sc,
       double energy;
       double min_energy;
       int min_label;
-      vector<double> parm;
       double mu;
       double sigma2;
-      vector<double> theta;
       for( int i = - 1; i > - 4; -- i ) {
-        theta.empty();
-        parm = health_parm[ i ]; 
+        vector<double> &parm = health_parm[ i ]; 
         mu = parm[ 0 ];
         sigma2 = parm[ 1 ];
-        theta.insert( theta.begin(), parm.begin() + 2, parm.end() );
+        for( int i = 0; i < 6; ++ i ) {
+          theta[ i ] = parm[ i + 2 ];
+        }
         energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
                           ptr_intst, ptr_nintst, theta );
         energy += energyX( i, idx, false, ptr_seg, ptr_nidx, 
@@ -200,16 +200,18 @@ void cmpET( int idx, int sc,
       nbrLabel( nbr_label, tumor_nbr, idx, ptr_seg, ptr_nidx );
       bool have_tumor = tumor_nbr.size();
       int t_label;
-      
+      vector<double> &t_theta = theta;
       // have tumor neighbor
       if( have_tumor ) {
         int t_idx = tumor_nbr.front();
         t_label = ptr_seg[ 2 * ( t_idx - 1 ) ];
         // tumor energy
-        vector<double> t_parm = tumor_parm[ t_label ];
+        vector<double> &t_parm = tumor_parm[ t_label ];
         double t_mu = t_parm[ 0 ];
         double t_sigma2 = t_parm[ 1 ];
-        vector<double> t_theta( t_parm.begin() + 2, t_parm.end() );
+        for( int i = 0; i < 6; ++ i ) {
+          t_theta[ i ] = t_parm[ i + 2 ];
+        }
         double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ], 
                                    t_sigma2, ptr_lambda2[ 3 ], ptr_seg, 
                                    ptr_nidx, ptr_intst, ptr_nintst, 
@@ -231,7 +233,6 @@ void cmpET( int idx, int sc,
         double out_mu = - 1, out_sigma2 = 1;
         list<int> out_region;
         out_region.push_back( idx );
-        vector<double> new_out_parm( 2, 0 );
         if( curr_label > 0 ) {
           new_out_parm = outl_parm[ curr_label ];
           out_mu = new_out_parm[ 0 ];
@@ -244,8 +245,6 @@ void cmpET( int idx, int sc,
           new_out_parm[ 0 ] = out_mu;
           new_out_parm[ 1 ] = out_sigma2;
         }
-
-        vector<double> out_theta( 6, 0 );
         
         out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], 
                                out_sigma2, ptr_lambda2[ 3 ], ptr_seg, 
@@ -270,10 +269,6 @@ void cmpET( int idx, int sc,
           int new_label = newTumorLabel( 1, tumor_labels );
           // new tumor region parameters
           double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
-          vector<double> theta;
-          for( int i = 0; i < 6; ++ i ) {
-            theta.push_back( 0 );
-          }
           list<int> new_region;
           list<list<int>> new_regions;
           new_region.push_back( idx );
@@ -284,7 +279,7 @@ void cmpET( int idx, int sc,
                       ptr_intst, new_label, ptr_lambda2[ 3 ], ptr_seg, 
                       ptr_nidx, ptr_nintst, ptr_alpha[ 3 ], 
                       ptr_beta[ 3 ], 20 );
-          vector<double> new_parm( 9, 0 );
+          vector<double> &new_parm = tmp_parm;
           list<vector<double>> new_region_parm;
           new_parm[ 0 ] = new_label;
           new_parm[ 1 ] = mu;
@@ -294,8 +289,8 @@ void cmpET( int idx, int sc,
           }
           new_region_parm.push_back( new_parm );
           
-          addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels, tumor_regions,
-                     tumor_parm );
+          addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels, 
+                     tumor_regions, tumor_parm );
           ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
           eraseOutl( curr_label, outl_labels, outl_parm );
         }

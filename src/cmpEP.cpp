@@ -207,7 +207,7 @@ void cmpEP( int idx, int sc,
     nbrLabel( nbr_label, tumor_nbr, idx, ptr_seg, ptr_nidx );
     bool have_tumor = tumor_nbr.size();
     int t_label;
-    
+    vector<double> &t_theta = theta;
     // have tumor neighbor
     if( have_tumor ) {
       int t_idx = tumor_nbr.front();
@@ -216,7 +216,6 @@ void cmpEP( int idx, int sc,
       vector<double> &t_parm = tumor_parm[ t_label ];
       double t_mu = t_parm[ 0 ];
       double t_sigma2 = t_parm[ 1 ];
-      vector<double> &t_theta = theta;
       for( int i = 0; i < 6; ++ i ) {
         t_theta[ i ] = t_parm[ i + 2 ];
       }
@@ -331,7 +330,6 @@ void cmpEP( int idx, int sc,
       }
       // new tumor region parameters
       double t_mu = -1, t_sigma2 = 1; // t_sigma2 has to be non-zero;
-      vector<double> &t_theta = theta;
       list<int> new_region;
       list<list<int>> new_regions;
       new_region.push_back( idx );
