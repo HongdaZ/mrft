@@ -9,6 +9,7 @@
 
 #include "energyY.h"
 #include "labelRegion.h"
+#include "initMV.h"
 
 using std::list;
 using std::vector;
@@ -35,33 +36,19 @@ double energyY( const list<int> &region,
   
   int nrow = region.size();
   int ncol = 6;
+  
+  double *yln_ = new double[ nrow * ncol ];
+  double *yln_i = new double[ nrow * ncol ];
+  double *yl_ = new double[ nrow ];
+  double sum_y = 0;
+  // Initialize yln_, yln_i, and yl;
+  initMV( region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
+          ptr_seg, - 4 );
+  
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
-  
-  list<int>::const_iterator it = region.begin();
-  int idx;
   // Initialize yln and yl;
-  for( int j = 0; j < nrow; ++ it, ++ j ) {
-    idx = *it;
-    yl[ j ] = ptr_intst[ idx - 1 ] - mu;
-  }
-  for( int i = 0; i < 6; ++ i ) {
-    it = region.begin();
-    for( int j = 0; j < nrow; ++ it, ++ j ) {
-      idx = *it;
-      int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      if( nidx != NA_INTEGER ) {
-        int nlabel = ptr_seg[ 2 * nidx - 1 ];
-        if( nlabel == 3 ) {
-          yln[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ] - mu;
-        } else {
-          yln[ i * nrow + j ] = 0;
-        }
-      } else {
-        yln[ i * nrow + j ] = 0;
-      }
-    }
-  }
+  initMV( yl, yl_, yln, yln_, yln_i, nrow, mu );
   
   // yl - yln * thetal
   double *vtheta = new double[ ncol ]; 
@@ -101,6 +88,9 @@ double energyY( const list<int> &region,
   // change ptr_seg[ 2, region ] back
   recoverLabel( region, ptr_seg );
 
+  delete [] yln_;
+  delete [] yln_i;
+  delete [] yl_;
   delete [] yln;
   delete [] yl;
   delete [] vtheta;

@@ -30,9 +30,6 @@ void updateTS( const int nrow, int curr_label,
                const double *yln_i,
                const double *yl_ ){
   int ncol = 6;
-  for( int j = 0; j < nrow; ++ j ) {
-    yl[ j ] = yl_[ j ] - mu;
-  }
   // Initialize yln and yl;
   initMV( yl, yl_, yln, yln_, yln_i, nrow, mu );
   // for( int i = 0; i < nrow; ++ i ) {
