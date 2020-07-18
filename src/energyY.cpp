@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "energyY.h"
+#include "labelRegion.h"
 
 using std::list;
 using std::vector;
@@ -30,10 +31,8 @@ double energyY( const list<int> &region,
                double betak,
                double a, double b ){
   // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
-  for( list<int>::const_iterator it = region.begin();
-       it != region.end(); ++ it ) {
-    ptr_seg[ 2 * *it - 1 ] = 3;
-  }
+  labelRegion( region, ptr_seg );
+  
   int nrow = region.size();
   int ncol = 6;
   double *yln = new double[ nrow * ncol ];
@@ -100,10 +99,7 @@ double energyY( const list<int> &region,
   energy = energy + log( 2 * pi ) * ncol / 2 + log( lambda2 ) * ncol / 2 + 
     sum_theta / ( 2 * lambda2 );
   // change ptr_seg[ 2, region ] back
-  for( list<int>::const_iterator it = region.begin();
-       it != region.end(); ++ it ) {
-    ptr_seg[ 2 * *it - 1 ] = 0;
-  }
+  recoverLabel( region, ptr_seg );
 
   delete [] yln;
   delete [] yl;

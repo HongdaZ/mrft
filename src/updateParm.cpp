@@ -4,6 +4,7 @@
 #include <cmath>   
 
 #include "updateParm.h"
+#include "labelRegion.h" 
 
 using std::abs;
 
@@ -136,10 +137,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tmp = 0;
   mu = - 1;
   // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
-  for( list<int>::const_iterator it = region.begin();
-       it != region.end(); ++ it ) {
-    ptr_seg[ 2 * *it - 1 ] = 3;
-  }
+  labelRegion( region, ptr_seg );
   
   // Initialize matrices and vectors
   int nrow = region.size();
@@ -213,10 +211,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     ++ i;
   }
   // change ptr_seg[ 2, region ] back
-  for( list<int>::const_iterator it = region.begin();
-       it != region.end(); ++ it ) {
-    ptr_seg[ 2 * *it - 1 ] = 0;
-  }
+  recoverLabel( region, ptr_seg );
   delete [] yln_;
   delete [] yln_i;
   delete [] yl_;
