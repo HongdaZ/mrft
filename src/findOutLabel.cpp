@@ -2,8 +2,9 @@
 
 // find an outlier label for current voxel
 int findOutLabel( const int idx, const int *ptr_seg, 
-                  const list<int> &outl_labels ) {
+                  list<int> &outl_labels ) {
   int out_label;
+  outl_labels.sort();
   // current label is not outlier
   if( ptr_seg[ 2 * ( idx - 1 ) ] < 1 ) {
     if( outl_labels.empty() ) {

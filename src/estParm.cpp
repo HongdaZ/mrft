@@ -129,7 +129,7 @@ extern "C" {
       for( int j = 1; j <= len; ++ j ) {
 
         skip_curr = skip( j, ptr_seg, ptr_nidx, ptr_intst, threshold,
-                          search[ j ], 5 );
+                          search[ j ], 10 );
         if( skip_curr ) {
           continue;
         } else {
