@@ -156,7 +156,7 @@ extern "C" {
     }
     // debug zero blocks
     for( int j = 1; j <= len; j ++ ) {
-      if( ptr_seg[ j - 1 ] == 0 ) {
+      if( ptr_seg[ 2 * ( j - 1 ) ] == 0 ) {
         int nbr_idx = 0;
         int label;
         Rprintf( "curr_idx = %d; ", j );
@@ -165,9 +165,10 @@ extern "C" {
           Rprintf( "nbr_idx = %d; ", nbr_idx );
           if( nbr_idx != NA_INTEGER ) {
             label = ptr_seg[ 2 * ( nbr_idx - 1 ) ];
-            Rprintf( "nbr_label = %d\n", label );
+            Rprintf( "nbr_label = %d; ", label );
           }
         }
+        Rprintf( "\n" );
       }
     }
     // printParm( health_parm );
