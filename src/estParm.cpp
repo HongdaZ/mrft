@@ -154,9 +154,25 @@ extern "C" {
                 ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
                 tumor_regions, ptr_a, ptr_b, len, 20 );
     }
-    printParm( health_parm );
-    printParm( tumor_parm );
-    printParm( outl_parm );
+    // debug zero blocks
+    for( int j = 1; j <= len; j ++ ) {
+      if( ptr_seg[ j - 1 ] == 0 ) {
+        int nbr_idx = 0;
+        int label;
+        Rprintf( "curr_idx = %d; ", j );
+        for( int i = 0; i < 6; ++ i ) {
+          nbr_idx = ptr_nidx[ 6 * ( j - 1 ) + i ];
+          Rprintf( "nbr_idx = %d; ", nbr_idx );
+          if( nbr_idx != NA_INTEGER ) {
+            label = ptr_seg[ 2 * ( nbr_idx - 1 ) ];
+            Rprintf( "nbr_label = %d\n", label );
+          }
+        }
+      }
+    }
+    // printParm( health_parm );
+    // printParm( tumor_parm );
+    // printParm( outl_parm );
     return seg;
   }
 } // extern "C"

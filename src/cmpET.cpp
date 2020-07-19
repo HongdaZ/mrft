@@ -125,10 +125,10 @@ void cmpET( int idx, int sc,
         new_out_parm[ i ] = outlier_parm[ 1 + i ];
       }
       addOutl( out_label, new_out_parm, outl_labels, outl_parm );
-      if( out_label == 32 ) {
-        Rprintf( "place 1: idx = %d; mu = %f, sigma2 = %f\n", idx, new_out_parm[ 0 ], 
-                 new_out_parm[ 1 ] );
-      }
+      // if( out_label == 32 ) {
+      //   Rprintf( "place 1: idx = %d; mu = %f, sigma2 = %f\n", idx, new_out_parm[ 0 ], 
+      //            new_out_parm[ 1 ] );
+      // }
       // remove old subregions, parameters and labels,
       // add new whole regions label,region and parameters,
       // set seg to tumor,
@@ -149,11 +149,11 @@ void cmpET( int idx, int sc,
                  tumor_regions, tumor_parm );
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       eraseOutl( out_label, outl_labels, outl_parm );
-      if( out_label == 32 ) {
-        bool in = outl_parm.find( 32 ) != outl_parm.end();
-        Rprintf( "place 5: idx = %d, in list = %d\n", 
-                 idx, in );
-      }
+      // if( out_label == 32 ) {
+      //   bool in = outl_parm.find( 32 ) != outl_parm.end();
+      //   Rprintf( "place 5: idx = %d, in list = %d\n", 
+      //            idx, in );
+      // }
       
     // update parameters for subregions
     } else if( combine_nrg >= split_nrg && sc == 2 ) {
@@ -265,18 +265,18 @@ void cmpET( int idx, int sc,
           ptr_seg[ 2 * ( idx - 1 ) ] = t_label;
           tumor_regions[ t_label ].remove( idx );
           eraseOutl( curr_label, outl_labels, outl_parm );
-          if( curr_label == 32 ) {
-            bool in = outl_parm.find( 32 ) != outl_parm.end();
-            Rprintf( "place 3: idx = %d, in list = %d\n", idx, in );
-          }
+          // if( curr_label == 32 ) {
+          //   bool in = outl_parm.find( 32 ) != outl_parm.end();
+          //   Rprintf( "place 3: idx = %d, in list = %d\n", idx, in );
+          // }
         } else if( curr_label < - 3 && t_energy >= out_energy ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
           tumor_regions[ t_label ].remove( idx );
           addOutl( out_label, new_out_parm, outl_labels, outl_parm );
-          if( out_label == 32 ) {
-            Rprintf( "place 2: idx = %d; mu = %f, sigma2 = %f\n", idx, new_out_parm[ 0 ], 
-                     new_out_parm[ 1 ] );
-          }
+          // if( out_label == 32 ) {
+          //   Rprintf( "place 2: idx = %d; mu = %f, sigma2 = %f\n", idx, new_out_parm[ 0 ], 
+          //            new_out_parm[ 1 ] );
+          // }
         }
         // not have tumor  
       } else {
@@ -309,10 +309,10 @@ void cmpET( int idx, int sc,
                      tumor_regions, tumor_parm );
           ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
           eraseOutl( curr_label, outl_labels, outl_parm );
-          if( curr_label == 32 ) {
-            bool in = outl_parm.find( 32 ) != outl_parm.end();
-            Rprintf( "place 4: idx = %d, in list = %d\n", idx, in );
-          }
+          // if( curr_label == 32 ) {
+          //   bool in = outl_parm.find( 32 ) != outl_parm.end();
+          //   Rprintf( "place 4: idx = %d, in list = %d\n", idx, in );
+          // }
         }
       }
     }
