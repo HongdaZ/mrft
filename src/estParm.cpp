@@ -112,7 +112,7 @@ extern "C" {
                 tumor_parm );
     Rprintf( "updateBeta finished!\n" );
 
-    int maxit = 20;
+    int maxit = 50;
     bool skip_curr;
     vector<int> search( len, 0 );
     double threshold = ptr_m[ 2 ];
@@ -125,15 +125,19 @@ extern "C" {
     vector<double> whole_parm( 8, 0 );
     
     Rprintf( "Segmentation started!\n" );
+    int old_label = 0;
+    int new_label = 0;
     for( int i = 0; i < maxit; ++ i ) {
       for( int j = 1; j <= len; ++ j ) {
 
+        // skip the voxels whose label remain the same in 5 consecutive 
+        // updates
         skip_curr = skip( j, ptr_seg, ptr_nidx, ptr_intst, threshold,
-                          search[ j ], 10 );
+                          search[ j - 1 ], 5 );
         if( skip_curr ) {
           continue;
         } else {
-          ++ search[ j ];
+          old_label = ptr_seg[ 2 * ( j - 1 ) ];
           list<list<int>> regions;
           list<int> labels;
           int sc = scTrn( labels, regions, tumor_labels, tumor_regions,
@@ -144,6 +148,12 @@ extern "C" {
                  ptr_alpha, ptr_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
                  ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
                  new_out_parm, whole_parm );
+          new_label = ptr_seg[ 2 * ( j - 1 ) ];
+          if( old_label == new_label ) {
+             ++ search[ j - 1 ];
+          } else {
+            search[ j - 1 ] = 0;
+          }
         }
         // Rprintf( "%d\t; curr_label = %d\n", j, ptr_seg[ 2 * ( j - 1 ) ] );
       }
@@ -154,21 +164,19 @@ extern "C" {
                 ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_beta,
                 tumor_regions, ptr_a, ptr_b, len, 20 );
     }
-    // debug zero blocks
+    // segment zero blocks
     for( int j = 1; j <= len; j ++ ) {
       if( ptr_seg[ 2 * ( j - 1 ) ] == 0 ) {
-        int nbr_idx = 0;
-        int label;
-        Rprintf( "curr_idx = %d; ", j );
-        for( int i = 0; i < 6; ++ i ) {
-          nbr_idx = ptr_nidx[ 6 * ( j - 1 ) + i ];
-          Rprintf( "nbr_idx = %d; ", nbr_idx );
-          if( nbr_idx != NA_INTEGER ) {
-            label = ptr_seg[ 2 * ( nbr_idx - 1 ) ];
-            Rprintf( "nbr_label = %d; ", label );
-          }
-        }
-        Rprintf( "\n" );
+        list<list<int>> regions;
+        list<int> labels;
+        int sc = scTrn( labels, regions, tumor_labels, tumor_regions,
+                        ptr_seg, ptr_nidx, j );
+        cmpET( j, sc, labels, regions, tumor_regions, tumor_labels,
+               outl_labels, health_parm, tumor_parm, outl_parm, ptr_seg,
+               ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
+               ptr_alpha, ptr_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
+               ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+               new_out_parm, whole_parm );
       }
     }
     // printParm( health_parm );
