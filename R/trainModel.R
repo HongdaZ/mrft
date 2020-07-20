@@ -8,10 +8,9 @@ trainModel <- function( patient, delta = 5 ^ 2, gamma = 1,
                         nu2 = rep( .25, 3 ) ) {
   
   l_intst <- splitCWG( patient ) # splitCWGX for testing
-  flair_model <- initTrn( l_intst$intensity$flair, 
-                    l_intst$label$flair, "flair" )
+  flair_model <- initTrn( l_intst, "flair" )
   # -1, -2, -3, > 0
-  m <- priorMode( flair_model$info$intst, flair_model$seg )
+  m <- priorMode( flair_model )
   b <- getB( m, a )
   sink( file = "/media/hzhang/ZHD-U1/output.txt" );
   system.time( par_flair <- estParm( flair_model, delta, gamma,
