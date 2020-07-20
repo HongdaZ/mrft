@@ -26,6 +26,7 @@
 #include "skip.h"
 #include "debug.h"
 #include "printParm.h"
+#include "verifyTumor.h"
 
 using std::stack;
 using std::queue;
@@ -193,6 +194,8 @@ extern "C" {
     // printParm( health_parm );
     // printParm( tumor_parm );
     // printParm( outl_parm );
+    bool match = verifyTumor( tumor_regions, ptr_res_seg, len );
+    Rprintf( "all matched: %s\n", match ? "true" : "false" );
     UNPROTECT( 2 );
     return res_seg;
   }
