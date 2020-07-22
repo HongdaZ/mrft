@@ -5,17 +5,14 @@ trainModel <- function( patient, delta = 5 ^ 2, gamma = 1,
                         beta = rep( 1, 4 ),
                         lambda2 = rep( 1 / ( 36 * 4 ) , 4 ), 
                         a = 5,
-                        nu2 = rep( .25, 3 ) ) {
+                        nu2 = rep( .25, 3 ), 
+                        maxit = 50L ) {
   
   l_intst <- splitCWG( patient ) # splitCWGX for testing
   flair_model <- initTrn( l_intst, "flair" )
   # -1, -2, -3, > 0
   m <- priorMode( flair_model )
   b <- getB( m, a )
-  sink( file = "/media/hzhang/ZHD-U1/output.txt" );
-  system.time( par_flair <- estParm( flair_model, delta, gamma,
-                        alpha, beta, lambda2, a, b, m, nu2 ) )
-  sink();
-  # par_flair <- estParm( flair_model, delta, gamma, 
-  #                       alpha, beta, lambda2, a, b, m, nu2 )
+  estParm( flair_model, delta, gamma,
+           alpha, beta, lambda2, a, b, m, nu2, maxit )
 }

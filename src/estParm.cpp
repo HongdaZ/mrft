@@ -27,6 +27,8 @@
 #include "debug.h"
 #include "printParm.h"
 #include "verifyTumor.h"
+#include "copyParm.h"
+#include "restoreImg.h"
 
 using std::stack;
 using std::queue;
@@ -36,7 +38,7 @@ using std::set;
 extern "C" {
   SEXP estParm( SEXP model, SEXP delta, SEXP gamma, 
                 SEXP alpha, SEXP beta, SEXP lambda2, 
-                SEXP a, SEXP b, SEXP m, SEXP nu2 ) {
+                SEXP a, SEXP b, SEXP m, SEXP nu2, SEXP maxit ) {
     SEXP info = getListElement( model, "info" );
     SEXP seg = getListElement( model, "seg" );
     
@@ -52,6 +54,7 @@ extern "C" {
     const double *ptr_intst = REAL( intst );
     const double *ptr_nintst = REAL( nintst );
     
+    
     const double *ptr_delta = REAL( delta );
     const double *ptr_gamma = REAL( gamma );
     const double *ptr_alpha = REAL( alpha );
@@ -61,6 +64,7 @@ extern "C" {
     const double *ptr_b = REAL( b );
     const double *ptr_m = REAL( m );
     const double *ptr_nu2 = REAL( nu2 );
+    const int *ptr_maxit = INTEGER( maxit );
     
     int len = length( idx );
     // a copy of seg and beta
@@ -124,7 +128,6 @@ extern "C" {
                 tumor_parm );
     // Rprintf( "updateBeta finished!\n" );
 
-    int maxit = 50;
     bool skip_curr;
     vector<int> search( len, 0 );
     double threshold = ptr_m[ 2 ];
@@ -139,7 +142,7 @@ extern "C" {
     // Rprintf( "Segmentation started!\n" );
     int old_label = 0;
     int new_label = 0;
-    for( int i = 0; i < maxit; ++ i ) {
+    for( int i = 0; i < *ptr_maxit; ++ i ) {
       for( int j = 1; j <= len; ++ j ) {
 
         // skip the voxels whose label remain the same in 5 consecutive 
@@ -194,9 +197,34 @@ extern "C" {
     // printParm( health_parm );
     // printParm( tumor_parm );
     // printParm( outl_parm );
-    bool match = verifyTumor( tumor_regions, ptr_res_seg, len );
-    Rprintf( "all matched: %s\n", match ? "true" : "false" );
-    UNPROTECT( 2 );
-    return res_seg;
+    // bool match = verifyTumor( tumor_regions, ptr_res_seg, len );
+    // Rprintf( "all matched: %s\n", match ? "true" : "false" );
+    int nrow = 1 + 2 + 6;
+    int ncol = tumor_parm.size() + health_parm.size() + outl_parm.size();
+    
+    SEXP res_parm = PROTECT( allocMatrix( REALSXP, nrow, ncol ) );
+    SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );
+    double *ptr_res_parm = REAL( res_parm );
+    int *ptr_res_image = INTEGER( res_image );
+    copyParm( health_parm, tumor_parm, outl_parm, ptr_res_parm, nrow );
+    restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len );
+    
+    // results to list
+    SEXP names = PROTECT( allocVector( STRSXP, 4 ) );
+    
+    SET_STRING_ELT( names, 0, mkChar( "beta" ) );
+    SET_STRING_ELT( names, 1, mkChar( "seg" ) );
+    SET_STRING_ELT( names, 2, mkChar( "parm" ) );
+    SET_STRING_ELT( names, 3, mkChar( "image" ) );
+    
+    SEXP res = PROTECT( allocVector( VECSXP, 4 ) );
+    SET_VECTOR_ELT( res, 0, res_beta );
+    SET_VECTOR_ELT( res, 1, res_seg );
+    SET_VECTOR_ELT( res, 2, res_parm );
+    SET_VECTOR_ELT( res, 3, res_image );
+    setAttrib( res, R_NamesSymbol, names );
+    
+    UNPROTECT( 6 );
+    return res;
   }
 } // extern "C"
