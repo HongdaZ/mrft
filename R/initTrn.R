@@ -2,6 +2,7 @@
 initTrn <- function( data, modality ) {
   img <- data$intensity[[ modality ]]
   label_ <- data$label[[ modality ]]
+  label <- NULL
   switch( modality,
           "flair" = {
             # label[ label == 1 | label == 4 ] <- NA_integer_

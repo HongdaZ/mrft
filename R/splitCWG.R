@@ -2,21 +2,25 @@
 # csf = 1, wm = 2, g = 3, TBD = 0, o.w. = NA 
 splitCWG <- function( patient ) {
   
-  lbl <- readNifti( patient[ 2 ] )
+  lbl_ <- readNifti( patient[ 2 ] )
   flair_ <- readNifti( patient[ 1 ] )
   t2_ <- readNifti( patient[ 5 ] )
   t1ce_ <- readNifti( patient[ 4 ] )
   
+  flair_[ flair_ == 0 ] <- NaN
+  t2_[ t2_ == 0 ] <- NaN
+  t1ce_[ t1ce_ == 0 ] <- NaN
+  
   img <- list( flair = flair_, t1ce = t1ce_, t2 = t2_ )
   
-  # non_valid <- lbl != 0
+  # non_valid <- lbl_ != 0
   # 
   # flair[ non_valid ] <-NaN
   # t2[ non_valid ] <- NaN
   # t1ce[ non_valid ] <- NaN
-  flair <- changeA( flair_, lbl )
-  t2 <- changeA( t2_, lbl )
-  t1ce <- changeA( t1ce_, lbl )
+  flair <- changeA( flair_, lbl_ )
+  t2 <- changeA( t2_, lbl_ )
+  t1ce <- changeA( t1ce_, lbl_ )
   
   # Find csf & necrosis
   q_flair <- quantile( flair, probs = c( .20, .40, .50, .01 ), na.rm = T, 
@@ -24,33 +28,33 @@ splitCWG <- function( patient ) {
   q_t2 <- quantile( t2, probs = c( .80, .01 ), na.rm = T, names = F )
   
   # csf <- flair < q_flair[ 1 ] & t2 > q_t2[ 1 ]
-  # lbl[ csf ] <- -1L
-  lbl <- changeB( lbl, flair, q_flair[ 1 ], t2, q_t2[ 1 ], -1L )
+  # lbl_[ csf ] <- -1L
+  lbl_ <- changeB( lbl_, flair, q_flair[ 1 ], t2, q_t2[ 1 ], -1L )
   
   # Find white matter
   q_t1ce <- quantile( t1ce, probs = c( .60, .50, .01 ), na.rm = T, names = F )
   
   # wm <- flair < q_flair[ 2 ] & t1ce > q_t1ce[ 1 ]
-  # lbl[ wm ] <- -2L
-  lbl <- changeB( lbl, flair, q_flair[ 2 ], t1ce, q_t1ce[ 1 ], -2L )
+  # lbl_[ wm ] <- -2L
+  lbl_ <- changeB( lbl_, flair, q_flair[ 2 ], t1ce, q_t1ce[ 1 ], -2L )
   
   # Find grey matter
   # gm <- t1ce < q_t1ce[ 2 ] & flair > q_flair[ 3 ]
-  # lbl[ gm ] <- -3L
-  lbl <- changeB( lbl, t1ce, q_t1ce[ 2 ], flair, q_flair[ 3 ], -3L )
+  # lbl_[ gm ] <- -3L
+  lbl_ <- changeB( lbl_, t1ce, q_t1ce[ 2 ], flair, q_flair[ 3 ], -3L )
   
   # Remove the darkest 1% of the voxels
-  # lbl_flair <- lbl
+  # lbl_flair <- lbl_
   # lbl_flair[ flair < q_flair[ 4 ] ] <- NA_integer_
-  lbl_flair <- changeC( lbl, flair, q_flair[ 4 ] )
+  lbl_flair <- changeC( lbl_, flair, q_flair[ 4 ] )
   
-  # lbl_t1ce <- lbl
+  # lbl_t1ce <- lbl_
   # lbl_t1ce[ t1ce < q_t1ce[ 3 ] ] <- NA_integer_
-  lbl_t1ce <- changeC( lbl, t1ce, q_t1ce[ 3 ] )
+  lbl_t1ce <- changeC( lbl_, t1ce, q_t1ce[ 3 ] )
   
-  # lbl_t2 <- lbl
+  # lbl_t2 <- lbl_
   # lbl_t2[ t2 < q_t2[ 2 ] ] <- NA_integer_
-  lbl_t2 <- changeC( lbl, t2, q_t2[ 2 ] )
+  lbl_t2 <- changeC( lbl_, t2, q_t2[ 2 ] )
   
   
   lbl <- list( flair = lbl_flair, t1ce = lbl_t1ce, t2 = lbl_t2 )
