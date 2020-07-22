@@ -148,7 +148,7 @@ extern "C" {
         // skip the voxels whose label remain the same in 5 consecutive 
         // updates
         skip_curr = skip( j, ptr_res_seg, ptr_nidx, ptr_intst, threshold,
-                          search[ j - 1 ], 5 );
+                          search[ j - 1 ], 3 );
         if( skip_curr ) {
           continue;
         } else {
