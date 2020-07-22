@@ -2,7 +2,7 @@
 
 // whether skip current voxel
 bool skip( const int idx, const int *ptr_seg, const int *ptr_nidx, 
-           const double *ptr_intst, const double threshold, 
+           const double *ptr_intst, const double lower, const double upper, 
            const int search, const int maxit ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   list<int> nbr_label;
@@ -20,7 +20,8 @@ bool skip( const int idx, const int *ptr_seg, const int *ptr_nidx,
   
   res = res && ( curr_label == 0 );
   double curr_intst = ptr_intst[ idx - 1 ];
-  res = res || ( curr_label != 0 && curr_intst < threshold
+  res = res || ( curr_label != 0 && 
+    ( curr_intst < lower || curr_intst > upper )
                    && search > maxit );
   return res;
 }

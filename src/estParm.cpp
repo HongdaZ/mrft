@@ -130,8 +130,8 @@ extern "C" {
 
     bool skip_curr;
     vector<int> search( len, 0 );
-    double threshold = ptr_m[ 2 ];
-    
+    double lower = ptr_m[ 2 ];
+    double upper = ptr_m[ 3 ];
     vector<double> outlier_parm( 3, 0 );
     vector<double> theta( 6, 0 );
     vector<double> tmp_parm( 9, 0 );
@@ -147,7 +147,7 @@ extern "C" {
 
         // skip the voxels whose label remain the same in 5 consecutive 
         // updates
-        skip_curr = skip( j, ptr_res_seg, ptr_nidx, ptr_intst, threshold,
+        skip_curr = skip( j, ptr_res_seg, ptr_nidx, ptr_intst, lower, upper,
                           search[ j - 1 ], 3 );
         if( skip_curr ) {
           continue;
