@@ -10,9 +10,7 @@ splitCWG <- function( patient ) {
   flair_[ flair_ == 0 ] <- NaN
   t2_[ t2_ == 0 ] <- NaN
   t1ce_[ t1ce_ == 0 ] <- NaN
-  
-  img <- list( flair = flair_, t1ce = t1ce_, t2 = t2_ )
-  
+
   # non_valid <- lbl_ != 0
   # 
   # flair[ non_valid ] <-NaN
@@ -57,6 +55,9 @@ splitCWG <- function( patient ) {
   lbl_t2 <- changeC( lbl_, t2, q_t2[ 2 ] )
   
   
-  lbl <- list( flair = lbl_flair, t1ce = lbl_t1ce, t2 = lbl_t2 )
-  list( label = lbl, intensity = img )
+  res <- list( label_flair = lbl_flair, label_t1ce = lbl_t1ce, 
+               label_t2 = lbl_t2, 
+               intst_flair = flair_, intst_t1ce = t1ce_,
+               intst_t2 = t2_ )
+  return( res )
 }
