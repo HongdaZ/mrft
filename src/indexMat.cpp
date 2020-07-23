@@ -14,8 +14,7 @@ SEXP indexMat( SEXP img, SEXP label ) {
   int ns = INTEGER( dim )[ 2 ];
   int len = nr * nc * ns;
   
-  SEXP full_idx = PROTECT( allocVector( INTSXP, len ) );
-  int *ptr_fidx = INTEGER( full_idx );
+  int *ptr_fidx = new int[ len ];
   // Get the number of non-zero voxels and index in valid voxel vector
   int n_valid = 0;
   for( int i = 0; i < len; ++ i ) {
@@ -154,6 +153,7 @@ SEXP indexMat( SEXP img, SEXP label ) {
   SET_VECTOR_ELT( res, 2, valid_intst );
   SET_VECTOR_ELT( res, 3, nbr_intst );
   setAttrib( res, R_NamesSymbol, names );
-  UNPROTECT( 7 ); /* ans  gradient  dimnames */
+  delete [] ptr_fidx;
+  UNPROTECT( 6 ); 
   return res;
 }

@@ -8,11 +8,13 @@ SEXP changeD( SEXP old, SEXP a, SEXP b ) {
   int a_ = INTEGER( a )[ 0 ];
   int b_ = INTEGER( b )[ 0 ];
   
-  int len = length( old );
-  
-  SEXP ans = PROTECT( allocVector( INTSXP, len ) );
   SEXP dim = getAttrib( old, R_DimSymbol );
-  setAttrib( ans, R_DimSymbol, dim );
+  int nr = INTEGER( dim )[ 0 ];
+  int nc = INTEGER( dim )[ 1 ];
+  int ns = INTEGER( dim )[ 2 ];
+  int len = nr * nc * ns;
+  
+  SEXP ans = PROTECT( alloc3DArray( INTSXP, nr, nc, ns ) );
   int *ptr_ans = INTEGER( ans );
   
   for( int i = 0; i < len; ++ i ) {

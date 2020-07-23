@@ -7,11 +7,16 @@ SEXP changeA( SEXP img, SEXP label ) {
   
   double *image = REAL( img );
   int *lbl = INTEGER( label );
-  int len = length( label );
-  SEXP ans = PROTECT( allocVector( REALSXP, len ) );
+  
   SEXP dim = getAttrib( img, R_DimSymbol );
-  setAttrib( ans, R_DimSymbol, dim );
+  int nr = INTEGER( dim )[ 0 ];
+  int nc = INTEGER( dim )[ 1 ];
+  int ns = INTEGER( dim )[ 2 ];
+  int len = nr * nc * ns;
+  
+  SEXP ans = PROTECT( alloc3DArray( REALSXP, nr, nc, ns ) );
   double *ptr_ans = REAL( ans );
+  
   for( int i = 0; i < len; ++ i ) {
     if( lbl[ i ] == 0 ) {
       ptr_ans[ i ] = image[ i ];

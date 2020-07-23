@@ -12,10 +12,14 @@ SEXP changeB( SEXP label, SEXP image1, SEXP q1, SEXP image2, SEXP q2,
   double q_1 = REAL( q1 )[ 0 ];
   double q_2 = REAL( q2 )[ 0 ];
   int l = INTEGER( k )[ 0 ];
-  int len = length( label );
-  SEXP ans = PROTECT( allocVector( INTSXP, len ) );
+  
   SEXP dim = getAttrib( label, R_DimSymbol );
-  setAttrib( ans, R_DimSymbol, dim );
+  int nr = INTEGER( dim )[ 0 ];
+  int nc = INTEGER( dim )[ 1 ];
+  int ns = INTEGER( dim )[ 2 ];
+  int len = nr * nc * ns;
+  
+  SEXP ans = PROTECT( alloc3DArray( INTSXP, nr, nc, ns ) );
   int *ptr_ans = INTEGER( ans );
 
   for( int i = 0; i < len; ++ i ) {

@@ -1,26 +1,21 @@
 ## Initialize data for training
-initTrn <- function( data, modality ) {
-  img <- data$intensity[[ modality ]]
-  label_ <- data$label[[ modality ]]
-  label <- NULL
-  switch( modality,
-          "flair" = {
-            # label[ label == 1 | label == 4 ] <- NA_integer_
-            label <- changeD( label_, 1L, 4L )
-          },
-          "t1ce" = {
-            # label[ label == 1 | label == 2 ] <- NA_integer_
-            label <- changeD( label_, 1L, 2L )
-          },
-          "t2" = {
-            # label[ label == 4 ] <- NA_integer_
-            label <- changeD( label_, 4L, NA_integer_ )
-          } )
-  info <- indexMat( img, label )
-  seg <- label[ info$idx ]
-  y <- rep( 0L, length( seg ) )
-  seg_pad <- rbind( seg, y )
+initTrn <- function( label_, intst_, modality ) {
 
-  list( info = info, seg = seg_pad )
+  if( modality == "flair" ) {
+    # label[ label == 1 | label == 4 ] <- NA_integer_
+    label <- changeD( label_, 1L, 4L )
+  } else if( modality == "t1ce" ) {
+    # label[ label == 1 | label == 2 ] <- NA_integer_
+    label <- changeD( label_, 1L, 2L )
+  } else if( modality == "t2" ) {
+    # label[ label == 4 ] <- NA_integer_
+    label <- changeD( label_, 4L, NA_integer_ )
+  }
+  info <- indexMat( intst_, label )
+  seg <- label[ info$idx ]
+  padding <- rep( 0L, length( seg ) )
+  seg_mat <- rbind( seg, padding )
   
+  res <- list( info = info, seg = seg_mat )
+  return( res )
 }

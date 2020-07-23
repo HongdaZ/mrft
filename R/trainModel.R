@@ -9,7 +9,8 @@ trainModel <- function( patient, delta = 5 ^ 2, gamma = 1,
                         maxit = 50L ) {
   
   l_intst <- splitCWG( patient ) # splitCWGX for testing
-  flair_model <- initTrn( l_intst, "flair" )
+  flair_model <- initTrn( l_intst$label_flair, l_intst$intst_flair, 
+                          "flair" )
   # -1, -2, -3, > 0
   m <- priorMode( flair_model )
   b <- getB( m, a )
