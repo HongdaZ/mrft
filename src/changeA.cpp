@@ -1,6 +1,8 @@
 #include <R.h>
 #include <Rinternals.h>
 
+extern "C" SEXP changeA( SEXP img, SEXP label );
+
 SEXP changeA( SEXP img, SEXP label ) {
   
   double *image = REAL( img );

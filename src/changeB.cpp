@@ -1,6 +1,9 @@
 #include <R.h>
 #include <Rinternals.h>
 
+extern "C" SEXP changeB( SEXP label, SEXP image1, SEXP q1, SEXP image2, 
+                        SEXP q2, SEXP k  );
+
 SEXP changeB( SEXP label, SEXP image1, SEXP q1, SEXP image2, SEXP q2, 
               SEXP k  ) {
   int *lbl = INTEGER( label );
