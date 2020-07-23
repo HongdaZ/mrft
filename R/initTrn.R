@@ -18,8 +18,8 @@ initTrn <- function( data, modality ) {
           } )
   info <- indexMat( img, label )
   seg <- label[ info$idx ]
-  seg <- rbind( seg, rep( 0L, length( seg ) ) )
+  seg_pad <- rbind( seg, rep( 0L, length( seg ) ) )
 
-  list( info = info, seg = seg )
+  a <- list( info = info, seg = seg_pad )
   
 }

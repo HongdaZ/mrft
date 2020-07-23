@@ -2,4 +2,4 @@ useDynLib( mrft )
 exportPattern("^[[:alpha:]]+")
 
 #importFrom(): import selected functions (including S4 generics).
-importFrom( "RNifti", "readNifti" )
+importFrom( "oro.nifti", "readNIfTI" )

@@ -2,11 +2,11 @@
 # csf = 1, wm = 2, g = 3, TBD = 0, o.w. = NA 
 splitCWG <- function( patient ) {
   
-  lbl_ <- readNifti( patient[ 2 ] )
-  flair_ <- readNifti( patient[ 1 ] )
-  t2_ <- readNifti( patient[ 5 ] )
-  t1ce_ <- readNifti( patient[ 4 ] )
-  
+  lbl_ <- readNIfTI( patient[ 2 ], reorient = FALSE )@.Data
+  flair_ <- readNIfTI( patient[ 1 ], reorient = FALSE )@.Data
+  t2_ <- readNIfTI( patient[ 5 ], reorient = FALSE )@.Data
+  t1ce_ <- readNIfTI( patient[ 4 ], reorient = FALSE )@.Data
+
   flair_[ flair_ == 0 ] <- NaN
   t2_[ t2_ == 0 ] <- NaN
   t1ce_[ t1ce_ == 0 ] <- NaN
