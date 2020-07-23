@@ -10,31 +10,30 @@ SEXP priorMode( SEXP intst, SEXP seg ) {
   
   double sum[ 4 ] = { 0 };
   int n[ 4 ] = { 0 };
-#pragma omp parallel for num_threads( 12 ) default( none )    \
-  firstprivate( len, ptr_seg, ptr_intst )                     \
-    reduction( +: sum[ : 4 ], n[ : 4 ] )
-    for( int i = 0; i < len; ++ i ) {
-      switch( ptr_seg[ 2 * i ] ) {
-      case -1 :
-        n[ 0 ] += 1;
-        sum[ 0 ] += ptr_intst[ i ];
-        break;
-      case -2 :
-        n[ 1 ] += 1;
-        sum[ 1 ] += ptr_intst[ i ];
-        break;
-      case -3 :
-        n[ 2 ] +=1;
-        sum[ 2 ] += ptr_intst[ i ];
-        break;
-      case 0 :
-        break;
-      default :
-        n[ 3 ] += 1;
-        sum[ 3 ] += ptr_intst[ i ];
-      }
+  for( int i = 0; i < len; ++ i ) {
+    switch( ptr_seg[ 2 * i ] ) {
+    case -1 :
+      n[ 0 ] += 1;
+      sum[ 0 ] += ptr_intst[ i ];
+      break;
+    case -2 :
+      n[ 1 ] += 1;
+      sum[ 1 ] += ptr_intst[ i ];
+      break;
+    case -3 :
+      n[ 2 ] +=1;
+      sum[ 2 ] += ptr_intst[ i ];
+      break;
+    case 0 :
+      break;
+    default :
+      n[ 3 ] += 1;
+    sum[ 3 ] += ptr_intst[ i ];
     }
-    SEXP ans = PROTECT( allocVector( REALSXP, 4 ) );
+  }
+
+    
+  SEXP ans = PROTECT( allocVector( REALSXP, 4 ) );
   double *ptr_ans = REAL( ans );
   for( int i = 0; i < 4; ++ i ) {
     ptr_ans[ i ] = sum[ i ] / n[ i ];
