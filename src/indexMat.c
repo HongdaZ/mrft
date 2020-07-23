@@ -53,7 +53,7 @@ SEXP indexMat( SEXP img, SEXP label ) {
         vec_index = nc * nr * k + nr * j + i + 1;
         for( int l = 0; l < n_nbr; ++ l ) {
           ptr_idx[ n_nbr * n_valid + l ] = NA_INTEGER;
-          ptr_intst[ n_nbr * n_valid + l ] = NA_REAL;
+          ptr_intst[ n_nbr * n_valid + l ] = R_NaN;
         }
         if( vec_index == ptr_vidx[ n_valid ] ) {
           
