@@ -1,6 +1,8 @@
 #include <R.h>
 #include <Rinternals.h>
- 
+
+#include "assignIdxIntst.h"
+
 extern "C" SEXP indexMat( SEXP img, SEXP label );
 
 SEXP indexMat( SEXP img, SEXP label ) {
@@ -13,7 +15,6 @@ SEXP indexMat( SEXP img, SEXP label ) {
   int nc = INTEGER( dim )[ 1 ];
   int ns = INTEGER( dim )[ 2 ];
   int len = nr * nc * ns;
-  
   int *ptr_fidx = new int[ len ];
   // Get the number of non-zero voxels and index in valid voxel vector
   int n_valid = 0;
@@ -38,108 +39,39 @@ SEXP indexMat( SEXP img, SEXP label ) {
       ptr_vintst[ n_valid ++ ] = image[ i ];
     }
   }
-  
   // Get index and intensity of neighboring voxels
   SEXP nbr_idx = PROTECT( allocMatrix( INTSXP, n_nbr, n_valid ) );
   int *ptr_idx = INTEGER( nbr_idx );
   SEXP nbr_intst = PROTECT( allocMatrix( REALSXP, n_nbr, n_valid ) );
   double *ptr_intst = REAL( nbr_intst );
+  const int vlen = n_valid;
   n_valid = 0;
   int vec_index = 0;
   int tmp_index = 0;
-  int i_, j_, k_;
+
+  int i_ = 0, j_ = 0, k_ = 0;
   for( int k = 0; k < ns; ++ k ) {
     for( int j = 0; j < nc; ++ j ) {
       for( int i = 0; i < nr; ++ i ) {
         vec_index = nc * nr * k + nr * j + i + 1;
-        for( int l = 0; l < n_nbr; ++ l ) {
-          ptr_idx[ n_nbr * n_valid + l ] = NA_INTEGER;
-          ptr_intst[ n_nbr * n_valid + l ] = R_NaN;
-        }
         if( vec_index == ptr_vidx[ n_valid ] ) {
-          
-          i_ = i;
-          j_ = j;
-          k_ = k - 1;
-          if( k_ >= 0  ) {
-            tmp_index = nc * nr * k_ + nr * j_ + i_ + 1;
-            
-            if( ptr_fidx[ tmp_index - 1 ] != NA_INTEGER ) {
-              ptr_idx[ n_nbr * n_valid ] = ptr_fidx[ tmp_index - 1 ];
-              ptr_intst[ n_nbr * n_valid ] = 
-                ptr_vintst[ ptr_fidx[ tmp_index - 1 ] - 1 ];
-            } 
-          }
-          
-          i_ = i;
-          j_ = j - 1;
-          k_ = k;
-          if( j_ >= 0  ) {
-            tmp_index = nc * nr * k_ + nr * j_ + i_ + 1;
-            
-            if( ptr_fidx[ tmp_index - 1 ] != NA_INTEGER ) {
-              ptr_idx[ n_nbr * n_valid + 1 ] = ptr_fidx[ tmp_index - 1 ];
-              ptr_intst[ n_nbr * n_valid + 1 ] = 
-                ptr_vintst[ ptr_fidx[ tmp_index - 1 ] - 1 ];
-            } 
-          }
-          i_ = i - 1;
-          j_ = j;
-          k_ = k;
-          if( i_ >= 0  ) {
-            tmp_index = nc * nr * k_ + nr * j_ + i_ + 1;
-            
-            if( ptr_fidx[ tmp_index - 1 ] != NA_INTEGER ) {
-              ptr_idx[ n_nbr * n_valid + 2 ] = ptr_fidx[ tmp_index - 1 ];
-              ptr_intst[ n_nbr * n_valid + 2 ] = 
-                ptr_vintst[ ptr_fidx[ tmp_index - 1 ] - 1 ];
-            }
-          }
-          
-          i_ = i + 1;
-          j_ = j;
-          k_ = k;
-          if( i_ < nr  ) {
-            tmp_index = nc * nr * k_ + nr * j_ + i_ + 1;
-            
-            if( ptr_fidx[ tmp_index - 1 ] != NA_INTEGER ) {
-              ptr_idx[ n_nbr * n_valid + 3 ] = ptr_fidx[ tmp_index - 1 ];
-              ptr_intst[ n_nbr * n_valid + 3 ] = 
-                ptr_vintst[ ptr_fidx[ tmp_index - 1 ] - 1 ];
-            }
-          }
-          
-          i_ = i;
-          j_ = j + 1;
-          k_ = k;
-          if( j_ < nc  ) {
-            tmp_index = nc * nr * k_ + nr * j_ + i_ + 1;
-            
-            if( ptr_fidx[ tmp_index - 1 ] != NA_INTEGER ) {
-              ptr_idx[ n_nbr * n_valid + 4 ] = ptr_fidx[ tmp_index - 1 ];
-              ptr_intst[ n_nbr * n_valid + 4 ] = 
-                ptr_vintst[ ptr_fidx[ tmp_index - 1 ] - 1 ];
-            }
-          }
-          
-          i_ = i;
-          j_ = j;
-          k_ = k + 1;
-          if( k_ < ns  ) {
-            tmp_index = nc * nr * k_ + nr * j_ + i_ + 1;
-            
-            if( ptr_fidx[ tmp_index - 1 ] != NA_INTEGER ) {
-              ptr_idx[ n_nbr * n_valid + 5 ] = ptr_fidx[ tmp_index - 1 ];
-              ptr_intst[ n_nbr * n_valid + 5 ] = 
-                ptr_vintst[ ptr_fidx[ tmp_index - 1 ] - 1 ];
-            }
-          }
+          assignIdxIntst( i, j, k, nr, nc, ns, n_nbr, n_valid, ptr_fidx, 
+                          ptr_idx, ptr_intst, ptr_vintst );
           ++ n_valid;
+          if( n_valid == vlen ) {
+            break;
+          }
         } 
       }
+      if( n_valid == vlen ) {
+        break;
+      }
+    }
+    if( n_valid == vlen ) {
+      break;
     }
   }
-  
+
   SEXP names = PROTECT( allocVector( STRSXP, 4 ) );
   
   SET_STRING_ELT( names, 0, mkChar( "idx" ) );
