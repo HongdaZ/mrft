@@ -1,10 +1,14 @@
 #include <R.h>
 #include <Rinternals.h>
-#include <omp.h>
+#include "helper.h"
 
-extern "C" SEXP priorMode( SEXP intst, SEXP seg );
+extern "C" SEXP priorMode( SEXP model );
 
-SEXP priorMode( SEXP intst, SEXP seg ) {
+SEXP priorMode( SEXP model ) {
+  
+  SEXP info = getListElement( model, "info" );
+  SEXP intst = getListElement( info, "intst" );
+  SEXP seg = getListElement( model, "seg" );
   
   const double *ptr_intst = REAL( intst );
   const int *ptr_seg = INTEGER( seg );
