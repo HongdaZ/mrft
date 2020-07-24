@@ -13,7 +13,7 @@ initTrn <- function( label_, intst_, modality ) {
   }
   info <- indexMat( intst_, label )
   seg <- label[ info$idx ]
-  padding <- rep( 0L, length( seg ) )
+  padding <- vector( mode = "integer", length( seg ) )
   seg_pad <- rbind( seg, padding )
   
   res <- list( info = info, seg = seg_pad )
