@@ -14,8 +14,8 @@ initTrn <- function( label_, intst_, modality ) {
   info <- indexMat( intst_, label )
   seg <- label[ info$idx ]
   padding <- rep( 0L, length( seg ) )
-  seg_mat <- rbind( seg, padding )
+  seg_pad <- rbind( seg, padding )
   
-  res <- list( info = info, seg = seg_mat )
+  res <- list( info = info, seg = seg_pad )
   return( res )
 }
