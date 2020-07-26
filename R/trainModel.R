@@ -14,6 +14,7 @@ trainModel <- function( patient, delta = 5 ^ 2, gamma = 1,
   # -1, -2, -3, > 0
   m <- priorMode( flair_model )
   b <- getB( m, a )
-  estParm( flair_model, delta, gamma,
-           alpha, beta, lambda2, a, b, m, nu2, maxit )
+  flair_res <- estParm( flair_model, delta, gamma,
+           alpha, beta, lambda2, a, b, m, nu2, 1L )
+  return( flair_res )
 }
