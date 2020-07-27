@@ -36,7 +36,8 @@ splitT1ce <- function( t1ce, flair ) {
   mean_white <- mean( t1ce[ label == - 3 ], na.rm = T )
   
   t1ce <- ( t1ce - mean_csf ) / ( mean_white - mean_csf ) 
-  
-  res <- list( label = label, t1ce = t1ce )
+  mean_grey <- ( mean_grey - mean_csf ) / ( mean_white - mean_csf ) 
+  res <- list( label = label, t1ce = t1ce,
+               m = c( 0, mean_grey, 1 ) )
   return( res )
 }
