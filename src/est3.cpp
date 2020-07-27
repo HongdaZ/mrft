@@ -26,7 +26,6 @@
 #include "verifyTumor.h"
 #include "copyParm.h"
 #include "restoreImg.h"
-#include "initParmHealth.h"
 
 using std::stack;
 using std::queue;
