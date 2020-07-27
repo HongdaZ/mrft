@@ -1,45 +1,23 @@
 #include <R.h>
 #include <Rinternals.h>
 
-#include <queue>
-#include <stack>
 #include <vector>
 #include <set>
 
 #include "helper.h"
-#include "scTrn.h"
-#include "scPred.h"
-#include "updateMu.h"
-#include "updateTS.h"
-#include "updateSigma.h"
-#include "energyY.h"
-#include "energyX.h"
-#include "nbrLabel.h"
-#include "updateParm.h"
 #include "initParm.h"
-#include "cmpET.h"
-#include "cmpEP.h"
 #include "updateBeta.h"
-#include "skip.h"
 #include "debug.h"
-#include "printParm.h"
-#include "verifyTumor.h"
 #include "copyParm.h"
 #include "restoreImg.h"
 
-using std::stack;
-using std::queue;
 using std::vector;
 using std::set;
 
 // estimate parameters of t1ce and t2 images without tumor
 extern "C" SEXP est3( SEXP model, SEXP delta, SEXP gamma, 
                         SEXP alpha, SEXP beta, SEXP lambda2, 
-                        SEXP m, SEXP nu2, SEXP maxit );
-
-SEXP estParm( SEXP model, SEXP delta, SEXP gamma, 
-              SEXP alpha, SEXP beta, SEXP lambda2, 
-              SEXP a, SEXP b, SEXP m, SEXP nu2, SEXP maxit ) {
+                        SEXP m, SEXP nu2, SEXP maxit ) {
   SEXP info = getListElement( model, "info" );
   SEXP seg = getListElement( model, "seg" );
   
@@ -61,8 +39,6 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   const double *ptr_alpha = REAL( alpha );
   const double *old_beta = REAL( beta );
   const double *ptr_lambda2 = REAL( lambda2 );
-  const double *ptr_a = REAL( a );
-  const double *ptr_b = REAL( b );
   const double *ptr_m = REAL( m );
   const double *ptr_nu2 = REAL( nu2 );
   const int *ptr_maxit = INTEGER( maxit );
@@ -80,62 +56,25 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
     ptr_res_beta[ i ] = old_beta[ i ];
   }
   map<int, vector<double>> health_parm;
-
+  // Initialize parameters for healthy regions
   initParmHealth3( health_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst, 
                    ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 
                    ptr_res_beta, len, 20 );
-  updateBeta( ptr_res_beta, ptr_alpha, health_parm, tumor_regions,
-              tumor_parm );
-  bool skip_curr;
-  vector<int> search( len, 0 );
-  double lower = ptr_m[ 2 ];
-  double upper = ptr_m[ 3 ];
-  vector<double> outlier_parm( 3, 0 );
-  vector<double> theta( 6, 0 );
-  vector<double> tmp_parm( 9, 0 );
-  vector<double> out_theta( 6, 0 );
-  vector<double> new_out_parm( 2, 0 );
-  vector<double> whole_parm( 8, 0 );
+  updateBeta3( ptr_res_beta, ptr_alpha, health_parm );
   
-  // Rprintf( "Segmentation started!\n" );
-  int old_label = 0;
-  int new_label = 0;
   for( int i = 0; i < *ptr_maxit; ++ i ) {
     for( int j = 1; j <= len; ++ j ) {
-      
-      // skip the voxels whose label remain the same in 5 consecutive 
-      // updates
-      skip_curr = skip( j, ptr_res_seg, ptr_nidx, ptr_intst, lower, upper,
-                        search[ j - 1 ], 3 );
-      if( skip_curr ) {
-        continue;
-      } else {
-        old_label = ptr_res_seg[ 2 * ( j - 1 ) ];
-        list<list<int>> regions;
-        list<int> labels;
-        int sc = scTrn( labels, regions, tumor_labels, tumor_regions,
-                        ptr_res_seg, ptr_nidx, j );
-        cmpET( j, sc, labels, regions, tumor_regions, tumor_labels,
-               outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
-               ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
-               ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
-               ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-               new_out_parm, whole_parm );
-        new_label = ptr_res_seg[ 2 * ( j - 1 ) ];
-        if( old_label == new_label ) {
-          ++ search[ j - 1 ];
-        } else {
-          search[ j - 1 ] = 0;
-        }
-      }
-      // Rprintf( "%d\t; curr_label = %d\n", j, ptr_res_seg[ 2 * ( j - 1 ) ] );
+      cmpET( j, sc, labels, regions, tumor_regions, tumor_labels,
+             outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
+             ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
+             ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
+             ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+             new_out_parm, whole_parm );
+     
     }
-    // Rprintf( "update parm for healthy and tumorous\n" );
-    // update parm for healthy and tumorous regions
-    initParm( false, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2,
-              ptr_intst,
-              ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_res_beta,
-              tumor_regions, ptr_a, ptr_b, len, 20 );
+    initParmHealth3( health_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst, 
+                     ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 
+                     ptr_res_beta, len, 20 );
   }
   // segment zero blocks
   for( int j = 1; j <= len; j ++ ) {
@@ -152,13 +91,9 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
              new_out_parm, whole_parm );
     }
   }
-  // printParm( health_parm );
-  // printParm( tumor_parm );
-  // printParm( outl_parm );
-  // bool match = verifyTumor( tumor_regions, ptr_res_seg, len );
-  // Rprintf( "all matched: %s\n", match ? "true" : "false" );
+  
   int nrow = 1 + 2 + 6;
-  int ncol = tumor_parm.size() + health_parm.size() + outl_parm.size();
+  int ncol = health_parm.size();
   
   SEXP res_parm = PROTECT( allocMatrix( REALSXP, nrow, ncol ) );
   SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );
