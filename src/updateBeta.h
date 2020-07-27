@@ -9,7 +9,7 @@ using std::vector;
 using std::map;
 using std::list;
 
-// add new outlier
+// update beta for healthy and tumor regions
 void updateBeta( double *ptr_beta, const double *ptr_alpha, 
                  map<int, vector<double>> &health_parm,
                  map<int, list<int>> &tumor_regions,

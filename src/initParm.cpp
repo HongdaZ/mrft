@@ -3,8 +3,6 @@
 
 #include "initParm.h"
 #include "updateParm.h"
-#include "energyY.h"
-#include "energyX.h"
 
 // Initialize parameters
 void initParm( const bool first_run, map<int, vector<double>> &health_parm,

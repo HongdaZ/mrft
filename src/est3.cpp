@@ -6,10 +6,7 @@
 #include <vector>
 #include <set>
 
-#include "search.h"
-#include "findRegion.h"
 #include "helper.h"
-#include "initRegion.h"
 #include "scTrn.h"
 #include "scPred.h"
 #include "updateMu.h"
@@ -29,6 +26,7 @@
 #include "verifyTumor.h"
 #include "copyParm.h"
 #include "restoreImg.h"
+#include "initParmHealth.h"
 
 using std::stack;
 using std::queue;
@@ -84,9 +82,9 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   }
   map<int, vector<double>> health_parm;
 
-  initParm( true, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst,
-            ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_res_beta,
-            tumor_regions, ptr_a, ptr_b, len, 20 );
+  initParmHealth3( health_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst, 
+                   ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 
+                   ptr_res_beta, len, 20 );
   updateBeta( ptr_res_beta, ptr_alpha, health_parm, tumor_regions,
               tumor_parm );
   bool skip_curr;
