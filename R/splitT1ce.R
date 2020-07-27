@@ -30,6 +30,13 @@ splitT1ce <- function( t1ce, flair ) {
   
   label[ label == -4L ] <- NA_integer_
   t1ce[ is.na( label ) ] <- NaN
+  # normalize intensity
+  mean_csf <- mean( t1ce[ label == -1 ], na.rm = T )
+  mean_grey <- mean( t1ce[ label == -2 ], na.rm = T )
+  mean_white <- mean( t1ce[ label == - 3 ], na.rm = T )
+  
+  t1ce <- ( t1ce - mean_csf ) / ( mean_white - mean_csf ) 
+  
   res <- list( label = label, t1ce = t1ce )
   return( res )
 }
