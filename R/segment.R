@@ -8,5 +8,7 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 1,
                      a = 5,
                      nu2 = rep( .25, 3 ), 
                      maxit = 50L ) {
+  data <- readImage( patient )
+  t1ce_data <- splitT1ce( data$t1ce, data$flair )
   
 }
