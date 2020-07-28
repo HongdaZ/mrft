@@ -18,7 +18,10 @@ using std::set;
 // estimate parameters of t1ce and t2 images without tumor
 extern "C" SEXP est3( SEXP model, SEXP delta, SEXP gamma, 
                         SEXP alpha, SEXP beta, SEXP lambda2, 
-                        SEXP m, SEXP nu2, SEXP maxit ) {
+                        SEXP m, SEXP nu2, SEXP maxit );
+SEXP est3( SEXP model, SEXP delta, SEXP gamma, 
+           SEXP alpha, SEXP beta, SEXP lambda2, 
+           SEXP m, SEXP nu2, SEXP maxit ) {
   SEXP info = getListElement( model, "info" );
   SEXP seg = getListElement( model, "seg" );
   

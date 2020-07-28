@@ -15,8 +15,17 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 1,
   # estimate parameters of t1ce or t2 images without tumor
   t1ce_seg <- est3( t1ce_model, delta, gamma,
                      alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ], 
-                     m, nu2[ 1 : 3 ], 50L )
-  t1ce_data <- splitT1ce4( images$t1ce, t1ce_seg )
+                     m, nu2[ 1 : 3 ], 20L )
+  # update beta
+  sigma2 <- rev( t1ce_seg$parm[ 3, ] )
+  beta[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
+  t1ce_data <- splitT1ce4( t1ce_data$t1ce, t1ce_seg )
+  # update m
+  m <- t1ce_data$m
+  b <- getB( m, a )
+  t1ce_model <- initEst( t1ce_data$label, t1ce_data$t1ce )
+  t1ce_seg <- pred4( t1ce_model, delta, gamma,
+                    alpha, beta, lambda2, a, b, m, nu2, 1L )
   
   
   
