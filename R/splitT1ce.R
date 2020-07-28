@@ -11,7 +11,6 @@ splitT1ce3 <- function( t1ce, flair ) {
   # Remove bright regions
   q_t1ce <- quantile( t1ce, probs = .90, na.rm = T )
   bright <- t1ce > q_t1ce
-  t1ce[ bright ] <- NaN
   label[ bright ] <- -4L
   
   tbd <- label == 0
@@ -29,7 +28,6 @@ splitT1ce3 <- function( t1ce, flair ) {
   label[ tbd ][ sub_flair > q_flair[ 2 ] & sub_t1ce < q_t1ce[ 1 ] ] <- -2L
   
   label[ label == -4L ] <- NA_integer_
-  t1ce[ is.na( label ) ] <- NaN
   # normalize intensity
   mean_csf <- mean( t1ce[ label == -1 ], na.rm = T )
   mean_grey <- mean( t1ce[ label == -2 ], na.rm = T )
