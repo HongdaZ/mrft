@@ -47,13 +47,13 @@ extern "C" SEXP est3( SEXP model, SEXP delta, SEXP gamma,
   int len = length( idx );
   // a copy of seg and beta
   SEXP res_seg = PROTECT( allocMatrix( INTSXP, 2, len ) );
-  SEXP res_beta = PROTECT( allocVector( REALSXP, 4 ) );
+  SEXP res_beta = PROTECT( allocVector( REALSXP, 3 ) );
   int *ptr_res_seg = INTEGER( res_seg );
   for( int i = 0; i < 2 * len; ++ i ) {
     ptr_res_seg[ i ] = old_seg[ i ];
   }
   double *ptr_res_beta = REAL( res_beta );
-  for( int i = 0; i < 4; ++ i ) {
+  for( int i = 0; i < 3; ++ i ) {
     ptr_res_beta[ i ] = old_beta[ i ];
   }
   map<int, vector<double>> health_parm;

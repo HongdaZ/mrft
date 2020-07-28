@@ -1,5 +1,5 @@
 # split T1ce to CSF & necrosis, grey matter and white matter
-splitT1ce <- function( t1ce, flair ) {
+splitT1ce3 <- function( t1ce, flair ) {
   
   label <- array( -4L, dim = dim( t1ce ) )
   label[ ! is.nan( t1ce ) ] <- 0L
