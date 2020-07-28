@@ -98,8 +98,9 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
       
       // skip the voxels whose label remain the same in 5 consecutive 
       // updates
-      skip_curr = skip( j, ptr_res_seg, ptr_nidx, ptr_intst, lower, upper,
-                        search[ j - 1 ], 3 );
+      // skip_curr = skip( j, ptr_res_seg, ptr_nidx, ptr_intst, lower, upper,
+      //                   search[ j - 1 ], 3 );
+      skip_curr = search[ j - 1 ] > 2;
       if( skip_curr ) {
         continue;
       } else {
@@ -121,7 +122,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
           search[ j - 1 ] = 0;
         }
       }
-      // Rprintf( "%d\t; curr_label = %d\n", j, ptr_res_seg[ 2 * ( j - 1 ) ] );
+      Rprintf( "%d\t; curr_label = %d\n", j, ptr_res_seg[ 2 * ( j - 1 ) ] );
     }
     // Rprintf( "update parm for healthy and tumorous\n" );
     // update parm for healthy and tumorous regions
