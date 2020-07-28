@@ -8,6 +8,7 @@
 #include "initParm.h"
 #include "updateBeta.h"
 #include "debug.h"
+#include "cmpE.h"
 #include "copyParm.h"
 #include "restoreImg.h"
 
@@ -61,15 +62,12 @@ extern "C" SEXP est3( SEXP model, SEXP delta, SEXP gamma,
                    ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 
                    ptr_res_beta, len, 20 );
   updateBeta3( ptr_res_beta, ptr_alpha, health_parm );
+  vector<double> theta( 6, 0 );
   
   for( int i = 0; i < *ptr_maxit; ++ i ) {
     for( int j = 1; j <= len; ++ j ) {
-      cmpET( j, sc, labels, regions, tumor_regions, tumor_labels,
-             outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
-             ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
-             ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
-             ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-             new_out_parm, whole_parm );
+      cmpE3( j, health_parm, ptr_res_seg,ptr_nidx, ptr_intst, ptr_nintst, 
+             ptr_delta, ptr_gamma, theta );
      
     }
     initParmHealth3( health_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst, 
@@ -79,16 +77,8 @@ extern "C" SEXP est3( SEXP model, SEXP delta, SEXP gamma,
   // segment zero blocks
   for( int j = 1; j <= len; j ++ ) {
     if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
-      list<list<int>> regions;
-      list<int> labels;
-      int sc = scTrn( labels, regions, tumor_labels, tumor_regions,
-                      ptr_res_seg, ptr_nidx, j );
-      cmpET( j, sc, labels, regions, tumor_regions, tumor_labels,
-             outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
-             ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
-             ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
-             ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-             new_out_parm, whole_parm );
+      cmpE3( j, health_parm, ptr_res_seg,ptr_nidx, ptr_intst, ptr_nintst, 
+             ptr_delta, ptr_gamma, theta );
     }
   }
   
