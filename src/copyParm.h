@@ -12,5 +12,7 @@ void copyParm( map<int, vector<double>> &health_parm,
                   map<int, vector<double>> &tumor_parm,
                   map<int, vector<double>> &outl_parm,
                   double *ptr_res_parm, int nrow );
+void copyParmHealth( map<int, vector<double>> &health_parm,
+                     double *ptr_res_parm, int nrow );
 
 #endif
