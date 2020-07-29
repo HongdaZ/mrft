@@ -2,13 +2,13 @@
 #include <Rinternals.h>
 
 #include "cmpEP.h"
-#include "nbrLabel.h"
 #include "findOutLabel.h"
 #include "newTumorLabel.h"
 #include "eraseRegion.h"
 #include "eraseOutl.h"
 #include "addRegion.h"
 #include "addOutl.h"
+#include "tumorNbr.h"
 
 // compare energy for prediction
 void cmpEP( int idx, int sc,
@@ -202,15 +202,12 @@ void cmpEP( int idx, int sc,
     // no split or combine
   } else {
     // check if having tumor neighbor
-    list<int> nbr_label;
-    list<int> tumor_nbr;
-    nbrLabel( nbr_label, tumor_nbr, idx, ptr_seg, ptr_nidx );
-    bool have_tumor = tumor_nbr.size();
+    int tumor_idx = firstTumorNbr( idx, ptr_seg, ptr_nidx ) ;
     int t_label;
     vector<double> &t_theta = theta;
     // have tumor neighbor
-    if( have_tumor ) {
-      int t_idx = tumor_nbr.front();
+    if( tumor_idx != 0 ) {
+      int t_idx = tumor_idx;
       t_label = ptr_seg[ 2 * ( t_idx - 1 ) ];
       // tumor energy
       vector<double> &t_parm = tumor_parm[ t_label ];

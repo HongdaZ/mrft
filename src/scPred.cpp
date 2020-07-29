@@ -7,7 +7,7 @@
 #include "scPred.h"
 #include "findRegion.h"
 #include "newTumorLabel.h"
-#include "nbrLabel.h"
+#include "tumorNbr.h"
 #include "nonTumor.h"
 
 using std::list;
@@ -26,10 +26,9 @@ int scPred( list<int> &labels, list<list<int>> &regions,
   int current = ptr_label[ 2 * ( start - 1 ) ];
   // possibly split
   list<int> tumor_nbr;
-  list<int> nbr_tumor_label;
-  nbrLabel( nbr_tumor_label, tumor_nbr, start, ptr_label, ptr_nidx );
-  // remove non-tumor labels
-  nbr_tumor_label.remove_if( nonTumor );
+  list<int> tumor_label;
+  // Add tumor neighbors to set
+  tumorNbrLabel( tumor_label, tumor_nbr, start, ptr_label, ptr_nidx );
   if( tumor_nbr.size() < 2 ) {
     return 0;
   } else if( current <= - 4 ) {
@@ -77,15 +76,15 @@ int scPred( list<int> &labels, list<list<int>> &regions,
       return 1;
     }
   } else {
-    if( nbr_tumor_label.size() == 1 ) {
+    if( tumor_label.size() == 1 ) {
       return 0;
     }
     list<int> whole;
     // possibly combine
     list<int>::iterator it;
     list<int> sub_region;
-    for( it = nbr_tumor_label.begin();
-         it != nbr_tumor_label.end(); ++ it ) {
+    for( it = tumor_label.begin();
+         it != tumor_label.end(); ++ it ) {
       sub_region = tumor_regions[ *it ];
       
       labels.push_back( *it );
