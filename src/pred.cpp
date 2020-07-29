@@ -96,35 +96,26 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   int curr_idx = 0;
   for( int i = 0; i < *ptr_maxit; ++ i ) {
     for( int j = 1; j <= len; ++ j ) {
-      curr_idx = j;
+      curr_idx = 1000;
       // skip the voxels whose label remain the same in 5 consecutive 
       // updates
       // skip_curr = skip( j, ptr_res_seg, ptr_nidx, ptr_intst, lower, upper,
       //                   search[ j - 1 ], 3 );
       
-      skip_curr = search[ curr_idx - 1 ] > 2;
-      if( skip_curr ) {
-        continue;
-      } else {
-        old_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
-        list<list<int>> regions;
-        list<int> labels;
-        int sc = scPred( labels, regions, tumor_labels, tumor_regions,
-                         ptr_res_seg, ptr_nidx, curr_idx );
-        cmpEP( curr_idx, sc, labels, regions, tumor_regions, tumor_labels,
-               outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
-               ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
-               ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
-               ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-               new_out_parm, whole_parm );
-        new_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
-        if( old_label == new_label ) {
-          ++ search[ curr_idx - 1 ];
-        } else {
-          search[ curr_idx - 1 ] = 0;
-        }
-      }
-      Rprintf( "%d\t; curr_label = %d\n", j, ptr_res_seg[ 2 * ( j - 1 ) ] );
+      old_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
+      list<list<int>> regions;
+      list<int> labels;
+      int sc = scPred( labels, regions, tumor_labels, tumor_regions,
+                       ptr_res_seg, ptr_nidx, curr_idx );
+      cmpEP( curr_idx, sc, labels, regions, tumor_regions, tumor_labels,
+             outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
+             ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
+             ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
+             ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+             new_out_parm, whole_parm );
+      new_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
+      Rprintf( "%d\t; curr_label = %d\n", curr_idx, new_label );
+      ptr_res_seg[ 2 * ( curr_idx - 1 ) ] = old_label;
     }
     // Rprintf( "update parm for healthy and tumorous\n" );
     // update parm for healthy and tumorous regions
