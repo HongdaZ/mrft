@@ -14,7 +14,7 @@
 void cmpET( int idx, int sc,
             list<int> &labels, list<list<int>> &regions,
             map<int, list<int>> &tumor_regions, 
-            list<int> &tumor_labels, list<int> &outl_labels,
+            vector<int> &tumor_labels, list<int> &outl_labels,
             map<int, vector<double>> &health_parm,
             map<int, vector<double>> &tumor_parm, 
             map<int, vector<double>> &outl_parm,

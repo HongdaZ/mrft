@@ -81,7 +81,7 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   for( int i = 0; i < 4; ++ i ) {
     ptr_res_beta[ i ] = old_beta[ i ];
   }
-  list<int> tumor_labels;
+  vector<int> tumor_labels;
   list<int> outl_labels;
   map<int, vector<double>> health_parm;
   map<int, vector<double>> tumor_parm;

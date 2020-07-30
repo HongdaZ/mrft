@@ -13,7 +13,7 @@ using std::map;
 void addRegion( int *ptr_seg, 
                 const list<vector<double>> &region_parm, 
                 const list<list<int>> &regions, 
-                list<int> &tumor_labels,
+                vector<int> &tumor_labels,
                 map<int, list<int>> &tumor_regions, 
                 map<int, vector<double>> &tumor_parm );
 

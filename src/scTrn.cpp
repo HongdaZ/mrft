@@ -18,7 +18,7 @@ using std::find;
 // start = 1 to length array
 // nidx also starts from 1
 int scTrn( list<int> &labels, list<list<int>> &regions,  
-           const list<int> &tumor_labels,
+           const vector<int> &tumor_labels,
            map<int, list<int>> &tumor_regions,
            int *ptr_label, const int *ptr_nidx, int start ) {
   labels.clear();

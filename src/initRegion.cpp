@@ -7,7 +7,7 @@
 #include "initRegion.h"
 
 void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
-                 map<int, list<int>> &tumor, list<int> &labels ) {
+                 map<int, list<int>> &tumor, vector<int> &labels ) {
   
   list<int> region;
   int tumor_label = - 4;
@@ -33,10 +33,9 @@ void initRegion( int *ptr_seg, const int *ptr_nidx, int len,
       ++ it ) {
         ptr_seg[ 2 * ( *it - 1 ) ] = tumor_label;
       }
-      labels.push_back( tumor_label );
+      labels[ - tumor_label - 4 ] = 1;
       -- tumor_label;
     }
   }
-  labels.sort();
   return;
 }

@@ -65,7 +65,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   for( int i = 0; i < 4; ++ i ) {
     ptr_res_beta[ i ] = old_beta[ i ];
   }
-  list<int> tumor_labels;
+  vector<int> tumor_labels( len, 0 );
   list<int> outl_labels;
   map<int, vector<double>> health_parm;
   map<int, vector<double>> tumor_parm;
@@ -114,7 +114,8 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
              ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
              new_out_parm, whole_parm );
       new_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
-      Rprintf( "%d\t; curr_label = %d\n", curr_idx, new_label );
+      Rprintf( "j = %d,curr_idx = %d, sc = %d, old = %d, new = %d\n",
+               j, curr_idx, sc, old_label, new_label );
       ptr_res_seg[ 2 * ( curr_idx - 1 ) ] = old_label;
     }
     // Rprintf( "update parm for healthy and tumorous\n" );
@@ -124,21 +125,21 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
               ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_res_beta,
               tumor_regions, ptr_a, ptr_b, len, 20 );
   }
-  // segment zero blocks
-  for( int j = 1; j <= len; j ++ ) {
-    if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
-      list<list<int>> regions;
-      list<int> labels;
-      int sc = scPred( labels, regions, tumor_labels, tumor_regions,
-                       ptr_res_seg, ptr_nidx, j );
-      cmpEP( j, sc, labels, regions, tumor_regions, tumor_labels,
-             outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
-             ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
-             ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
-             ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-             new_out_parm, whole_parm );
-    }
-  }
+  // // segment zero blocks
+  // for( int j = 1; j <= len; j ++ ) {
+  //   if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
+  //     list<list<int>> regions;
+  //     list<int> labels;
+  //     int sc = scPred( labels, regions, tumor_labels, tumor_regions,
+  //                      ptr_res_seg, ptr_nidx, j );
+  //     cmpEP( j, sc, labels, regions, tumor_regions, tumor_labels,
+  //            outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
+  //            ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
+  //            ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
+  //            ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+  //            new_out_parm, whole_parm );
+  //   }
+  // }
   
   int nrow = 1 + 2 + 6;
   int ncol = tumor_parm.size() + health_parm.size() + outl_parm.size();

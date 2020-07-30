@@ -3,7 +3,7 @@
 void addRegion( int *ptr_seg, 
                 const list<vector<double>> &region_parm, 
                 const list<list<int>> &regions, 
-                list<int> &tumor_labels,
+                vector<int> &tumor_labels,
                 map<int, list<int>> &tumor_regions, 
                 map<int, vector<double>> &tumor_parm ) {
   
@@ -18,7 +18,7 @@ void addRegion( int *ptr_seg,
       // update ptr_seg
       ptr_seg[ 2 * ( *it_ - 1 ) ] = new_label;
     }
-    tumor_labels.push_back( new_label );
+    tumor_labels[ - new_label - 4 ] = 1;
     tumor_regions[ new_label ] = *it_region;
     tumor_parm[ new_label ] = new_parm;
   }
