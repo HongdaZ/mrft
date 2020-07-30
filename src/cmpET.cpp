@@ -14,7 +14,7 @@
 void cmpET( int idx, int sc,
             list<int> &labels, list<list<int>> &regions,
             map<int, list<int>> &tumor_regions, 
-            vector<int> &tumor_labels, list<int> &outl_labels,
+            vector<int> &tumor_labels, vector<int> &outl_labels,
             map<int, vector<double>> &health_parm,
             map<int, vector<double>> &tumor_parm, 
             map<int, vector<double>> &outl_parm,
@@ -36,7 +36,8 @@ void cmpET( int idx, int sc,
             // new_out_parm( 2, 0 )
             vector<double> &new_out_parm,
             // whole_parm( 8, 0 )
-            vector<double> &whole_parm ) {
+            vector<double> &whole_parm,
+            int &n_tumor, int &n_outl ) {
   
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier
@@ -111,20 +112,21 @@ void cmpET( int idx, int sc,
       tumor_parm[ whole_label ] = whole_parm;
     // remove old whole region and add new splitted regions and new outlier
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
-      eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm );
+      eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm, 
+                   n_tumor );
       list<vector<double>> new_region_parm( ++ region_parm.begin() ,
                                             region_parm.end() );
       list<list<int>> new_regions( ++ regions.begin(), 
                                         regions.end() );
       addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels, tumor_regions, 
-                 tumor_parm );
+                 tumor_parm, n_tumor );
       
       ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
       
       for( int i = 0; i < 2; ++ i ) {
         new_out_parm[ i ] = outlier_parm[ 1 + i ];
       }
-      addOutl( out_label, new_out_parm, outl_labels, outl_parm );
+      addOutl( out_label, new_out_parm, outl_labels, outl_parm, n_outl );
       // if( out_label == 32 ) {
       //   Rprintf( "place 1: idx = %d; mu = %f, sigma2 = %f\n", idx, new_out_parm[ 0 ], 
       //            new_out_parm[ 1 ] );
@@ -138,7 +140,8 @@ void cmpET( int idx, int sc,
       for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
            it_list != region_parm.end(); ++ it_list ) {
         int sub_label = it_list->front();
-        eraseRegion( sub_label, tumor_labels, tumor_regions, tumor_parm );
+        eraseRegion( sub_label, tumor_labels, tumor_regions, tumor_parm, 
+                     n_tumor );
       }
       
       list<vector<double>> new_whole_parm;
@@ -146,9 +149,9 @@ void cmpET( int idx, int sc,
       new_whole_parm.push_back( label_whole_parm );
       new_whole_region.push_back( regions.front() );
       addRegion( ptr_seg, new_whole_parm, new_whole_region, tumor_labels, 
-                 tumor_regions, tumor_parm );
+                 tumor_regions, tumor_parm, n_tumor );
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
-      eraseOutl( out_label, outl_labels, outl_parm );
+      eraseOutl( out_label, outl_labels, outl_parm, n_outl );
       // if( out_label == 32 ) {
       //   bool in = outl_parm.find( 32 ) != outl_parm.end();
       //   Rprintf( "place 5: idx = %d, in list = %d\n", 
@@ -261,7 +264,7 @@ void cmpET( int idx, int sc,
         if( curr_label > 0 && t_energy <= out_energy ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = t_label;
           tumor_regions[ t_label ].remove( idx );
-          eraseOutl( curr_label, outl_labels, outl_parm );
+          eraseOutl( curr_label, outl_labels, outl_parm, n_outl );
           // if( curr_label == 32 ) {
           //   bool in = outl_parm.find( 32 ) != outl_parm.end();
           //   Rprintf( "place 3: idx = %d, in list = %d\n", idx, in );
@@ -269,7 +272,8 @@ void cmpET( int idx, int sc,
         } else if( curr_label < - 3 && t_energy >= out_energy ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
           tumor_regions[ t_label ].remove( idx );
-          addOutl( out_label, new_out_parm, outl_labels, outl_parm );
+          addOutl( out_label, new_out_parm, outl_labels, outl_parm, 
+                   n_outl );
           // if( out_label == 32 ) {
           //   Rprintf( "place 2: idx = %d; mu = %f, sigma2 = %f\n", idx, new_out_parm[ 0 ], 
           //            new_out_parm[ 1 ] );
@@ -303,9 +307,9 @@ void cmpET( int idx, int sc,
           new_region_parm.push_back( new_parm );
           
           addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels, 
-                     tumor_regions, tumor_parm );
+                     tumor_regions, tumor_parm, n_tumor );
           ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
-          eraseOutl( curr_label, outl_labels, outl_parm );
+          eraseOutl( curr_label, outl_labels, outl_parm, n_outl );
           // if( curr_label == 32 ) {
           //   bool in = outl_parm.find( 32 ) != outl_parm.end();
           //   Rprintf( "place 4: idx = %d, in list = %d\n", idx, in );

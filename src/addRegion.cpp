@@ -5,7 +5,8 @@ void addRegion( int *ptr_seg,
                 const list<list<int>> &regions, 
                 vector<int> &tumor_labels,
                 map<int, list<int>> &tumor_regions, 
-                map<int, vector<double>> &tumor_parm ) {
+                map<int, vector<double>> &tumor_parm,
+                int &n_tumor ) {
   
   list<vector<double>>::const_iterator it = region_parm.begin();
   list<list<int>>::const_iterator it_region = regions.begin();
@@ -21,6 +22,7 @@ void addRegion( int *ptr_seg,
     tumor_labels[ - new_label - 4 ] = 1;
     tumor_regions[ new_label ] = *it_region;
     tumor_parm[ new_label ] = new_parm;
+    ++ n_tumor;
   }
   return;
 }

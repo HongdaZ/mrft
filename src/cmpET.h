@@ -18,7 +18,7 @@ using std::list;
 void cmpET( int idx, int sc,
             list<int> &labels, list<list<int>> &regions,
             map<int, list<int>> &tumor_regions, 
-            vector<int> &tumor_labels, list<int> &outl_labels,
+            vector<int> &tumor_labels, vector<int> &outl_labels,
             map<int, vector<double>> &health_parm,
             map<int, vector<double>> &tumor_parm, 
             map<int, vector<double>> &outl_parm,
@@ -40,6 +40,7 @@ void cmpET( int idx, int sc,
             // new_out_parm( 2, 0 )
             vector<double> &new_out_parm,
             // whole_parm( 8, 0 )
-            vector<double> &whole_parm );
+            vector<double> &whole_parm,
+            int &n_tumor, int &n_outl );
 
 #endif

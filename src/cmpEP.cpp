@@ -14,7 +14,7 @@
 void cmpEP( int idx, int sc,
             list<int> &labels, list<list<int>> &regions,
             map<int, list<int>> &tumor_regions,
-            vector<int> &tumor_labels, list<int> &outl_labels,
+            vector<int> &tumor_labels, vector<int> &outl_labels,
             map<int, vector<double>> &health_parm,
             map<int, vector<double>> &tumor_parm,
             map<int, vector<double>> &outl_parm,
@@ -36,7 +36,8 @@ void cmpEP( int idx, int sc,
             // new_out_parm( 2, 0 )
             vector<double> &new_out_parm,
             // whole_parm( 8, 0 )
-            vector<double> &whole_parm 
+            vector<double> &whole_parm,
+            int &n_tumor, int &n_outl
             ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   if( sc != 0 ) {  // split or combine
@@ -138,20 +139,21 @@ void cmpEP( int idx, int sc,
       // remove old whole region and add new splitted regions and
       // new outlier if min_label > 1
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
-      eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm );
+      eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm,
+                   n_tumor );
       list<vector<double>> new_region_parm( ++ region_parm.begin() ,
                                             region_parm.end() );
       list<list<int>> new_regions( ++ regions.begin(), 
                                         regions.end() );
       addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels,
-                 tumor_regions, tumor_parm );
+                 tumor_regions, tumor_parm, n_tumor );
       
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       if( min_label > 0 ) {
         for( int i = 0; i < 2; ++ i ) {
           new_out_parm[ i ] = outlier_parm[ 1 + i ];
         }
-        addOutl( out_label, new_out_parm, outl_labels, outl_parm );
+        addOutl( out_label, new_out_parm, outl_labels, outl_parm, n_outl );
       }
       // remove old subregions, parameters and labels,
       // add new whole regions label,region and parameters,
@@ -162,7 +164,8 @@ void cmpEP( int idx, int sc,
       for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
            it_list != region_parm.end(); ++ it_list ) {
         int sub_label = it_list->front();
-        eraseRegion( sub_label, tumor_labels, tumor_regions, tumor_parm );
+        eraseRegion( sub_label, tumor_labels, tumor_regions, tumor_parm, 
+                     n_tumor );
       }
       
       list<vector<double>> new_whole_parm;
@@ -170,10 +173,10 @@ void cmpEP( int idx, int sc,
       new_whole_parm.push_back( label_whole_parm );
       new_whole_region.push_back( regions.front() );
       addRegion( ptr_seg, new_whole_parm, new_whole_region, tumor_labels,
-                 tumor_regions, tumor_parm );
+                 tumor_regions, tumor_parm, n_tumor );
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       if( curr_label > 0 ) {
-        eraseOutl( out_label, outl_labels, outl_parm );
+        eraseOutl( out_label, outl_labels, outl_parm, n_outl );
       }
       // update parameters for subregions
       // possibly remove or add outlier;
@@ -193,10 +196,10 @@ void cmpEP( int idx, int sc,
         for( int i = 0; i < 2; ++ i ) {
           new_out_parm[ i ] = outlier_parm[ 1 + i ];
         }
-        addOutl( out_label, new_out_parm, outl_labels, outl_parm );
+        addOutl( out_label, new_out_parm, outl_labels, outl_parm, n_outl );
         // outlier to healthy
       } else if( min_label < 0 && curr_label > 0 ) {
-        eraseOutl( out_label, outl_labels, outl_parm );
+        eraseOutl( out_label, outl_labels, outl_parm, n_outl );
       }
     }
     // no split or combine
@@ -291,7 +294,7 @@ void cmpEP( int idx, int sc,
           tumor_regions[ t_label ].push_back( idx );
         } else if( curr_label >= 1 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          eraseOutl( out_label, outl_labels, outl_parm );
+          eraseOutl( out_label, outl_labels, outl_parm, n_outl );
           tumor_regions[ t_label ].push_back( idx );
         }
       } else if( min_label >= - 3 && min_label <= -1 ) {
@@ -302,16 +305,18 @@ void cmpEP( int idx, int sc,
           tumor_regions[ t_label ].remove( idx );
         } else if( curr_label >= 1 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          eraseOutl( out_label, outl_labels, outl_parm );
+          eraseOutl( out_label, outl_labels, outl_parm, n_outl );
         }
       } else if( min_label >= 1 ) {
         if( curr_label  <= - 4 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           tumor_regions[ t_label ].remove( idx );
-          addOutl( out_label, new_out_parm, outl_labels, outl_parm );
+          addOutl( out_label, new_out_parm, outl_labels, outl_parm,
+                   n_outl );
         } else if( curr_label >= - 3 && curr_label <= 0 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          addOutl( out_label, new_out_parm, outl_labels, outl_parm );
+          addOutl( out_label, new_out_parm, outl_labels, outl_parm,
+                   n_outl );
         }
       }
       
@@ -387,22 +392,23 @@ void cmpEP( int idx, int sc,
         if( curr_label >= - 3 && curr_label <= 0 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels,
-                     tumor_regions, tumor_parm );
+                     tumor_regions, tumor_parm, n_tumor );
         } else if( curr_label >= 1 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          eraseOutl( curr_label, outl_labels, outl_parm );
+          eraseOutl( curr_label, outl_labels, outl_parm, n_outl );
           addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels,
-                     tumor_regions, tumor_parm );
+                     tumor_regions, tumor_parm, n_tumor );
         }
       } else if( min_label >= - 3 && min_label <= - 1 ) {
         if( curr_label == 0 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
         } else if( curr_label <= - 4 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          eraseRegion( t_label, tumor_labels, tumor_regions, tumor_parm );
+          eraseRegion( t_label, tumor_labels, tumor_regions, tumor_parm,
+                       n_tumor );
         } else if( curr_label >= 1 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          eraseOutl( curr_label, outl_labels, outl_parm );
+          eraseOutl( curr_label, outl_labels, outl_parm, n_outl );
         }
       }
     }

@@ -81,8 +81,10 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   for( int i = 0; i < 4; ++ i ) {
     ptr_res_beta[ i ] = old_beta[ i ];
   }
-  vector<int> tumor_labels;
-  list<int> outl_labels;
+  vector<int> tumor_labels( len, 0 );
+  vector<int> outl_labels( len, 0 );
+  int n_tumor = 0;
+  int n_outl = 0;
   map<int, vector<double>> health_parm;
   map<int, vector<double>> tumor_parm;
   map<int, vector<double>> outl_parm;
@@ -165,7 +167,7 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
                ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
                ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
                ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-               new_out_parm, whole_parm );
+               new_out_parm, whole_parm, n_tumor, n_outl );
         new_label = ptr_res_seg[ 2 * ( j - 1 ) ];
         if( old_label == new_label ) {
           ++ search[ j - 1 ];
@@ -194,7 +196,7 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
              ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
              ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
              ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-             new_out_parm, whole_parm );
+             new_out_parm, whole_parm, n_tumor, n_outl );
     }
   }
   // printParm( health_parm );

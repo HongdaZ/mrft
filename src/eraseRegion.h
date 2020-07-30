@@ -13,6 +13,7 @@ using std::vector;
 void eraseRegion( const int tumor_label, 
                  vector<int> &tumor_labels,
                  map<int, list<int>> &tumor_regions, 
-                 map<int, vector<double>> &tumor_parm );
+                 map<int, vector<double>> &tumor_parm,
+                 int &n_tumor );
 
 #endif
