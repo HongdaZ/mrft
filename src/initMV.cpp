@@ -4,24 +4,22 @@
 #include "initMV.h"
 
 // initialize yln_, yln_i and yl_
-void initMV( const list<int> &region, double *yln_, double *yln_i,
-             double *yl_, double &sum_y, const double *ptr_intst, 
-             const int *ptr_nidx,
+void initMV( const int *region, const int &len_region, double *yln_, 
+             double *yln_i, double *yl_, double &sum_y,
+             const double *ptr_intst, const int *ptr_nidx,
              const double *ptr_nintst, const int *ptr_seg, 
              const int curr_label ) {
-  int nrow = region.size();
+  int nrow = len_region;
   int ncol = 6;
-  list<int>::const_iterator it = region.begin();
   int idx;
-  for( int j = 0; j < nrow; ++ it, ++ j ) {
-    idx = *it;
+  for( int j = 0; j < nrow; ++ j ) {
+    idx = region[ j ];
     yl_[ j ] = ptr_intst[ idx - 1 ];
     sum_y += yl_[ j ];
   }
   for( int i = 0; i < 6; ++ i ) {
-    it = region.begin();
-    for( int j = 0; j < nrow; ++ it, ++ j ) {
-      idx = *it;
+    for( int j = 0; j < nrow; ++ j ) {
+      idx = region[ j ];
       int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
       if( nidx != NA_INTEGER ) {
         // healthy

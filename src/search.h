@@ -1,17 +1,15 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
-#include <Rinternals.h>
-
 #include <list> 
-#include <queue>
+#include <vector>
 
 using std::list;
-using std::queue;
+using std::vector;
 
 void search( const int n_region, const bool init, int *label,
-             const int *nidx, queue<int>& front, const int & l,
-             list<int>& region, list<int> &tumor_nbr, 
+             const int *nidx, vector<int>& front, const int & l,
+             vector<int>& region, list<int> &tumor_nbr, 
              bool &early_return );
 
 #endif

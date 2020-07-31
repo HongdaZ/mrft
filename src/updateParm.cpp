@@ -14,7 +14,7 @@ using std::abs;
 
 // update parameters for healthy cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const list<int> &region,
+                 const int *region, const int &len_region,
                  const double m,
                  const double nu2,
                  const double *ptr_intst,
@@ -35,14 +35,14 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tmp = 0;
   mu = - 1;
   // Initialize matrices and vectors
-  int nrow = region.size();
+  int nrow = len_region;
   int ncol = 6;
   double *yln_ = new double[ nrow * ncol ];
   double *yln_i = new double[ nrow * ncol ];
   double *yl_ = new double[ nrow ];
   double sum_y = 0;
   
-  initMV( region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
+  initMV( region, len_region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
           ptr_seg, curr_label );
   
   double *yln = new double[ nrow * ncol ];
@@ -79,7 +79,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for tumor cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const list<int> &region,
+                 const int *region, const int &len_region,
                  const double m,
                  const double mk_1,
                  const double a,
@@ -101,10 +101,10 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tmp = 0;
   mu = - 1;
   // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
-  labelRegion( region, ptr_seg );
+  labelRegion( region, len_region, ptr_seg );
   
   // Initialize matrices and vectors
-  int nrow = region.size();
+  int nrow = len_region;
   int ncol = 6;
   double *yln_ = new double[ nrow * ncol ];
   double *yln_i = new double[ nrow * ncol ];
@@ -112,7 +112,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   
   double sum_y = 0;
   
-  initMV( region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
+  initMV( region, len_region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
           ptr_seg, curr_label );
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
@@ -138,7 +138,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     ++ i;
   }
   // change ptr_seg[ 2, region ] back
-  recoverLabel( region, ptr_seg );
+  recoverLabel( region, len_region, ptr_seg );
   delete [] yln_;
   delete [] yln_i;
   delete [] yl_;
@@ -149,7 +149,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for outliers
 void updateParm( double &mu, double &sigma2, 
-                 const list<int> &region,
+                 const int *region, const int &len_region,
                  const double m,
                  const double mk_1,
                  const double a,
@@ -166,8 +166,7 @@ void updateParm( double &mu, double &sigma2,
   double tol = 1;
   double tmp = 0;
   mu = - 1;
-  list<int>::const_iterator it = region.begin();
-  int idx = *it;
+  int idx = region[ 0 ];
   double sum_y = ptr_intst[ idx - 1 ];
   int n = 1;
   while(  i < 2 || ( i < maxit && tol > .0001 ) ) {

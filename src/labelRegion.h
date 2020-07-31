@@ -5,8 +5,8 @@
 
 using std::list;
 
-void labelRegion( const list<int> &region, int *ptr_seg );
-void recoverLabel( const list<int> &region, int *ptr_seg );
+void labelRegion( const int *region, const int &len_region, int *ptr_seg );
+void recoverLabel( const int *region, const int &len_region, int *ptr_seg );
 
 
 #endif

@@ -1,5 +1,11 @@
 #include "debug.h"
 
+#include <algorithm> 
+#include <chrono> 
+#include <iostream> 
+using namespace std; 
+using namespace std::chrono; 
+
 // void debug() {
 //   vector<double> theta;
 //   for( int i = 0; i < 6; ++ i ) {
@@ -55,9 +61,38 @@
 //   return;
 // }
 void debug() {
-  for( int i = 0; i < 10; ++ i ) {
-    vector<double> vec( 8, 0 );
-    vec[ 1 ] = 4;
+  
+  vector<int> values( 1000000, 0 ); 
+  
+  // Generate Random values 
+  auto f = []() -> int { return rand() % 10000; }; 
+  
+  // Fill up the vector 
+  generate(values.begin(), values.end(), f); 
+  Rprintf( "size of array: %d\n", values.size() );
+  // Get starting timepoint 
+  auto start = high_resolution_clock::now(); 
+  int a;
+  for( int j = 0; j < 1000000; ++ j ) {
+    for( int i = 0; i < values.size(); ++ i ){
+      if( values[ i ] < 0 ) {
+        a = values[ i ];
+      }
+      
+    }
   }
-  return;
+  
+  
+  // Get ending timepoint 
+  auto stop = high_resolution_clock::now(); 
+  
+  // Get duration. Substart timepoints to  
+  // get durarion. To cast it to proper unit 
+  // use duration cast method 
+  auto duration = duration_cast<microseconds>(stop - start); 
+  
+  cout << "Time taken by function: "
+       << duration.count() << " microseconds" << endl; 
+  
+  return; 
 }

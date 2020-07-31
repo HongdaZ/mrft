@@ -1,20 +1,17 @@
 #ifndef UPDATEPARM_H
 #define UPDATEPARM_H
 
-
-#include <list>
 #include <vector>
 
 #include "updateMu.h"
 #include "updateTS.h"
 #include "updateSigma.h"
 
-using std::list;
 using std::vector;
 
 // update parameters for healthy cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const list<int> &region,
+                 const int *region, const int &len_region,
                  const double m,
                  const double nu2,
                  const double *ptr_intst,
@@ -28,7 +25,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  int maxit );
 // update parameters for tumor regions
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const list<int> &region,
+                 const int *region, const int &len_region,
                  const double m,
                  const double mk_1,
                  const double a,
@@ -44,7 +41,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  int maxit );
 // update parameters for outliers
 void updateParm( double &mu, double &sigma2, 
-                 const list<int> &region,
+                 const int *region, const int &len_region,
                  const double m,
                  const double mk_1,
                  const double a,

@@ -69,18 +69,33 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   vector<int> outl_labels( len, 0 );
   int n_tumor = 0;
   int n_outl = 0;
-  map<int, vector<double>> health_parm;
-  map<int, vector<double>> tumor_parm;
-  map<int, vector<double>> outl_parm;
+  // 0, 1, 2 = -1, -2, -3
+  vector<double> health_parm( 8 * 3, 0 );
+  // 0, 1, 2, ... = -4, -5, -6, ...
+  vector<double> tumor_parm( 8 * len, 0 );
+  // 0, 1, 2, ... = 1, 2, 3, ...
+  vector<double> outl_parm( 2 * len, 0 );
+  // number of voxels of in a tumor region
+  // 0, 1, 2, ... = -4, -5, -6, ...
+  vector<int> n_voxel( len, 0 );
+  // tumor region labels
+  vector<int> labels;
+  // frontier in search
+  vector<int> front;
+  front.reserve( len );
+  // store the result of findReion
+  vector<int> region;
+  region.reserve( len );
+  // represents finded whole and sub-region
+  vector<int> regions;
+  regions.reserve( 2 * len );
   
-  
-  map<int, list<int>> tumor_regions;
-  initRegion( ptr_res_seg, ptr_nidx, len,
-              tumor_regions, tumor_labels );
-  initParm( true, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst,
-            ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_res_beta,
-            tumor_regions, ptr_a, ptr_b, len, 10 );
-  updateBeta( ptr_res_beta, ptr_alpha, health_parm, tumor_regions,
+  initRegion( region, front, ptr_res_seg, ptr_nidx, len,
+              n_voxel, tumor_labels );
+  initParm( true, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2, 
+            ptr_intst, ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 
+            ptr_res_beta, n_voxel, n_tumor, ptr_a, ptr_b, len, 20 );
+  updateBeta( ptr_res_beta, ptr_alpha, health_parm, n_voxel, n_tumor,
               tumor_parm );
   bool skip_curr;
   vector<int> search( len, 0 );
@@ -105,11 +120,9 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
       //                   search[ j - 1 ], 3 );
       
       old_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
-      list<list<int>> regions;
-      list<int> labels;
-      int sc = scPred( labels, regions, tumor_labels, tumor_regions,
+      int sc = scPred( labels, tumor_labels, n_voxel,
                        ptr_res_seg, ptr_nidx, curr_idx );
-      cmpEP( curr_idx, sc, labels, regions, tumor_regions, tumor_labels,
+      cmpEP( curr_idx, sc, labels, n_voxel, tumor_labels,
              outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
              ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
              ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
@@ -123,9 +136,8 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
     // Rprintf( "update parm for healthy and tumorous\n" );
     // update parm for healthy and tumorous regions
     initParm( false, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2,
-              ptr_intst,
-              ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_res_beta,
-              tumor_regions, ptr_a, ptr_b, len, 20 );
+              ptr_intst, ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha,
+              ptr_res_beta, n_voxel, n_tumor, ptr_a, ptr_b, len, 20 );
   }
   // // segment zero blocks
   // for( int j = 1; j <= len; j ++ ) {

@@ -11,11 +11,11 @@ using std::list;
 
 // update beta for healthy and tumor regions
 void updateBeta( double *ptr_beta, const double *ptr_alpha, 
-                 map<int, vector<double>> &health_parm,
-                 map<int, list<int>> &tumor_regions,
-                 map<int, vector<double>> &tumor_parm );
+                 const vector<double> &health_parm,  
+                 const vector<int> &n_voxel, const int &n_tumor,
+                 const vector<double> &tumor_parm );
 // update beta for t1ce or flair images
 void updateBeta3( double *ptr_beta, const double *ptr_alpha, 
-                  map<int, vector<double>> &health_parm );
+                  const vector<double> &health_parm );
 
 #endif

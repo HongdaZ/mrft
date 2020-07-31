@@ -17,10 +17,9 @@ using std::vector;
 // nidx also starts from 1
 
 // split or combine for prediction
-int scPred( list<int> &labels, list<list<int>> &regions, 
-            const vector<int> &tumor_labels,
-            map<int, list<int>> &tumor_regions,
-            int *ptr_label, const int *ptr_nidx, int start ) {
+int scPredint scPred( vector<int> &labels, const vector<int> &tumor_labels,
+                      const vector<int> &n_voxel, int *ptr_label, 
+                      const int *ptr_nidx, int start ) {
   labels.clear();
   regions.clear();
   int current = ptr_label[ 2 * ( start - 1 ) ];
