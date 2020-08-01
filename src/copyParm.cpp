@@ -1,49 +1,57 @@
 #include "copyParm.h"
 
 // copy estimated parameters to SEXP
-void copyParm( map<int, vector<double>> &health_parm,
-               map<int, vector<double>> &tumor_parm,
-               map<int, vector<double>> &outl_parm,
-               double *ptr_res_parm, int nrow ) {
+void copyParm( vector<double> &health_parm,
+               vector<double> &tumor_parm,
+               vector<double> &outl_parm,
+               double *ptr_res_parm, const int &nrow, 
+               const vector<int> &tumor_labels, 
+               const vector<int> &outl_labels, const int &len ) {
   int j = 0;
-  for( map<int, vector<double>>::iterator it = tumor_parm.begin();
-       it != tumor_parm.end(); ++ it ) {
-    ptr_res_parm[ nrow * j ] = it->first;
-    for( int i = 0; i < 8; ++ i ) {
-      ptr_res_parm[ nrow * j + i + 1 ] = it->second[ i ];
+  int curr_label;
+  for( int i = 0; i < len; ++ i ) {
+    if( tumor_labels[ i ] != 0 ) {
+      curr_label = - i - 4;
+      ptr_res_parm[ nrow * j ] = curr_label;
+      for( int k = 0; k < 8; ++ k ) {
+        ptr_res_parm[ nrow * j + k + 1 ] = tumor_parm[ 8 * i + k ];
+      }
+      ++ j;
+    } 
+  }
+  for( int i = 0; i < 3; ++ i ) {
+    curr_label = - i - 1;
+    ptr_res_parm[ nrow * j ] = curr_label;
+    for( int k = 0; k < 8; ++ k ) {
+      ptr_res_parm[ nrow * j + k + 1 ] = health_parm[ 8 * i + k ];
     }
     ++ j;
   }
-  for( map<int, vector<double>>::iterator it = health_parm.begin();
-       it != health_parm.end(); ++ it ) {
-    ptr_res_parm[ nrow * j ] = it->first;
-    for( int i = 0; i < 8; ++ i ) {
-      ptr_res_parm[ nrow * j + i + 1 ] = it->second[ i ];
+  for( int i = 0; i < len; ++ i ) {
+    if( outl_labels[ i ] != 0 ) {
+      curr_label = i + 1;
+      ptr_res_parm[ nrow * j ] = curr_label;
+      for( int k = 0; k < 2; ++ k ) {
+        ptr_res_parm[ nrow * j + k + 1 ] = outl_parm[ 2 * i + k ];
+      }
+      for( int k = 2; k < 8; ++ k ) {
+        ptr_res_parm[ nrow * j + k + 1 ] = 0;
+      }
+      ++ j;
     }
-    ++ j;
-  }
-  for( map<int, vector<double>>::iterator it = outl_parm.begin();
-       it != outl_parm.end(); ++ it ) {
-    ptr_res_parm[ nrow * j ] = it->first;
-    for( int i = 0; i < 2; ++ i ) {
-      ptr_res_parm[ nrow * j + i + 1 ] = it->second[ i ];
-    }
-    for( int i = 2; i < 8; ++ i ) {
-      ptr_res_parm[ nrow * j + i + 1 ] = 0;
-    }
-    ++ j;
   }
   return;
 }
 
-void copyParmHealth( map<int, vector<double>> &health_parm,
-                     double *ptr_res_parm, int nrow ) {
+void copyParmHealth( vector<double> &health_parm,
+                     double *ptr_res_parm, const int &nrow ) {
   int j = 0;
-  for( map<int, vector<double>>::iterator it = health_parm.begin();
-       it != health_parm.end(); ++ it ) {
-    ptr_res_parm[ nrow * j ] = it->first;
-    for( int i = 0; i < 8; ++ i ) {
-      ptr_res_parm[ nrow * j + i + 1 ] = it->second[ i ];
+  int curr_label;
+  for( int i = 0; i < 3; ++ i ) {
+    curr_label = - i - 1;
+    ptr_res_parm[ nrow * j ] = curr_label;
+    for( int k = 0; k < 8; ++ k ) {
+      ptr_res_parm[ nrow * j + k + 1 ] = health_parm[ 8 * i + k ];
     }
     ++ j;
   }

@@ -8,11 +8,13 @@ using std::map;
 using std::vector;
 
 // copy estimated parameters to SEXP
-void copyParm( map<int, vector<double>> &health_parm,
-                  map<int, vector<double>> &tumor_parm,
-                  map<int, vector<double>> &outl_parm,
-                  double *ptr_res_parm, int nrow );
-void copyParmHealth( map<int, vector<double>> &health_parm,
-                     double *ptr_res_parm, int nrow );
+void copyParm( vector<double> &health_parm,
+               vector<double> &tumor_parm,
+               vector<double> &outl_parm,
+               double *ptr_res_parm, const int &nrow,
+               const vector<int> &tumor_labels, 
+               const vector<int> &outl_labels, const int &len );
+void copyParmHealth( vector<double> &health_parm,
+                     double *ptr_res_parm, const int &nrow );
 
 #endif
