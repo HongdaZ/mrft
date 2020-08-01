@@ -3,10 +3,13 @@
 // erase single outlier
 void eraseOutl( const int out_label, 
                 vector<int> &outl_labels,
-                map<int, vector<double>> &outl_parm,
+                vector<double> &outl_parm,
                 int &n_outl ) {
-  outl_labels[ out_label - 1 ] = 0;
-  outl_parm.erase( out_label );
+  int idxcol = out_label - 1;
+  outl_labels[ idxcol ] = 0;
+  for( int i = 0; i < 2; ++ i ) {
+    outl_parm[ 2 * idxcol + i ] = 0;
+  }
   -- n_outl;
   return;
 }

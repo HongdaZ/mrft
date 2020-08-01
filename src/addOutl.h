@@ -11,7 +11,7 @@ using std::map;
 void addOutl( const int new_out_label,
               const vector<double> &new_out_parm, 
               vector<int> &outl_labels,
-              map<int, vector<double>> &outl_parm,
+              vector<double> &outl_parm,
               int &n_outl );
 
 #endif

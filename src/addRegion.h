@@ -11,11 +11,10 @@ using std::map;
 
 // add new tumor regions
 void addRegion( int *ptr_seg, 
-                const list<vector<double>> &region_parm, 
-                const list<list<int>> &regions, 
+                const vector<double> &region_parm,
+                const vector<double> &regions, const int &region_row,
                 vector<int> &tumor_labels,
-                map<int, list<int>> &tumor_regions, 
-                map<int, vector<double>> &tumor_parm,
+                vector<double> &tumor_parm,
                 int &n_tumor );
 
 #endif

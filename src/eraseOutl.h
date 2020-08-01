@@ -10,7 +10,7 @@ using std::vector;
 // erase single outlier
 void eraseOutl( const int out_label, 
                 vector<int> &outl_labels,
-                map<int, vector<double>> &outl_parm,
+                vector<double> &outl_parm,
                 int &n_outl );
 
 #endif

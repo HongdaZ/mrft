@@ -3,9 +3,6 @@
 // store region in regions
 void assignRegion( vector<int> &regions, vector<int> &region, 
                    const int &row, int label ) {
-  if( row == 0 ) {
-    label = -label;
-  }
   for( int i = 0; i < region.size(); ++ i ) {
     regions[ 2 * ( region[ i ] - 1 ) + row ] = label;
   }
