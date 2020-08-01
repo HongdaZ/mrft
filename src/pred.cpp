@@ -78,15 +78,18 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   // number of voxels of in a tumor region
   // 0, 1, 2, ... = -4, -5, -6, ...
   vector<int> n_voxel( len, 0 );
-  // tumor region labels
-  vector<int> labels;
+  
   // frontier in search
   vector<int> front;
   front.reserve( len );
-  // store the result of findReion
+  // store the result of findRegion
   vector<int> region;
   region.reserve( len );
-  // represents finded whole and sub-region
+  
+  // tumor region labels
+  vector<int> labels;
+  labels.reserve( 7 );
+  // represents whole and sub-regions
   vector<int> regions;
   regions.reserve( 2 * len );
   
@@ -120,8 +123,8 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
       //                   search[ j - 1 ], 3 );
       
       old_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
-      int sc = scPred( labels, tumor_labels, n_voxel,
-                       ptr_res_seg, ptr_nidx, curr_idx );
+      int sc = scPred( labels, regions, front, region, tumor_labels, 
+                       n_voxel, ptr_res_seg, ptr_nidx, len, curr_idx );
       cmpEP( curr_idx, sc, labels, n_voxel, tumor_labels,
              outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
              ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,

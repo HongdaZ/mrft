@@ -4,7 +4,7 @@
 #include "initMV.h"
 
 // initialize yln_, yln_i and yl_
-void initMV( const int *region, const int &len_region, double *yln_, 
+void initMV( const vector<int> &region, const int &len_region, double *yln_, 
              double *yln_i, double *yl_, double &sum_y,
              const double *ptr_intst, const int *ptr_nidx,
              const double *ptr_nintst, const int *ptr_seg, 

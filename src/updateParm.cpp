@@ -14,7 +14,7 @@ using std::abs;
 
 // update parameters for healthy cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const int *region, const int &len_region,
+                 const vector<int> &region, const int &len_region,
                  const double m,
                  const double nu2,
                  const double *ptr_intst,
@@ -79,7 +79,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for tumor cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const int *region, const int &len_region,
+                 const vector<int> &region, const int &len_region,
                  const double m,
                  const double mk_1,
                  const double a,
@@ -149,7 +149,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for outliers
 void updateParm( double &mu, double &sigma2, 
-                 const int *region, const int &len_region,
+                 const vector<int> &region, const int &len_region,
                  const double m,
                  const double mk_1,
                  const double a,

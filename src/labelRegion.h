@@ -1,12 +1,14 @@
 #ifndef LABELREGION_H
 #define LABELREGION_H
 
-#include <list>
+#include <vector>
 
-using std::list;
+using std::vector;
 
-void labelRegion( const int *region, const int &len_region, int *ptr_seg );
-void recoverLabel( const int *region, const int &len_region, int *ptr_seg );
+void labelRegion( const vector<int> &region, const int &len_region, 
+                  int *ptr_seg );
+void recoverLabel( const vector<int> &region, const int &len_region, 
+                   int *ptr_seg );
 
 
 #endif

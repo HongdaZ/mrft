@@ -9,6 +9,10 @@
 #include "newTumorLabel.h"
 #include "tumorNbr.h"
 #include "nonTumor.h"
+#include "clearVector.h"
+#include "zeroVector.h"
+#include "assignRegion.h"
+#include "getRegion.h"
 
 using std::list;
 using std::vector;
@@ -17,19 +21,24 @@ using std::vector;
 // nidx also starts from 1
 
 // split or combine for prediction
-int scPredint scPred( vector<int> &labels, const vector<int> &tumor_labels,
-                      const vector<int> &n_voxel, int *ptr_label, 
-                      const int *ptr_nidx, int start ) {
-  labels.clear();
-  regions.clear();
+int scPred( vector<int> &labels, vector<int> &regions,  vector<int> &front,
+            vector<int> &region, const vector<int> &tumor_labels,
+            const vector<int> &n_voxel, int *ptr_label, const int *ptr_nidx,
+            const int &len, int start ) {
+  clearVector( labels );
+  zeroVector( regions );
   int current = ptr_label[ 2 * ( start - 1 ) ];
-  // possibly split
+  if( current <= -4 ) {
+    labels.push_back( current );
+  }
+  
   list<int> tumor_nbr;
   list<int> tumor_label;
   // Add tumor neighbors to set
   tumorNbrLabel( tumor_label, tumor_nbr, start, ptr_label, ptr_nidx );
   if( tumor_nbr.size() < 2 ) {
     return 0;
+    // possibly split
   } else if( current <= - 4 ) {
     // remember to reset seg[ 2, ] == 0
     ptr_label[ 2 * start - 1  ] = 1;
@@ -43,17 +52,16 @@ int scPredint scPred( vector<int> &labels, const vector<int> &tumor_labels,
     while( !tumor_nbr.empty() ) {
       n_region = regions.size();
       int new_start = *tumor_nbr.begin();
-      tumor_nbr.remove( new_start );
+      tumor_nbr.pop_front();
       ptr_label[ 2 * new_start - 1 ] = 0;
-      list<int> sub_region = findRegion( n_region, ptr_label, ptr_nidx, 
-                                               false, tumor_nbr,
-                                               early_return, new_start );
+      findRegion( region, front, n_region, ptr_label, ptr_nidx, 
+                  false, tumor_nbr, early_return, new_start );
       if( early_return ) {
         ptr_label[ 2 * start - 1  ] = 0;
         return 0;
       }
       int region_label;
-      if( regions.empty() ) {
+      if( labels.size() == 1 ) {
         region_label = current;
       } else {
         region_label = newTumorLabel( regions.size(), tumor_labels );
@@ -61,40 +69,42 @@ int scPredint scPred( vector<int> &labels, const vector<int> &tumor_labels,
         
       }
       labels.push_back( region_label );
-      regions.push_back( sub_region );
+      assignRegion( regions, region, 1, region_label );
     }
     // restore the value of seg[ 2, ] to 0;
     ptr_label[ 2 * start - 1  ] = 0;
-    if( regions.size() < 2 ) {
-      regions.clear();
+    if( labels.size() < 3 ) {
       return 0;
     } else {
-      list<int> current_tumor = tumor_regions[ current ];
-      labels.push_front( current );
-      regions.push_front( current_tumor );
+      int len_region = n_voxel[ - current - 4 ];
+      region.resize( len_region );
+      getRegion( region, len_region, current, ptr_label, len );
+      assignRegion( regions, region, 0, current );
       return 1;
     }
   } else {
     if( tumor_label.size() == 1 ) {
       return 0;
     }
-    list<int> whole;
     // possibly combine
-    list<int>::iterator it;
-    list<int> sub_region;
-    for( it = tumor_label.begin();
+    int combine_label = tumor_label.back();
+    labels.push_back( combine_label );
+
+    for( list<int>::iterator it = tumor_label.begin();
          it != tumor_label.end(); ++ it ) {
-      sub_region = tumor_regions[ *it ];
+      int len_region = n_voxel[ - *it - 4 ];
+      region.resize( len_region );
+      getRegion( region, len_region, *it, ptr_label, len );
+      assignRegion( regions, region, 1, *it );
       
       labels.push_back( *it );
-      regions.push_back( sub_region );
-      
-      whole.insert( whole.end(), sub_region.begin(), sub_region.end() );
+      assignRegion( regions, region, 0, combine_label );
     }
-    int combine_label = *( -- it );
-    whole.push_front( start );
-    labels.push_front( combine_label );
-    regions.push_front( whole );
+    
+    region.resize( 1 );
+    region[ 0 ] = start;
+    assignRegion( regions, region, 0, combine_label );
+    
     return 2;
   }
 }

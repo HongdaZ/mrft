@@ -1,7 +1,7 @@
 #include "getRegion.h"
 
 // get the region with label = label
-void getRegion( int *region, const int &len_region, const int &label,
+void getRegion( vector<int> &region, const int &len_region, const int &label,
                 const int *ptr_seg, const int &len ){
   int count = 0;
   for( int i = 1; i <= len; ++ i ) {

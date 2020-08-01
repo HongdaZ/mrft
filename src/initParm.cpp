@@ -4,6 +4,7 @@
 #include "initParm.h"
 #include "updateParm.h"
 #include "getRegion.h"
+#include "lengthRegion.h"
 
 // Initialize parameters
 void initParm( const bool first_run, vector<double> &health_parm,
@@ -23,10 +24,9 @@ void initParm( const bool first_run, vector<double> &health_parm,
       if( first_run || n_voxel[ i ] != 1 ) {
         int curr_label = - i - 4;
         int len_region = n_voxel[ i ];
-        int *region = new int[ len_region ];
+        vector<int> region( len_region, 0 );
         // region starts from 1
         getRegion( region, len_region, curr_label, ptr_seg, len );
-        
         double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
         vector<double> theta( 6, 0 );
         updateParm( mu, theta, sigma2, region, len_region, ptr_m[ 3 ], 
@@ -39,7 +39,6 @@ void initParm( const bool first_run, vector<double> &health_parm,
         for( int j = 0; j < 6; ++ j ) {
           tumor_parm[ 8 * cidx + j + 2 ] = theta[ j ];
         }
-        delete [] region;
       }
       ++ count;
       if( count == n_tumor ) {
@@ -53,13 +52,8 @@ void initParm( const bool first_run, vector<double> &health_parm,
     // Rprintf( "curr_label = %d \n", curr_label );
     double mu = -1, sigma2 = 1;
     vector<double> theta( 6, 0 );
-    int len_region = 0;
-    for( int k = 0; k < len; ++ k ) {
-      if( ptr_seg[ 2 * k ] == curr_label ) {
-        ++ len_region; 
-      }
-    }
-    int *region = new int[ len_region ];
+    int len_region = lengthRegion( ptr_seg, len, curr_label );
+    vector<int> region( len_region, 0 );
     getRegion( region, len_region, curr_label, ptr_seg, len );
     int h_idx =  - 1 - curr_label; // == 0, 1, 2
     updateParm( mu, theta, sigma2, region, len_region, ptr_m[ h_idx ], 
@@ -73,7 +67,6 @@ void initParm( const bool first_run, vector<double> &health_parm,
     for( int j = 0; j < 6; ++ j ) {
       health_parm[ 8 * cidx + j + 2 ] = theta[ j ];
     }
-    delete [] region;
   }
   return;
 }
@@ -90,13 +83,8 @@ void initParmHealth3( vector<double> &health_parm,
     int curr_label = i;
     double mu = -1, sigma2 = 1;
     vector<double> theta( 6, 0 );
-    int len_region = 0;
-    for( int k = 0; k < len; ++ k ) {
-      if( ptr_seg[ 2 * k ] == curr_label ) {
-        ++ len_region; 
-      }
-    }
-    int *region = new int[ len_region ];
+    int len_region = lengthRegion( ptr_seg, len, curr_label );
+    vector<int> region( len_region, 0 );
     getRegion( region, len_region, curr_label, ptr_seg, len );
     int h_idx =  - 1 - curr_label; // == 0, 1, 2
     updateParm( mu, theta, sigma2, region, len_region, ptr_m[ h_idx ], 
@@ -110,7 +98,6 @@ void initParmHealth3( vector<double> &health_parm,
     for( int j = 0; j < 6; ++ j ) {
       health_parm[ 8 * cidx + j + 2 ] = theta[ j ];
     }
-    delete [] region;
   }
   return;
 }

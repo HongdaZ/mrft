@@ -2,7 +2,8 @@
 
 
 // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
-void labelRegion( const int *region, const int &len_region, int *ptr_seg ) {
+void labelRegion( const vector<int> &region, const int &len_region,
+                  int *ptr_seg ) {
   
   for( int i = 0; i < len_region; ++ i ) {
     ptr_seg[ 2 * region[ i ] - 1 ] = 3;
@@ -10,7 +11,7 @@ void labelRegion( const int *region, const int &len_region, int *ptr_seg ) {
   return;
 }
 // change ptr_seg[ 2, region ] back
-void recoverLabel( const int *region, const int &len_region,
+void recoverLabel( const vector<int> &region, const int &len_region,
                    int *ptr_seg ) {
   
   for( int i = 0; i < len_region; ++ i ) {
