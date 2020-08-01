@@ -34,7 +34,7 @@ int scPred( vector<int> &labels, vector<int> &regions,  vector<int> &front,
   
   list<int> tumor_nbr;
   list<int> tumor_label;
-  // Add tumor neighbors to set
+  // Add tumor neighbors to list
   tumorNbrLabel( tumor_label, tumor_nbr, start, ptr_label, ptr_nidx );
   if( tumor_nbr.size() < 2 ) {
     return 0;
@@ -50,7 +50,7 @@ int scPred( vector<int> &labels, vector<int> &regions,  vector<int> &front,
     bool early_return = 0;
     int n_region;
     while( !tumor_nbr.empty() ) {
-      n_region = regions.size();
+      n_region = labels.size() - 1;
       int new_start = *tumor_nbr.begin();
       tumor_nbr.pop_front();
       ptr_label[ 2 * new_start - 1 ] = 0;
