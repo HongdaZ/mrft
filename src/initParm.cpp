@@ -26,10 +26,10 @@ void initParm( const bool first_run, vector<double> &health_parm,
         int len_region = n_voxel[ i ];
         vector<int> region( len_region, 0 );
         // region starts from 1
-        getRegion( region, len_region, curr_label, ptr_seg, len );
+        getRegion( region, curr_label, ptr_seg, len );
         double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
         vector<double> theta( 6, 0 );
-        updateParm( mu, theta, sigma2, region, len_region, ptr_m[ 3 ], 
+        updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
                     ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                     curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
                     ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
@@ -54,9 +54,9 @@ void initParm( const bool first_run, vector<double> &health_parm,
     vector<double> theta( 6, 0 );
     int len_region = lengthRegion( ptr_seg, len, curr_label );
     vector<int> region( len_region, 0 );
-    getRegion( region, len_region, curr_label, ptr_seg, len );
+    getRegion( region, curr_label, ptr_seg, len );
     int h_idx =  - 1 - curr_label; // == 0, 1, 2
-    updateParm( mu, theta, sigma2, region, len_region, ptr_m[ h_idx ], 
+    updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], 
                 ptr_nu2[ h_idx ], ptr_intst, curr_label, 
                 ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx, ptr_nintst,
                 ptr_alpha[ h_idx ], ptr_beta[ h_idx ], maxit );
@@ -85,9 +85,9 @@ void initParmHealth3( vector<double> &health_parm,
     vector<double> theta( 6, 0 );
     int len_region = lengthRegion( ptr_seg, len, curr_label );
     vector<int> region( len_region, 0 );
-    getRegion( region, len_region, curr_label, ptr_seg, len );
+    getRegion( region, curr_label, ptr_seg, len );
     int h_idx =  - 1 - curr_label; // == 0, 1, 2
-    updateParm( mu, theta, sigma2, region, len_region, ptr_m[ h_idx ], 
+    updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], 
                 ptr_nu2[ h_idx ], ptr_intst, curr_label,
                 ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx, ptr_nintst, 
                 ptr_alpha[ h_idx ], ptr_beta[ h_idx ], maxit );

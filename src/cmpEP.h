@@ -15,12 +15,11 @@ using std::list;
 
 // compare energy for prediction
 void cmpEP( int idx, int sc,
-            list<int> &labels, list<list<int>> &regions,
-            map<int, list<int>> &tumor_regions, 
+            const vector<int> &labels, const vector<int> &regions,
             vector<int> &tumor_labels, vector<int> &outl_labels,
-            map<int, vector<double>> &health_parm,
-            map<int, vector<double>> &tumor_parm, 
-            map<int, vector<double>> &outl_parm,
+            const vector<double> &health_parm,
+            vector<double> &tumor_parm, 
+            vector<double> &outl_parm,
             int *ptr_seg, const int *ptr_nidx,
             const double *ptr_intst, const double *ptr_nintst,
             const double *ptr_delta, const double *ptr_gamma, 

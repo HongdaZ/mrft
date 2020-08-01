@@ -59,7 +59,8 @@ SEXP est3( SEXP model, SEXP delta, SEXP gamma,
   for( int i = 0; i < 3; ++ i ) {
     ptr_res_beta[ i ] = old_beta[ i ];
   }
-  map<int, vector<double>> health_parm;
+  // 0, 1, 2 = -1, -2, -3
+  vector<double> health_parm( 8 * 3, 0 );
   // Initialize parameters for healthy regions
   initParmHealth3( health_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst, 
                    ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 

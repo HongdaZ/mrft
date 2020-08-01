@@ -125,7 +125,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
       old_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
       int sc = scPred( labels, regions, front, region, tumor_labels, 
                        n_voxel, ptr_res_seg, ptr_nidx, len, curr_idx );
-      cmpEP( curr_idx, sc, labels, n_voxel, tumor_labels,
+      cmpEP( curr_idx, sc, labels, regions, tumor_labels,
              outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
              ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
              ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,

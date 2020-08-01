@@ -14,7 +14,7 @@ using std::abs;
 
 // update parameters for healthy cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const vector<int> &region, const int &len_region,
+                 const vector<int> &region,
                  const double m,
                  const double nu2,
                  const double *ptr_intst,
@@ -35,6 +35,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tmp = 0;
   mu = - 1;
   // Initialize matrices and vectors
+  int len_region = region.size();
   int nrow = len_region;
   int ncol = 6;
   double *yln_ = new double[ nrow * ncol ];
@@ -79,7 +80,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for tumor cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
-                 const vector<int> &region, const int &len_region,
+                 const vector<int> &region,
                  const double m,
                  const double mk_1,
                  const double a,
@@ -100,6 +101,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double tol = 1;
   double tmp = 0;
   mu = - 1;
+  int len_region = region.size();
   // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
   labelRegion( region, len_region, ptr_seg );
   
@@ -149,7 +151,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
 
 // update parameters for outliers
 void updateParm( double &mu, double &sigma2, 
-                 const vector<int> &region, const int &len_region,
+                 const vector<int> &region,
                  const double m,
                  const double mk_1,
                  const double a,

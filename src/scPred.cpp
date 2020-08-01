@@ -78,7 +78,7 @@ int scPred( vector<int> &labels, vector<int> &regions,  vector<int> &front,
     } else {
       int len_region = n_voxel[ - current - 4 ];
       region.resize( len_region );
-      getRegion( region, len_region, current, ptr_label, len );
+      getRegion( region, current, ptr_label, len );
       assignRegion( regions, region, 0, current );
       return 1;
     }
@@ -94,7 +94,7 @@ int scPred( vector<int> &labels, vector<int> &regions,  vector<int> &front,
          it != tumor_label.end(); ++ it ) {
       int len_region = n_voxel[ - *it - 4 ];
       region.resize( len_region );
-      getRegion( region, len_region, *it, ptr_label, len );
+      getRegion( region, *it, ptr_label, len );
       assignRegion( regions, region, 1, *it );
       
       labels.push_back( *it );

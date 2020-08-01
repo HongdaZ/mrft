@@ -12,16 +12,15 @@
 
 // compare energy for prediction
 void cmpEP( int idx, int sc,
-            list<int> &labels, list<list<int>> &regions,
-            map<int, list<int>> &tumor_regions,
+            const vector<int> &labels, const vector<int> &regions,
             vector<int> &tumor_labels, vector<int> &outl_labels,
-            map<int, vector<double>> &health_parm,
-            map<int, vector<double>> &tumor_parm,
-            map<int, vector<double>> &outl_parm,
+            const vector<double> &health_parm,
+            vector<double> &tumor_parm, 
+            vector<double> &outl_parm,
             int *ptr_seg, const int *ptr_nidx,
             const double *ptr_intst, const double *ptr_nintst,
-            const double *ptr_delta, const double *ptr_gamma,
-            const double *ptr_alpha, const double *ptr_beta,
+            const double *ptr_delta, const double *ptr_gamma, 
+            const double *ptr_alpha, const double *ptr_beta, 
             const double *ptr_lambda2, const double *ptr_a,
             const double *ptr_b, const double *ptr_m,
             const double *ptr_nu2,
@@ -37,8 +36,7 @@ void cmpEP( int idx, int sc,
             vector<double> &new_out_parm,
             // whole_parm( 8, 0 )
             vector<double> &whole_parm,
-            int &n_tumor, int &n_outl
-            ) {
+            int &n_tumor, int &n_outl ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier
