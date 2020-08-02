@@ -10,6 +10,7 @@
 #include "addOutl.h"
 #include "tumorNbr.h"
 #include "getRegion.h"
+#include "assignParm.h"
 
 // compare energy for prediction
 void cmpEP( vector<int> &region, int idx, int sc,
@@ -47,8 +48,9 @@ void cmpEP( vector<int> &region, int idx, int sc,
     // parameters for regions
     int nrow = 9;
     vector<double> region_parm( nrow * n_region, 0 );
+    double mu;
+    double sigma2;
     for( int i = 0; i < n_region; ++ i ) {
-      double mu = - 1, sigma2 = 1;
       int curr_label = labels[ i ];
       int row = ( i == 0 ) ? 0 : 1;
       getRegion( region, curr_label, regions, len, row );
@@ -75,8 +77,9 @@ void cmpEP( vector<int> &region, int idx, int sc,
     int out_label = findOutLabel( idx, ptr_seg, outl_labels );
 
     // outlier parameters
-    double out_mu = - 1, out_sigma2 = 1;
-    list<int> out_region;
+    double &out_mu = mu;
+    double &out_sigma2 = sigma2;
+    vector<int> out_region;
     out_region.push_back( idx );
     updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], ptr_m[ 2 ],
                 ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, out_label,
@@ -98,14 +101,12 @@ void cmpEP( vector<int> &region, int idx, int sc,
     double min_energy = out_energy;
     int min_label = out_label;
     
-    double mu;
-    double sigma2;
     for( int i = - 1; i > - 4; -- i ) {
-      vector<double> &parm = health_parm[ i ];
-      mu = parm[ 0 ];
-      sigma2 = parm[ 1 ];
+      int idxcol = - i - 1;
+      mu = health_parm[ 8 * idxcol ];
+      sigma2 = health_parm[ 8 * idxcol + 1 ];
       for( int j = 0; j < 6; ++ j ) {
-        theta[ j ] = parm[ 2 + j ];
+        theta[ j ] = health_parm[ 8 * idxcol + 2 + j ];
       }
       energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
                         ptr_intst, ptr_nintst, theta );
@@ -117,21 +118,21 @@ void cmpEP( vector<int> &region, int idx, int sc,
       }
     }
     
-    *it_nrg = min_energy;
-    it_nrg = nrg.begin();
-    double combine_nrg = *it_nrg;
+    nrg.back() = min_energy;
+    double combine_nrg = nrg[ 0 ];
     double split_nrg = 0;
-    for( ++ it_nrg; it_nrg != nrg.end(); ++ it_nrg ) {
-      split_nrg += *it_nrg;
+    for( int i = 1; i < ( n_region + 1 ); ++ i ) {
+      split_nrg += nrg[ i ];
     }
-    vector<double> &label_whole_parm = region_parm.front();
+    vector<double> label_whole_parm( region_parm.begin(), 
+                                     region_parm.begin() + nrow );
     int whole_label = label_whole_parm[ 0 ];
     // update parameters for whole region
     if( combine_nrg <= split_nrg && sc == 1 ) {
       for( int i = 0; i < 8; ++ i ) {
         whole_parm[ i ] = label_whole_parm[ 1 + i ];
       }
-      tumor_parm[ whole_label ] = whole_parm;
+      assignParm( tumor_parm, whole_label, whole_parm );
       // remove old whole region and add new splitted regions and
       // new outlier if min_label > 1
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
