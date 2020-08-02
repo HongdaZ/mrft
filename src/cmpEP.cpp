@@ -9,6 +9,7 @@
 #include "addRegion.h"
 #include "addOutl.h"
 #include "tumorNbr.h"
+#include "getRegion.h"
 
 // compare energy for prediction
 void cmpEP( vector<int> &region, int idx, int sc,
@@ -47,7 +48,8 @@ void cmpEP( vector<int> &region, int idx, int sc,
     vector<double> region_parm( nrow * len, 0 );
     for( int i = 0; i < len; ++ i ) {
       double mu = - 1, sigma2 = 1;
-      int curr_label = *it_label;
+      int curr_label = labels[ i ];
+      
       updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ],
                   ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, curr_label,
                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
