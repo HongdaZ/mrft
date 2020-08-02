@@ -2,7 +2,7 @@
 // add new tumor regions
 void addRegion( int *ptr_seg, 
                 const vector<double> &region_parm,
-                const vector<double> &regions, const int &region_row,
+                const vector<int> &regions, const int &region_row,
                 vector<int> &tumor_labels,
                 vector<double> &tumor_parm,
                 int &n_tumor ) {

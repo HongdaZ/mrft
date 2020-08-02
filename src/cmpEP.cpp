@@ -136,14 +136,12 @@ void cmpEP( vector<int> &region, int idx, int sc,
       // remove old whole region and add new splitted regions and
       // new outlier if min_label > 1
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
-      eraseRegion( whole_label, tumor_labels, tumor_regions, tumor_parm,
+      eraseRegion( whole_label, tumor_labels, tumor_parm,
                    n_tumor );
-      list<vector<double>> new_region_parm( ++ region_parm.begin() ,
-                                            region_parm.end() );
-      list<list<int>> new_regions( ++ regions.begin(), 
-                                        regions.end() );
-      addRegion( ptr_seg, new_region_parm, new_regions, tumor_labels,
-                 tumor_regions, tumor_parm, n_tumor );
+      vector<double> new_region_parm( region_parm.begin() + nrow,
+                                      region_parm.end() );
+      addRegion( ptr_seg, new_region_parm, regions, 1, tumor_labels,
+                 tumor_parm, n_tumor );
       
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       if( min_label > 0 ) {
