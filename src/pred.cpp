@@ -92,14 +92,6 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   // represents whole and sub-regions
   vector<int> regions;
   regions.reserve( 2 * len );
-  
-  initRegion( region, front, ptr_res_seg, ptr_nidx, len,
-              n_voxel, tumor_labels );
-  initParm( true, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2, 
-            ptr_intst, ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 
-            ptr_res_beta, n_voxel, n_tumor, ptr_a, ptr_b, len, 20 );
-  updateBeta( ptr_res_beta, ptr_alpha, health_parm, n_voxel, n_tumor,
-              tumor_parm );
   bool skip_curr;
   vector<int> search( len, 0 );
   double lower = ptr_m[ 2 ];
@@ -111,6 +103,13 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   vector<double> new_out_parm( 2, 0 );
   vector<double> whole_parm( 8, 0 );
   
+  initRegion( region, front, ptr_res_seg, ptr_nidx, len,
+              n_voxel, tumor_labels );
+  initParm( region, theta, true, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2, 
+            ptr_intst, ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 
+            ptr_res_beta, n_voxel, n_tumor, ptr_a, ptr_b, len, 20 );
+  updateBeta( ptr_res_beta, ptr_alpha, health_parm, n_voxel, n_tumor,
+              tumor_parm );
   int old_label = 0;
   int new_label = 0;
   int curr_idx = 0;
@@ -138,7 +137,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
     }
     // Rprintf( "update parm for healthy and tumorous\n" );
     // update parm for healthy and tumorous regions
-    initParm( false, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2,
+    initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2,
               ptr_intst, ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha,
               ptr_res_beta, n_voxel, n_tumor, ptr_a, ptr_b, len, 20 );
   }
