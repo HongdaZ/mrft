@@ -50,28 +50,26 @@ void cmpEP( vector<int> &region, int idx, int sc,
     for( int i = 0; i < n_region; ++ i ) {
       double mu = - 1, sigma2 = 1;
       int curr_label = labels[ i ];
-      getRegion( region, curr_label, )
-      updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ],
+      int row = ( i == 0 ) ? 0 : 1;
+      getRegion( region, curr_label, regions, len, row );
+      updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
                   ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, curr_label,
                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
                   ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
       // curr_label, mu, sigma2, theta
-      tmp_parm[ 0 ] = curr_label;
-      tmp_parm[ 1 ] = mu;
-      tmp_parm[ 2 ] = sigma2;
-      for( int i = 0; i < 6; ++ i ) {
-        tmp_parm[ i + 3 ] = theta[ i ];
+      region_parm[ nrow * i ] = curr_label;
+      region_parm[ nrow * i + 1 ] = mu;
+      region_parm[ nrow * i + 2 ] = sigma2;
+      for( int j = 0; j < 6; ++ j ) {
+        region_parm[ nrow * i + j + 3 ] = theta[ j ];
       }
-
-      region_parm.push_back( tmp_parm );
-
       // calculate energy
-      double energy = energyY( *it, mu, ptr_m[ 2 ], sigma2,
+      double energy = energyY( region, mu, ptr_m[ 2 ], sigma2,
                                ptr_lambda2[ 3 ], ptr_seg, ptr_nidx,
                                ptr_intst, ptr_nintst,
                                theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
                                ptr_a[ 0 ], ptr_b[ 0 ] );
-      *it_nrg = energy;
+      nrg[ i ] = energy;
     }
     // New outlier label
     int out_label = findOutLabel( idx, ptr_seg, outl_labels );

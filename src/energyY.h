@@ -1,13 +1,11 @@
 #ifndef ENERGYY_H
 #define ENERGYY_H
 
-#include <list>
 #include <vector>
 
-using std::list;
 using std::vector;
 
-double energyY( const list<int> &region,
+double energyY( const vector<int> &region,
                 double mu,
                 double mk1,
                 double sigma2,

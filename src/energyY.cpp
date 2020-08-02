@@ -3,7 +3,6 @@
 #include <R_ext/BLAS.h>
 #include <R_ext/Lapack.h>
 
-#include <list>
 #include <vector>
 #include <algorithm>
 
@@ -11,14 +10,13 @@
 #include "labelRegion.h"
 #include "initMV.h"
 
-using std::list;
 using std::vector;
 using std::find;
 
 
 // region starts from 1
 // calculate energy for tumor regions
-double energyY( const list<int> &region,
+double energyY( const vector<int> &region,
                double mu,
                double mk1,
                double sigma2,
