@@ -169,10 +169,14 @@ void cmpEP( vector<int> &region, int idx, int sc,
       // update parameters for subregions
       // possibly remove or add outlier;
     } else if( combine_nrg >= split_nrg && sc == 2 ) {
-      vector<double> new_region_parm( region_parm.begin() + nrow,
-                                      region_parm.end() );
-      addRegion( ptr_seg, new_region_parm, regions, 1, tumor_labels,
-                 tumor_parm, n_tumor );
+      for( int i = 1; i < n_region; ++ i ) {
+        int sub_label = labels[ i ];
+        vector<double> &new_parm = whole_parm; 
+        for( int j = 0; j < 8; ++ j ) {
+          new_parm[ j ] = region_parm[ nrow * i + j + 1 ];
+        }
+        assignParm( tumor_parm, sub_label, new_parm );
+      }
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       // healthy to outlier
       if( min_label > 0 && curr_label < 1 ) {
