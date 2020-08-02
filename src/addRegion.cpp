@@ -15,7 +15,7 @@ void addRegion( int *ptr_seg,
     idxcol = - new_label - 4;
     tumor_labels[ idxcol ] = 1;
     for( int j = 0; j < 8; ++ j ) {
-      tumor_parm[ 8 * idxcol + j ] = region_parm[ nrow * i + j ];
+      tumor_parm[ 8 * idxcol + j ] = region_parm[ nrow * i + j + 1 ];
     }
     ++ n_tumor;
   }
