@@ -129,7 +129,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
              ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
              ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
              ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-             new_out_parm, whole_parm, n_tumor, n_outl );
+             new_out_parm, whole_parm, n_tumor, n_outl, len );
       new_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
       Rprintf( "j = %d,curr_idx = %d, sc = %d, old = %d, new = %d\n",
                j, curr_idx, sc, old_label, new_label );

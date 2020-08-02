@@ -37,19 +37,20 @@ void cmpEP( vector<int> &region, int idx, int sc,
             vector<double> &new_out_parm,
             // whole_parm( 8, 0 )
             vector<double> &whole_parm,
-            int &n_tumor, int &n_outl ) {
+            int &n_tumor, int &n_outl,
+            const int &len ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier or healthy cell
-    int len = labels.size();
-    vector<double> nrg( len + 1, 0 ); 
+    int n_region = labels.size();
+    vector<double> nrg( n_region + 1, 0 ); 
     // parameters for regions
     int nrow = 9;
-    vector<double> region_parm( nrow * len, 0 );
-    for( int i = 0; i < len; ++ i ) {
+    vector<double> region_parm( nrow * n_region, 0 );
+    for( int i = 0; i < n_region; ++ i ) {
       double mu = - 1, sigma2 = 1;
       int curr_label = labels[ i ];
-      
+      getRegion( region, curr_label, )
       updateParm( mu, theta, sigma2, *it, ptr_m[ 3 ], ptr_m[ 2 ],
                   ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, curr_label,
                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
