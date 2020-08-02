@@ -16,5 +16,11 @@ void addRegion( int *ptr_seg,
                 vector<int> &tumor_labels,
                 vector<double> &tumor_parm,
                 int &n_tumor );
-
+// add a new single voxel tumor region
+void addRegion( int *ptr_seg, 
+                const vector<double> &region_parm,
+                const vector<int> region,
+                vector<int> &tumor_labels,
+                vector<double> &tumor_parm,
+                int &n_tumor );
 #endif
