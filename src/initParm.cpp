@@ -25,7 +25,6 @@ void initParm( vector<int> &region, vector<double> &theta,
       if( first_run || n_voxel[ i ] != 1 ) {
         int curr_label = - i - 4;
         // region starts from 1
-        clearVector( region );
         getRegion( region, curr_label, ptr_seg, len );
         double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
         updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
@@ -50,7 +49,6 @@ void initParm( vector<int> &region, vector<double> &theta,
     int curr_label = i;
     // Rprintf( "curr_label = %d \n", curr_label );
     double mu = -1, sigma2 = 1;
-    clearVector( region );
     getRegion( region, curr_label, ptr_seg, len );
     int h_idx =  - 1 - curr_label; // == 0, 1, 2
     updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], 
@@ -80,7 +78,6 @@ void initParmHealth3( vector<int> &region, vector<double> &theta,
   for( int i = - 1; i > - 4;  -- i ) {
     int curr_label = i;
     double mu = -1, sigma2 = 1;
-    clearVector( region );
     getRegion( region, curr_label, ptr_seg, len );
     int h_idx =  - 1 - curr_label; // == 0, 1, 2
     updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], 
