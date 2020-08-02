@@ -11,6 +11,8 @@
 #include "tumorNbr.h"
 #include "getRegion.h"
 #include "assignParm.h"
+#include "label2col.h"
+#include "getParm.h"
 
 // compare energy for prediction
 void cmpEP( vector<int> &region, int idx, int sc,
@@ -102,12 +104,8 @@ void cmpEP( vector<int> &region, int idx, int sc,
     int min_label = out_label;
     
     for( int i = - 1; i > - 4; -- i ) {
-      int idxcol = - i - 1;
-      mu = health_parm[ 8 * idxcol ];
-      sigma2 = health_parm[ 8 * idxcol + 1 ];
-      for( int j = 0; j < 6; ++ j ) {
-        theta[ j ] = health_parm[ 8 * idxcol + 2 + j ];
-      }
+      int idxcol = label2col( i );
+      getParm( mu, sigma2, theta, health_parm, idxcol );
       energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
                         ptr_intst, ptr_nintst, theta );
       energy += energyX( i, idx, true, ptr_seg, ptr_nidx,
@@ -200,12 +198,9 @@ void cmpEP( vector<int> &region, int idx, int sc,
       int t_idx = tumor_idx;
       t_label = ptr_seg[ 2 * ( t_idx - 1 ) ];
       // tumor energy
-      vector<double> &t_parm = tumor_parm[ t_label ];
-      double t_mu = t_parm[ 0 ];
-      double t_sigma2 = t_parm[ 1 ];
-      for( int i = 0; i < 6; ++ i ) {
-        t_theta[ i ] = t_parm[ i + 2 ];
-      }
+      int idxcol = label2col( t_label );
+      double t_mu, t_sigma2;
+      getParm( t_mu, t_sigma2, t_theta, tumor_parm, idxcol );
       double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
                                  t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
                                  ptr_nidx, ptr_intst, ptr_nintst,
