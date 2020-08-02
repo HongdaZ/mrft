@@ -156,19 +156,12 @@ void cmpEP( vector<int> &region, int idx, int sc,
       // remove outlier from outl_labels
       // remove outl_parm
     } else if( combine_nrg < split_nrg && sc == 2 ) {
-      for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
-           it_list != region_parm.end(); ++ it_list ) {
-        int sub_label = it_list->front();
-        eraseRegion( sub_label, tumor_labels, tumor_regions, tumor_parm, 
-                     n_tumor );
+      for( int i = 1; i < n_region; ++ i ) {
+        int sub_label = labels[ i ];
+        eraseRegion( sub_label, tumor_labels, tumor_parm, n_tumor );
       }
-      
-      list<vector<double>> new_whole_parm;
-      list<list<int>> new_whole_region;
-      new_whole_parm.push_back( label_whole_parm );
-      new_whole_region.push_back( regions.front() );
-      addRegion( ptr_seg, new_whole_parm, new_whole_region, tumor_labels,
-                 tumor_regions, tumor_parm, n_tumor );
+      addRegion( ptr_seg, label_whole_parm, regions, 0, tumor_labels,
+                 tumor_parm, n_tumor );
       ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       if( curr_label > 0 ) {
         eraseOutl( out_label, outl_labels, outl_parm, n_outl );
@@ -176,15 +169,10 @@ void cmpEP( vector<int> &region, int idx, int sc,
       // update parameters for subregions
       // possibly remove or add outlier;
     } else if( combine_nrg >= split_nrg && sc == 2 ) {
-      for( list<vector<double>>::iterator it_list =  ++ region_parm.begin();
-           it_list != region_parm.end(); ++ it_list ) {
-        int sub_label = it_list->front();
-        vector<double> &new_parm = whole_parm; 
-        for( int i = 0; i < 8; ++ i ) {
-          new_parm[ i ] = *( it_list->begin() + i + 1); 
-        }
-        tumor_parm[ sub_label ] = new_parm;
-      }
+      vector<double> new_region_parm( region_parm.begin() + nrow,
+                                      region_parm.end() );
+      addRegion( ptr_seg, new_region_parm, regions, 1, tumor_labels,
+                 tumor_parm, n_tumor );
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       // healthy to outlier
       if( min_label > 0 && curr_label < 1 ) {

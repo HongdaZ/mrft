@@ -20,7 +20,11 @@ void addRegion( int *ptr_seg,
     ++ n_tumor;
   }
   for( int i = 1; i <= regions.size() / 2; ++ i ) {
-    ptr_seg[ 2 * ( i - 1 ) ] = regions[ 2 * ( i - 1 ) + region_row ];
+    new_label = regions[ 2 * ( i - 1 ) + region_row ];
+    if( new_label != 0 ) {
+      ptr_seg[ 2 * ( i - 1 ) ] = new_label;
+    }
+    
   }
   return;
 }
