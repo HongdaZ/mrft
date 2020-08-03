@@ -133,7 +133,6 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
       new_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
       Rprintf( "j = %d,curr_idx = %d, sc = %d, old = %d, new = %d\n",
                j, curr_idx, sc, old_label, new_label );
-      ptr_res_seg[ 2 * ( curr_idx - 1 ) ] = old_label;
     }
     // Rprintf( "update parm for healthy and tumorous\n" );
     // update parm for healthy and tumorous regions
