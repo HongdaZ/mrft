@@ -91,7 +91,7 @@ SEXP est3( SEXP model, SEXP delta, SEXP gamma,
   }
   
   int nrow = 1 + 2 + 6;
-  int ncol = health_parm.size();
+  int ncol = health_parm.size() / 8;
   
   SEXP res_parm = PROTECT( allocMatrix( REALSXP, nrow, ncol ) );
   SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );

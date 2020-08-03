@@ -43,7 +43,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double *yl_ = new double[ nrow ];
   double sum_y = 0;
   
-  initMV( region, len_region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
+  initMV( region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
           ptr_seg, curr_label );
   
   double *yln = new double[ nrow * ncol ];
@@ -103,7 +103,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   mu = - 1;
   int len_region = region.size();
   // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
-  labelRegion( region, len_region, ptr_seg );
+  labelRegion( region, ptr_seg );
   
   // Initialize matrices and vectors
   int nrow = len_region;
@@ -114,7 +114,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   
   double sum_y = 0;
   
-  initMV( region, len_region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
+  initMV( region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
           ptr_seg, curr_label );
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
@@ -140,7 +140,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     ++ i;
   }
   // change ptr_seg[ 2, region ] back
-  recoverLabel( region, len_region, ptr_seg );
+  recoverLabel( region, ptr_seg );
   delete [] yln_;
   delete [] yln_i;
   delete [] yl_;

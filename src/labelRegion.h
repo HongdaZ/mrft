@@ -5,9 +5,9 @@
 
 using std::vector;
 
-void labelRegion( const vector<int> &region, const int &len_region, 
+void labelRegion( const vector<int> &region,
                   int *ptr_seg );
-void recoverLabel( const vector<int> &region, const int &len_region, 
+void recoverLabel( const vector<int> &region, 
                    int *ptr_seg );
 
 

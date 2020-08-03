@@ -19,7 +19,7 @@ using std::vector;
 
 // start = 1 to length array
 // nidx also starts from 1
-int scPred( vector<int> &labels, vector<int> &regions,  vector<int> &front,
+int scTrn( vector<int> &labels, vector<int> &regions,  vector<int> &front,
             vector<int> &region, const vector<int> &tumor_labels,
             const vector<int> &n_voxel, int *ptr_label, const int *ptr_nidx, 
             const int &len, int start ) {
