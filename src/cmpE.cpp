@@ -1,4 +1,6 @@
 #include "cmpE.h"
+#include "label2col.h"
+#include "getParm.h"
 
 // compare energy for t1ce or flair images in estimation
 void cmpE3( int idx, vector<double> &health_parm,
@@ -12,13 +14,10 @@ void cmpE3( int idx, vector<double> &health_parm,
   int min_label;
   double mu;
   double sigma2;
+  int idxcol;
   for( int i = - 1; i > - 4; -- i ) {
-    vector<double> &parm = health_parm[ i ];
-    mu = parm[ 0 ];
-    sigma2 = parm[ 1 ];
-    for( int i = 0; i < 6; ++ i ) {
-      theta[ i ] = parm[ i + 2 ];
-    }
+    idxcol = label2col( i );
+    getParm( mu, sigma2, theta, health_parm, idxcol );
     energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
                       ptr_intst, ptr_nintst, theta );
     energy += energyX( i, idx, false, ptr_seg, ptr_nidx,

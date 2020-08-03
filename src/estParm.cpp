@@ -85,14 +85,42 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   vector<int> outl_labels( len, 0 );
   int n_tumor = 0;
   int n_outl = 0;
-  map<int, vector<double>> health_parm;
-  map<int, vector<double>> tumor_parm;
-  map<int, vector<double>> outl_parm;
+  // 0, 1, 2 = -1, -2, -3
+  vector<double> health_parm( 8 * 3, 0 );
+  // 0, 1, 2, ... = -4, -5, -6, ...
+  vector<double> tumor_parm( 8 * len, 0 );
+  // 0, 1, 2, ... = 1, 2, 3, ...
+  vector<double> outl_parm( 2 * len, 0 );
+  // number of voxels of in a tumor region
+  // 0, 1, 2, ... = -4, -5, -6, ...
+  vector<int> n_voxel( len, 0 );
   
+  // frontier in search
+  vector<int> front;
+  front.reserve( len );
+  // store the result of findRegion
+  vector<int> region;
+  region.reserve( len );
   
-  map<int, list<int>> tumor_regions;
-  initRegion( ptr_res_seg, ptr_nidx, len,
-              tumor_regions, tumor_labels );
+  // tumor region labels
+  vector<int> labels;
+  labels.reserve( 7 );
+  // represents whole and sub-regions
+  vector<int> regions;
+  regions.reserve( 2 * len );
+  bool skip_curr;
+  vector<int> search( len, 0 );
+  double lower = ptr_m[ 2 ];
+  double upper = ptr_m[ 3 ];
+  vector<double> outlier_parm( 3, 0 );
+  vector<double> theta( 6, 0 );
+  vector<double> tmp_parm( 9, 0 );
+  vector<double> out_theta( 6, 0 );
+  vector<double> new_out_parm( 2, 0 );
+  vector<double> whole_parm( 8, 0 );
+  
+  initRegion( region, front, ptr_res_seg, ptr_nidx, len,
+              n_voxel, tumor_labels );
   // Rprintf( "initRegion finished!\n" );
   // Rprintf( "tumor_regions.size = %d; tumor_labels.size() = %d\n", 
   //          tumor_regions.size(), tumor_labels.size() );
@@ -125,24 +153,14 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   //   Rprintf( "%f, ", theta[ i ] );
   // }
   // Rprintf( "\n" );
-  initParm( true, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst,
-            ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_res_beta,
-            tumor_regions, ptr_a, ptr_b, len, 20 );
+  initParm( region, theta, true, health_parm, tumor_parm, ptr_res_seg, 
+            ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx, ptr_nintst, 
+            ptr_alpha, ptr_res_beta, n_voxel, n_tumor, ptr_a, ptr_b,
+            len, 20 );
   // Rprintf( "initParm finished!\n" );
-  updateBeta( ptr_res_beta, ptr_alpha, health_parm, tumor_regions,
+  updateBeta( ptr_res_beta, ptr_alpha, health_parm, n_voxel, n_tumor,
               tumor_parm );
   // Rprintf( "updateBeta finished!\n" );
-  
-  bool skip_curr;
-  vector<int> search( len, 0 );
-  double lower = ptr_m[ 2 ];
-  double upper = ptr_m[ 3 ];
-  vector<double> outlier_parm( 3, 0 );
-  vector<double> theta( 6, 0 );
-  vector<double> tmp_parm( 9, 0 );
-  vector<double> out_theta( 6, 0 );
-  vector<double> new_out_parm( 2, 0 );
-  vector<double> whole_parm( 8, 0 );
   
   // Rprintf( "Segmentation started!\n" );
   int old_label = 0;
@@ -158,16 +176,14 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
         continue;
       } else {
         old_label = ptr_res_seg[ 2 * ( j - 1 ) ];
-        list<list<int>> regions;
-        list<int> labels;
-        int sc = scTrn( labels, regions, tumor_labels, tumor_regions,
-                        ptr_res_seg, ptr_nidx, j );
-        cmpET( j, sc, labels, regions, tumor_regions, tumor_labels,
+        int sc = scTrn( labels, regions, front, region, tumor_labels,
+                   n_voxel, ptr_res_seg, ptr_nidx, len, j );
+        cmpET( region, j, sc, labels, regions, tumor_labels,
                outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
                ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
                ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
                ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-               new_out_parm, whole_parm, n_tumor, n_outl );
+               new_out_parm, whole_parm, n_tumor, n_outl, len );
         new_label = ptr_res_seg[ 2 * ( j - 1 ) ];
         if( old_label == new_label ) {
           ++ search[ j - 1 ];
@@ -179,24 +195,22 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
     }
     // Rprintf( "update parm for healthy and tumorous\n" );
     // update parm for healthy and tumorous regions
-    initParm( false, health_parm, tumor_parm, ptr_res_seg, ptr_m, ptr_nu2,
-              ptr_intst,
-              ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, ptr_res_beta,
-              tumor_regions, ptr_a, ptr_b, len, 20 );
+    initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg,
+              ptr_m, ptr_nu2,ptr_intst, ptr_lambda2, ptr_nidx, ptr_nintst, 
+              ptr_alpha, ptr_res_beta, n_voxel, n_tumor, ptr_a, ptr_b, 
+              len, 20 );
   }
   // segment zero blocks
   for( int j = 1; j <= len; j ++ ) {
     if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
-      list<list<int>> regions;
-      list<int> labels;
-      int sc = scTrn( labels, regions, tumor_labels, tumor_regions,
-                      ptr_res_seg, ptr_nidx, j );
-      cmpET( j, sc, labels, regions, tumor_regions, tumor_labels,
+      int sc = scTrn( labels, regions, front, region, tumor_labels,
+                      n_voxel, ptr_res_seg, ptr_nidx, len, j );
+      cmpET( region, j, sc, labels, regions, tumor_labels,
              outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
              ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
              ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
              ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-             new_out_parm, whole_parm, n_tumor, n_outl );
+             new_out_parm, whole_parm, n_tumor, n_outl, len );
     }
   }
   // printParm( health_parm );
@@ -211,7 +225,8 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );
   double *ptr_res_parm = REAL( res_parm );
   int *ptr_res_image = INTEGER( res_image );
-  copyParm( health_parm, tumor_parm, outl_parm, ptr_res_parm, nrow );
+  copyParm( health_parm, tumor_parm, outl_parm, ptr_res_parm, nrow,
+            tumor_labels, outl_labels, len );
   restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len );
   
   // results to list

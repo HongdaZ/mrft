@@ -1,4 +1,6 @@
 #include "addRegion.h"
+#include "label2col.h"
+
 // add new tumor regions
 void addRegion( int *ptr_seg, 
                 const vector<double> &region_parm,
@@ -12,7 +14,7 @@ void addRegion( int *ptr_seg,
   int idxcol;
   for( int i = 0; i < ncol; ++ i ) {
     new_label = region_parm[ nrow * i ];
-    idxcol = - new_label - 4;
+    idxcol = label2col( new_label );
     tumor_labels[ idxcol ] = 1;
     for( int j = 0; j < 8; ++ j ) {
       tumor_parm[ 8 * idxcol + j ] = region_parm[ nrow * i + j + 1 ];
@@ -41,7 +43,7 @@ void addRegion( int *ptr_seg,
   int idxcol;
   for( int i = 0; i < ncol; ++ i ) {
     new_label = region_parm[ nrow * i ];
-    idxcol = - new_label - 4;
+    idxcol = label2col( new_label );
     tumor_labels[ idxcol ] = 1;
     for( int j = 0; j < 8; ++ j ) {
       tumor_parm[ 8 * idxcol + j ] = region_parm[ nrow * i + j + 1 ];

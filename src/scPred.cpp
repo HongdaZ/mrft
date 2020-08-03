@@ -64,7 +64,7 @@ int scPred( vector<int> &labels, vector<int> &regions,  vector<int> &front,
       if( labels.size() == 1 ) {
         region_label = current;
       } else {
-        region_label = newTumorLabel( regions.size(), tumor_labels );
+        region_label = newTumorLabel( labels.size() - 1, tumor_labels );
         // region_label = ( *tumor_labels.begin() ) - regions.size();
         
       }

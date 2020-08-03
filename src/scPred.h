@@ -1,14 +1,8 @@
 #ifndef SCPRED_H
 #define SCPRED_H
 
-#include <list>
-#include <map>
-#include <set>
 #include <vector>
 
-using std::list;
-using std::map;
-using std::set;
 using std::vector;
 
 // split or combine for prediction
