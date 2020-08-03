@@ -120,7 +120,7 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   vector<double> whole_parm( 8, 0 );
   
   initRegion( region, front, ptr_res_seg, ptr_nidx, len,
-              n_voxel, tumor_labels );
+              n_voxel, tumor_labels, n_tumor );
   // Rprintf( "initRegion finished!\n" );
   // Rprintf( "tumor_regions.size = %d; tumor_labels.size() = %d\n", 
   //          tumor_regions.size(), tumor_labels.size() );

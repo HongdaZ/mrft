@@ -8,7 +8,7 @@
 
 void initRegion( vector<int> &region, vector<int> &front, int *ptr_seg, 
                  const int *ptr_nidx, int len, vector<int> &n_voxel, 
-                 vector<int> &labels ) {
+                 vector<int> &labels, int &n_tumor ) {
   int tumor_label = - 4;
   int n_region = 1;
   for( int i = 0; i < len; ++ i ) {
@@ -24,6 +24,7 @@ void initRegion( vector<int> &region, vector<int> &front, int *ptr_seg,
       }
       labels[ - tumor_label - 4 ] = 1;
       -- tumor_label;
+      ++ n_tumor;
     }
   }
   return;

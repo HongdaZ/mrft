@@ -42,7 +42,7 @@ void copyParm( vector<double> &health_parm,
   }
   return;
 }
-
+// health_parm: -1, -2, and -3
 void copyParmHealth( vector<double> &health_parm,
                      double *ptr_res_parm, const int &nrow ) {
   int j = 0;
@@ -51,7 +51,7 @@ void copyParmHealth( vector<double> &health_parm,
     curr_label = - i - 1;
     ptr_res_parm[ nrow * j ] = curr_label;
     for( int k = 0; k < 8; ++ k ) {
-      ptr_res_parm[ nrow * j + k + 1 ] = health_parm[ 8 * i + k ];
+      ptr_res_parm[ nrow * j + k + 1 ] = health_parm[ 8 * ( 2 - i ) + k ];
     }
     ++ j;
   }
