@@ -16,7 +16,7 @@ void initParm( vector<int> &region, vector<double> &theta,
                const double *ptr_lambda2, const int *ptr_nidx,
                const double *ptr_nintst, const double *ptr_alpha,
                const double *ptr_beta,
-               const vector<int> &n_voxel, const int &n_tumor,
+               const list<list<int>> &tumor_regions, const int &n_tumor,
                const double *ptr_a, const double *ptr_b, const int &len, 
                int maxit ) {
   // update parameters for tumor regions
