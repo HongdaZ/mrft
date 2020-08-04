@@ -3,9 +3,10 @@
 #include <algorithm> 
 #include <chrono> 
 #include <iostream> 
-using namespace std; 
-using namespace std::chrono; 
+#include <list>
 
+using namespace std; 
+using namespace std::chrono;
 // void debug() {
 //   vector<double> theta;
 //   for( int i = 0; i < 6; ++ i ) {
@@ -72,10 +73,10 @@ void debug() {
   // Get starting timepoint 
   auto start = high_resolution_clock::now(); 
   int a;
-  for( int i = 0; i < 1000; ++ i ){
+  for( int i = 0; i < values.size(); ++ i ){
     // if( values[ i ] <  0 ) {
-    // if( values[ i ] >  10000 ) {
-    if( values[ values[ i ] ] >  10000 ) {
+    if( values[ i ] >  10000 ) {
+    // if( values[ values[ i ] ] >  10000 ) {
       a = values[ i ];
     }
   }
@@ -96,6 +97,23 @@ void debug() {
   duration = duration_cast<microseconds>(stop - start); 
   cout  << "Time taken by resize: "
         << duration.count() << " microseconds" << endl; 
-  
+  list<int> region;
+  values.resize( 1000000 );
+  for( int i = 0; i < values.size(); ++ i ) {
+    region.push_back( i );
+  }
+  cout  << "length of list: " << region.size() << endl;
+  start = high_resolution_clock::now(); 
+  for( list<int>::iterator it = region.begin();
+       it != region.end(); ++ it ) {
+    if( *it > 1000 ) {
+      a = *it;
+    }
+    
+  }
+  stop = high_resolution_clock::now(); 
+  duration = duration_cast<microseconds>(stop - start); 
+  cout  << "Time taken by traverse: "
+        << duration.count() << " microseconds" << endl; 
   return; 
 }
