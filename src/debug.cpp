@@ -65,24 +65,20 @@ void debug() {
   vector<int> values( 1000000, 0 ); 
   
   // Generate Random values 
-  auto f = []() -> int { return rand() % 10000; }; 
+  auto f = []() -> int { return rand() % 1000000; }; 
   
   // Fill up the vector 
   generate(values.begin(), values.end(), f); 
-  Rprintf( "size of array: %d\n", values.size() );
   // Get starting timepoint 
   auto start = high_resolution_clock::now(); 
   int a;
-  for( int j = 0; j < 1000000; ++ j ) {
-    for( int i = 0; i < values.size(); ++ i ){
-      if( values[ i ] < 0 ) {
-        a = values[ i ];
-      }
-      
+  for( int i = 0; i < 1000; ++ i ){
+    // if( values[ i ] <  0 ) {
+    // if( values[ i ] >  10000 ) {
+    if( values[ values[ i ] ] >  10000 ) {
+      a = values[ i ];
     }
   }
-  
-  
   // Get ending timepoint 
   auto stop = high_resolution_clock::now(); 
   
@@ -90,9 +86,16 @@ void debug() {
   // get durarion. To cast it to proper unit 
   // use duration cast method 
   auto duration = duration_cast<microseconds>(stop - start); 
-  
-  cout << "Time taken by function: "
+  cout << "a = " << a << "\n"
+       << "Time taken by function: "
        << duration.count() << " microseconds" << endl; 
+  start = high_resolution_clock::now(); 
+  values.resize( 100000 );
+  values.resize( 0 );
+  stop = high_resolution_clock::now(); 
+  duration = duration_cast<microseconds>(stop - start); 
+  cout  << "Time taken by resize: "
+        << duration.count() << " microseconds" << endl; 
   
   return; 
 }
