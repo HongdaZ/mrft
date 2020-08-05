@@ -6,6 +6,7 @@
 using std::vector;
 
 // assign zero to all elements of the vector
-void zeroVector( vector<int> &v );
+template < typename T >
+void zeroVector( vector< T > &v );
 
 #endif

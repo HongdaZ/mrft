@@ -9,7 +9,7 @@
 
 void initRegion( vector<int> &region, vector<int> &front, 
                  list<list<int>> &tumor_regions, 
-                 list<int> &tumor_regions_label, int *ptr_seg, 
+                 int *ptr_seg, 
                  const int *ptr_nidx, const int &len,
                  vector<int> &labels, int &n_tumor ) {
   int tumor_label = - 4;
@@ -20,7 +20,7 @@ void initRegion( vector<int> &region, vector<int> &front,
       list<int> tumor_nbr;
       // a new tumor region
       list<int> new_region;
-      tumor_regions_label.push_back( tumor_label );
+      new_region.push_back( tumor_label );
       bool early_return;
       findRegion( region, front, n_region, ptr_seg, ptr_nidx, true, 
                   tumor_nbr, early_return, i + 1 );

@@ -12,7 +12,7 @@ using std::vector;
 
 void initRegion( vector<int> &region, vector<int> &front, 
                  list<list<int>> &tumor_regions, 
-                 list<int> &tumor_regions_label, int *ptr_seg, 
+                 int *ptr_seg, 
                  const int *ptr_nidx, const int &len,
                  vector<int> &labels, int &n_tumor );
 

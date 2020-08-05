@@ -13,14 +13,12 @@ void getRegion( vector<int> &region, const int &label, const int *ptr_seg,
   return;
 }
 
-void getRegion( vector<int> &region, const int &label, 
-                const vector<int> &regions,
-                const int &len, const int &row ){
+void getRegion( vector<int> &region, const list<int> &t_region ){
   clearVector( region );
-  for( int i = 1; i <= len; ++ i ) {
-    if( regions[ 2 * ( i - 1 ) + row ] == label ) {
-      region.push_back( i );
-    }
+  list<int>::const_iterator it = t_region.begin();
+  ++ it;
+  for( ; it != t_region.end(); ++ it ) {
+    region.push_back( *it );
   }
   return;
 }
