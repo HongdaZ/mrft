@@ -1,7 +1,7 @@
 #include <R.h>
 #include <Rinternals.h>
-#include <cmath>   
-#include <algorithm> 
+#include <cmath>
+#include <algorithm>
 #include <list>
 #include <vector>
 #include <map>
@@ -14,10 +14,11 @@ using std::vector;
 using std::map;
 using std::abs;
 using std::max;
+using std::min;
 
 // region starts from 1
 // update mu for healthy cells
-double updateMu( const int n,  
+double updateMu( const int n,
                  const double sigma2,
                  const double m,
                  const double nu2,
@@ -30,7 +31,7 @@ double updateMu( const int n,
 }
 
 // update mu for tumor cells
-double updateMu( const int n,  
+double updateMu( const int n,
                  const double sigma2,
                  const double m,
                  const double mk_1,
@@ -38,31 +39,38 @@ double updateMu( const int n,
                  const double b,
                  const double sum_theta,
                  const double sum_y ) {
-  double y_ = sum_y / n;
-  double d_ = 1 - sum_theta;
+  double e_ = 1 - sum_theta;
   double p;
-  if( d_ == 0 ) {
+  if( e_ == 0 ) {
     p = m;
   } else {
-    double a_ = mk_1 - y_; 
-    double b_ = ( a + 1 ) / ( n / sigma2 * pow( d_ , 2 ) );
-    double c_ = - b / ( n / sigma2 * pow( d_ , 2 ) );
+    double y_ = sum_y / n;
+    double a_ = mk_1 - y_;
+    double d_ = n / sigma2 * pow( e_ , 2 );
+    double b_ = ( a + 1 ) / d_;
+    double c_ = - b /  d_;
     vector<double> x( 3, 0 );
     int res = root( x, a_, b_, c_ );
     if( res == 1 ) {
       p = x[ 0 ] + mk_1;
     } else if( res == 2 ) {
-      if( ( x[ 0 ] + mk_1 ) > max( y_, mk_1 ) && ( x[ 0 ] + mk_1 ) < m ) {
-        p = x[ 0 ] + mk_1;
+      double tmp = x[ 0 ] + mk_1;
+      double max_ = max( max( y_, mk_1 ), m );
+      double min_ = min( max( y_, mk_1 ), m );
+      if( tmp >= min_ && tmp <= max_ ) {
+        p = tmp;
       } else {
         p = x[ 1 ] + mk_1;
       }
-    } else { 
-      if( ( x[ 0 ] + mk_1 ) > max( y_, mk_1 ) && ( x[ 0 ] + mk_1 ) < m ) {
-        p = x[ 0 ] + mk_1;
-      } else if( ( x[ 1 ] + mk_1 ) > max( y_, mk_1 ) 
-                   && ( x[ 1 ] + mk_1 ) < m ) {
-        p = x[ 1 ] + mk_1;
+    } else {
+      double tmp1 = x[ 0 ] + mk_1;
+      double tmp2 = x[ 1 ] + mk_1;
+      double max_ = max( max( y_, mk_1 ), m );
+      double min_ = min( max( y_, mk_1 ), m );
+      if( tmp1 >= min_ && tmp1 <= max_ ) {
+        p = tmp1;
+      } else if( tmp2 > min_ && tmp2 <= max_ ) {
+        p = tmp2;
       } else {
         p = x[ 2 ] + mk_1;
       }
@@ -72,7 +80,7 @@ double updateMu( const int n,
 }
 
 // update mu for outliers
-double updateMu( const int n,  
+double updateMu( const int n,
                  const double sigma2,
                  const double m,
                  const double mk_1,
@@ -80,35 +88,6 @@ double updateMu( const int n,
                  const double b,
                  const double sum_y ) {
   double sum_theta = 0;
-  double y_ = sum_y / n;
-  double d_ = 1 - sum_theta;
-  double p;
-  if( d_ == 0 ) {
-    p = m;
-  } else {
-    double a_ = mk_1 - y_; 
-    double b_ = ( a + 1 ) / ( n / sigma2 * pow( d_ , 2 ) );
-    double c_ = - b / ( n / sigma2 * pow( d_ , 2 ) );
-    vector<double> x( 3, 0 );
-    int res = root( x, a_, b_, c_ );
-    if( res == 1 ) {
-      p = x[ 0 ] + mk_1;
-    } else if( res == 2 ) {
-      if( ( x[ 0 ] + mk_1 ) > max( y_, mk_1 ) && ( x[ 0 ] + mk_1 ) < m ) {
-        p = x[ 0 ] + mk_1;
-      } else {
-        p = x[ 1 ] + mk_1;
-      }
-    } else { 
-      if( ( x[ 0 ] + mk_1 ) > max( y_, mk_1 ) && ( x[ 0 ] + mk_1 ) < m ) {
-        p = x[ 0 ] + mk_1;
-      } else if( ( x[ 1 ] + mk_1 ) > max( y_, mk_1 ) 
-                   && ( x[ 1 ] + mk_1 ) < m ) {
-        p = x[ 1 ] + mk_1;
-      } else {
-        p = x[ 2 ] + mk_1;
-      }
-    }
-  }
+  double p = updateMu( n, sigma2, m, mk_1, a, b, sum_theta, sum_y );
   return p;
 }
