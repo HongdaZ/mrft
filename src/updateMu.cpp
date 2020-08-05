@@ -1,17 +1,19 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <cmath>   
-
+#include <algorithm> 
 #include <list>
 #include <vector>
 #include <map>
 
 #include "updateMu.h"
+#include "root.h"
 
 using std::list;
 using std::vector;
 using std::map;
 using std::abs;
+using std::max;
 
 // region starts from 1
 // update mu for healthy cells
@@ -26,11 +28,7 @@ double updateMu( const int n,
   return mu;
   
 }
-double derivative( double mu, double sigma2, double sum_theta, 
-             double mean_y, int n, double a, double b, double m, double mk ) {
-  return n / sigma2 * pow( 1 - sum_theta, 2 ) * ( mean_y - mu ) -
-    ( a + 1 ) / ( mu - m ) + b / pow( mu - m, 2 );
-}
+
 // update mu for tumor cells
 double updateMu( const int n,  
                  const double sigma2,
@@ -40,40 +38,35 @@ double updateMu( const int n,
                  const double b,
                  const double sum_theta,
                  const double sum_y ) {
-  int max_itr = 100;
-  double l, r;
-  double mean_y = sum_y / n;
-  if( mean_y > mk_1 ) {
-    l = mean_y;
+  double y_ = sum_y / n;
+  double d_ = 1 - sum_theta;
+  double p;
+  if( d_ == 0 ) {
+    p = m;
   } else {
-    l = mk_1 + (  m- mk_1 ) / 1000;
-  }
-  r = m;
-  int i = 0;
-  double dif =  r - l;
-  double p = ( l + r ) / 2;
-  double tol = (  m- mk_1 ) / 1000 ;
-  
-  // Rprintf( "mean_y = %f \n", mean_y );
-  double fr = derivative( r, sigma2, sum_theta, mean_y, n, a, b, mk_1,  m);
-  double fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, mk_1,  m);
-  if( fl < 0 && fr < 0 ) {
-    return l;
-  }
-  double fp;
-  while( abs( dif ) > tol && i < max_itr &&
-         derivative( p, sigma2, sum_theta, mean_y, n, a, b, mk_1, m ) != 0 ) {
-    fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
-    fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
-    if( fp * fl < 0 ) {
-      r = p;
-    } else {
-      l = p;
+    double a_ = mk_1 - y_; 
+    double b_ = ( a + 1 ) / ( n / sigma2 * pow( d_ , 2 ) );
+    double c_ = - b / ( n / sigma2 * pow( d_ , 2 ) );
+    vector<double> x( 3, 0 );
+    int res = root( x, a_, b_, c_ );
+    if( res == 1 ) {
+      p = x[ 0 ] + mk_1;
+    } else if( res == 2 ) {
+      if( ( x[ 0 ] + mk_1 ) > max( y_, mk_1 ) && ( x[ 0 ] + mk_1 ) < m ) {
+        p = x[ 0 ] + mk_1;
+      } else {
+        p = x[ 1 ] + mk_1;
+      }
+    } else { 
+      if( ( x[ 0 ] + mk_1 ) > max( y_, mk_1 ) && ( x[ 0 ] + mk_1 ) < m ) {
+        p = x[ 0 ] + mk_1;
+      } else if( ( x[ 1 ] + mk_1 ) > max( y_, mk_1 ) 
+                   && ( x[ 1 ] + mk_1 ) < m ) {
+        p = x[ 1 ] + mk_1;
+      } else {
+        p = x[ 2 ] + mk_1;
+      }
     }
-    dif = r - l;
-    p = ( r + l ) / 2;
-    ++ i;
-    // Rprintf( "fp= %f\n", fp );
   }
   return p;
 }
@@ -87,40 +80,35 @@ double updateMu( const int n,
                  const double b,
                  const double sum_y ) {
   double sum_theta = 0;
-  int max_itr = 100;
-  double l, r;
-  double mean_y = sum_y / n;
-  if( mean_y > mk_1 ) {
-    l = mean_y;
+  double y_ = sum_y / n;
+  double d_ = 1 - sum_theta;
+  double p;
+  if( d_ == 0 ) {
+    p = m;
   } else {
-    l = mk_1 + ( m - mk_1 ) / 1000;
-  }
-  r = m;
-  int i = 0;
-  double dif =  r - l;
-  double p = ( l + r ) / 2;
-  double tol = ( m - mk_1 ) / 1000 ;
-  
-  // Rprintf( "mean_y = %f \n", mean_y );
-  double fr = derivative( r, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
-  double fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
-  if( fl < 0 && fr < 0 ) {
-    return l;
-  }
-  double fp;
-  while( abs( dif ) > tol && i < max_itr &&
-         derivative( p, sigma2, sum_theta, mean_y, n, a, b, mk_1, m ) != 0 ) {
-    fp = derivative( p, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
-    fl = derivative( l, sigma2, sum_theta, mean_y, n, a, b, mk_1, m );
-    if( fp * fl < 0 ) {
-      r = p;
-    } else {
-      l = p;
+    double a_ = mk_1 - y_; 
+    double b_ = ( a + 1 ) / ( n / sigma2 * pow( d_ , 2 ) );
+    double c_ = - b / ( n / sigma2 * pow( d_ , 2 ) );
+    vector<double> x( 3, 0 );
+    int res = root( x, a_, b_, c_ );
+    if( res == 1 ) {
+      p = x[ 0 ] + mk_1;
+    } else if( res == 2 ) {
+      if( ( x[ 0 ] + mk_1 ) > max( y_, mk_1 ) && ( x[ 0 ] + mk_1 ) < m ) {
+        p = x[ 0 ] + mk_1;
+      } else {
+        p = x[ 1 ] + mk_1;
+      }
+    } else { 
+      if( ( x[ 0 ] + mk_1 ) > max( y_, mk_1 ) && ( x[ 0 ] + mk_1 ) < m ) {
+        p = x[ 0 ] + mk_1;
+      } else if( ( x[ 1 ] + mk_1 ) > max( y_, mk_1 ) 
+                   && ( x[ 1 ] + mk_1 ) < m ) {
+        p = x[ 1 ] + mk_1;
+      } else {
+        p = x[ 2 ] + mk_1;
+      }
     }
-    dif = r - l;
-    p = ( r + l ) / 2;
-    ++ i;
-    // Rprintf( "fp= %f\n", fp );
   }
   return p;
 }
