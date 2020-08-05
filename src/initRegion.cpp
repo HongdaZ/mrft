@@ -14,7 +14,7 @@ void initRegion( vector<int> &region, vector<int> &front,
                  vector<int> &labels, int &n_tumor ) {
   int tumor_label = - 4;
   int n_region = 1;
-  int idxcol;
+  int cidx;
   for( int i = 0; i < len; ++ i ) {
     if( ptr_seg[ 2 * i ] > 0 ) {
       list<int> tumor_nbr;
@@ -30,8 +30,8 @@ void initRegion( vector<int> &region, vector<int> &front,
         new_region.push_back( *it );
       }
       tumor_regions.push_back( new_region );
-      idxcol = label2col( tumor_label );
-      labels[ idxcol ] = 1;
+      cidx = label2col( tumor_label );
+      labels[ cidx ] = 1;
       -- tumor_label;
       ++ n_tumor;
     }

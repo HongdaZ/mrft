@@ -11,13 +11,13 @@ void addRegion( int *ptr_seg,
   int nrow = 1 + 2 + 6;
   int ncol = region_parm.size() / nrow;
   int new_label;
-  int idxcol;
+  int cidx;
   for( int i = 0; i < ncol; ++ i ) {
     new_label = region_parm[ nrow * i ];
-    idxcol = label2col( new_label );
-    tumor_labels[ idxcol ] = 1;
+    cidx = label2col( new_label );
+    tumor_labels[ cidx ] = 1;
     for( int j = 0; j < 8; ++ j ) {
-      tumor_parm[ 8 * idxcol + j ] = region_parm[ nrow * i + j + 1 ];
+      tumor_parm[ 8 * cidx + j ] = region_parm[ nrow * i + j + 1 ];
     }
     ++ n_tumor;
   }
@@ -40,13 +40,13 @@ void addRegion( int *ptr_seg,
   int nrow = 1 + 2 + 6;
   int ncol = region_parm.size() / nrow;
   int new_label;
-  int idxcol;
+  int cidx;
   for( int i = 0; i < ncol; ++ i ) {
     new_label = region_parm[ nrow * i ];
-    idxcol = label2col( new_label );
-    tumor_labels[ idxcol ] = 1;
+    cidx = label2col( new_label );
+    tumor_labels[ cidx ] = 1;
     for( int j = 0; j < 8; ++ j ) {
-      tumor_parm[ 8 * idxcol + j ] = region_parm[ nrow * i + j + 1 ];
+      tumor_parm[ 8 * cidx + j ] = region_parm[ nrow * i + j + 1 ];
     }
     ++ n_tumor;
   }

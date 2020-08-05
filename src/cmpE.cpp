@@ -14,10 +14,10 @@ void cmpE3( int idx, vector<double> &health_parm,
   int min_label;
   double mu;
   double sigma2;
-  int idxcol;
+  int cidx;
   for( int i = - 1; i > - 4; -- i ) {
-    idxcol = label2col( i );
-    getParm( mu, sigma2, theta, health_parm, idxcol );
+    cidx = label2col( i );
+    getParm( mu, sigma2, theta, health_parm, cidx );
     energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
                       ptr_intst, ptr_nintst, theta );
     energy += energyX( i, idx, false, ptr_seg, ptr_nidx,

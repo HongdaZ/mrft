@@ -170,14 +170,14 @@ void cmpET( vector<int> &region, int idx, int sc,
     double mu, sigma2;
     vector<double> &t_theta = theta;
     vector<double> &h_theta = theta;
-    int idxcol;
+    int cidx;
     int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
     if( curr_label > - 4 && curr_label < 1 ) {
       double &h_energy = energy;
       double &h_mu = mu, &h_sigma2 = sigma2;
       for( int i = - 1; i > - 4; -- i ) {
-        idxcol = label2col( i );
-        getParm( h_mu, h_sigma2, h_theta, health_parm, idxcol );
+        cidx = label2col( i );
+        getParm( h_mu, h_sigma2, h_theta, health_parm, cidx );
         h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,
                             ptr_intst, ptr_nintst, h_theta );
         h_energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
@@ -205,9 +205,9 @@ void cmpET( vector<int> &region, int idx, int sc,
         int t_idx = tumor_idx;
         t_label = ptr_seg[ 2 * ( t_idx - 1 ) ];
         // tumor energy
-        int idxcol = label2col( t_label );
+        int cidx = label2col( t_label );
         double &t_mu = mu, &t_sigma2 = sigma2;
-        getParm( t_mu, t_sigma2, t_theta, tumor_parm, idxcol );
+        getParm( t_mu, t_sigma2, t_theta, tumor_parm, cidx );
         double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
                                    t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
                                    ptr_nidx, ptr_intst, ptr_nintst,
@@ -230,8 +230,8 @@ void cmpET( vector<int> &region, int idx, int sc,
         vector<int> out_region;
         out_region.push_back( idx );
         if( curr_label > 0 ) {
-          idxcol = label2col( curr_label );
-          getParm( out_mu, out_sigma2, outl_parm, idxcol );
+          cidx = label2col( curr_label );
+          getParm( out_mu, out_sigma2, outl_parm, cidx );
         } else {
           updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ],
                       ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,

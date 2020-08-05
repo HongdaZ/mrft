@@ -6,10 +6,10 @@ void eraseRegion( const int tumor_label,
                   vector<int> &tumor_labels,
                   vector<double> &tumor_parm,
                   int &n_tumor ) {
-  int idxcol = label2col( tumor_label );
-  tumor_labels[ idxcol ] = 0;
+  int cidx = label2col( tumor_label );
+  tumor_labels[ cidx ] = 0;
   for( int i = 0; i < 8; ++ i ) {
-    tumor_parm[ 8 * idxcol + i ] = 0;
+    tumor_parm[ 8 * cidx + i ] = 0;
   }
   -- n_tumor;
   return;
