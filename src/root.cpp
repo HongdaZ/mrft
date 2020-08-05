@@ -70,6 +70,6 @@ int root( vector<double> &x, double a, double b, double c) {
     x[ 1 ] = -0.5 * ( A + B ) - a;
     x[ 2 ] = 0.5 * sqrt( 3. ) * ( A - B );
     if( fabs( x[ 2 ] ) < eps ) { x[ 2 ] = x[ 1 ]; return(2); }
-    return(1);
+    return( 1 );
   }
 }
