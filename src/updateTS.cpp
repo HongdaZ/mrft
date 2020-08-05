@@ -14,17 +14,17 @@ using std::vector;
 
 // region starts from 1
 // updateTheta and sigma2 for health and tumorous regions
-void updateTS( const int nrow, int curr_label,
-               const double mu,
+void updateTS( const int &nrow,
+               const double &mu,
                double &sigma2,
-               const double lambda2,
+               const double &lambda2,
                const int *ptr_seg,
                const int *ptr_nidx,
                const double *ptr_intst,
                const double *ptr_nintst,
                vector<double> &theta,
-               const double alphal,
-               const double betal,
+               const double &alphal,
+               const double &betal,
                double *yl, double *yln,
                const double *yln_,
                const double *yln_i,
@@ -115,9 +115,9 @@ void updateTS( const int nrow, int curr_label,
   // ////////////////////////////////////
   double sum = betal;
   for( int i = 0; i < nrow; ++ i ) {
-    sum += pow( yl[ i ], 2 ) / 2;
+    sum += pow( yl[ i ], 2. ) / 2.;
   }
-  sigma2 = sum / ( nrow / (double)2 + alphal + 1 );
+  sigma2 = sum / ( nrow / 2. + alphal + 1 );
 
   delete [] I;
   delete [] tmp;
