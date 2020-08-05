@@ -116,7 +116,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
             ptr_intst, ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha,
             ptr_res_beta, tumor_regions,
             n_tumor, ptr_a, ptr_b, len, 20 );
-  updateBeta( ptr_res_beta, ptr_alpha, health_parm, n_voxel, n_tumor,
+  updateBeta( ptr_res_beta, ptr_alpha, health_parm, n_tumor,
               tumor_parm );
   int old_label = 0;
   int new_label = 0;
