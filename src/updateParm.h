@@ -39,9 +39,9 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  const double alphal,
                  const double betal,
                  const int &maxit );
-// update parameters for outliers
+// update parameters for outliers or single point tumor regions
 void updateParm( double &mu, double &sigma2, 
-                 const vector<int> &region,
+                 const int idx,
                  const double m,
                  const double mk_1,
                  const double a,

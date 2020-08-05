@@ -11,7 +11,8 @@ using std::list;
 using std::vector;
 
 void initRegion( vector<int> &region, vector<int> &front, 
-                 list<list<int>> &tumor_regions, int *ptr_seg, 
+                 list<list<int>> &tumor_regions, 
+                 list<int> &tumor_regions_label, int *ptr_seg, 
                  const int *ptr_nidx, const int &len,
                  vector<int> &labels, int &n_tumor );
 

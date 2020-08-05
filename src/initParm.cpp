@@ -22,23 +22,23 @@ void initParm( vector<int> &region, vector<double> &theta,
   // update parameters for tumor regions
   int count = 0;
   double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
-  for( int i = 0; i < len; ++ i ) {
-    if( n_voxel[ i ] != 0 ) {
-      if( first_run || n_voxel[ i ] != 1 ) {
-        int curr_label = - i - 4;
-        // region starts from 1
-        getRegion( region, curr_label, ptr_seg, len );
-        
-        updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
-                    ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
-                    curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
-                    ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
-        assignParm( tumor_parm, curr_label, mu, sigma2, theta );
-      }
-      ++ count;
-      if( count == n_tumor ) {
-        break;
-      }
+  int curr_label;
+  for( list<list<int>>::const_iterator it = tumor_regions.begin();
+       it != tumor_regions.end(); ++ it ) {
+    if( first_run || it->size() > 2 ) {
+      curr_label = it->front();
+      // region starts from 1
+      getRegion( region, curr_label, ptr_seg, len );
+      
+      updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
+                  ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
+                  curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
+                  ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
+      assignParm( tumor_parm, curr_label, mu, sigma2, theta );
+    }
+    ++ count;
+    if( count == n_tumor ) {
+      break;
     }
   }
   // Initialize parameters for healthy regions

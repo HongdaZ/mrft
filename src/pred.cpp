@@ -78,6 +78,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   // 0, 1, 2, ... = 1, 2, 3, ...
   vector<double> outl_parm( 2 * len, 0 );
   list<list<int>> tumor_regions;
+  list<int> tumor_regions_label;
   
   // whole and subregions in sc functions
   vector<int> regions_whole;
@@ -107,7 +108,8 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   vector<double> new_out_parm( 2, 0 );
   vector<double> whole_parm( 8, 0 );
   
-  initRegion( region, front, tumor_regions, ptr_res_seg, ptr_nidx, len,
+  initRegion( region, front, tumor_regions, tumor_regions_label,
+              ptr_res_seg, ptr_nidx, len,
               tumor_labels, n_tumor );
   Rprintf( "n_tumor = %d\n", n_tumor );
   initParm( region, theta, true, health_parm, tumor_parm, ptr_res_seg,

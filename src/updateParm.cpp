@@ -149,9 +149,9 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   return;
 }
 
-// update parameters for outliers
+// update parameters for outliers or single point tumor regions
 void updateParm( double &mu, double &sigma2, 
-                 const vector<int> &region,
+                 const int idx,
                  const double m,
                  const double mk_1,
                  const double a,
@@ -168,7 +168,6 @@ void updateParm( double &mu, double &sigma2,
   double tol = 1;
   double tmp = 0;
   mu = - 1;
-  int idx = region[ 0 ];
   double sum_y = ptr_intst[ idx - 1 ];
   int n = 1;
   while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
