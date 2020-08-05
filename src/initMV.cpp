@@ -8,7 +8,7 @@ void initMV( const vector<int> &region, double *yln_,
              double *yln_i, double *yl_, double &sum_y,
              const double *ptr_intst, const int *ptr_nidx,
              const double *ptr_nintst, const int *ptr_seg, 
-             const int curr_label ) {
+             const int &curr_label ) {
   int nrow = region.size();
   int ncol = 6;
   int idx;
@@ -53,7 +53,7 @@ void initMV( const vector<int> &region, double *yln_,
 }
 // initialize yl and yln
 void initMV( double *yl, const double *yl_, double *yln, const double *yln_,
-             const double *yln_i, const int nrow, const double mu ) {
+             const double *yln_i, const int &nrow, const double &mu ) {
   int ncol = 6;
   for( int j = 0; j < nrow; ++ j ) {
     yl[ j ] = yl_[ j ] - mu;

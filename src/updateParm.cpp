@@ -15,17 +15,17 @@ using std::abs;
 // update parameters for healthy cells
 void updateParm( double &mu, vector<double> &theta, double &sigma2, 
                  const vector<int> &region,
-                 const double m,
-                 const double nu2,
+                 const double &m,
+                 const double &nu2,
                  const double *ptr_intst,
-                 int curr_label,
+                 const int &curr_label,
                  const double lambda2,
                  int *ptr_seg,
                  const int *ptr_nidx,
                  const double *ptr_nintst,
-                 const double alphal,
-                 const double betal,
-                 int maxit ) {
+                 const double &alphal,
+                 const double &betal,
+                 const int &maxit ) {
 
   for( int i = 0; i < 6; ++ i ) {
     theta[ i ] = 0;
@@ -59,7 +59,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     // Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );
     mu = tmp;
-    updateTS( nrow, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
+    updateTS( nrow, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
               ptr_intst, ptr_nintst, theta, alphal, betal, yl, yln,
               yln_, yln_i, yl_ );
     // for( int j = 0; j < 6; ++ j ) {
@@ -86,14 +86,14 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  const double a,
                  const double b,
                  const double *ptr_intst,
-                 const int curr_label,
+                 const int &curr_label,
                  const double lambda2,
                  int *ptr_seg,
                  const int *ptr_nidx,
                  const double *ptr_nintst,
                  const double alphal,
                  const double betal,
-                 int maxit ) {
+                 const int &maxit ) {
   for( int i = 0; i < 6; ++ i ) {
     theta[ i ] = 0;
   }
@@ -129,7 +129,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     // Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );
     mu = tmp;
-    updateTS( nrow, curr_label, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
+    updateTS( nrow, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
               ptr_intst, ptr_nintst, theta, alphal, betal, yl, yln,
               yln_, yln_i, yl_ );
     // for( int j = 0; j < 6; ++ j ) {
@@ -157,13 +157,13 @@ void updateParm( double &mu, double &sigma2,
                  const double a,
                  const double b,
                  const double *ptr_intst,
-                 int curr_label,
+                 const int &curr_label,
                  const double lambda2,
                  int *ptr_seg,
                  const int *ptr_nidx,
                  const double alphal,
                  const double betal,
-                 int maxit ) {
+                 const int &maxit ) {
   int i = 0;
   double tol = 1;
   double tmp = 0;
