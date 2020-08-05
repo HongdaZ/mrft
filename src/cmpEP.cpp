@@ -13,6 +13,7 @@
 #include "assignParm.h"
 #include "label2col.h"
 #include "getParm.h"
+#include "zeroVector.h"
 
 // compare energy for prediction
 void cmpEP( vector<int> &region, int idx, int sc,
@@ -306,12 +307,12 @@ void cmpEP( vector<int> &region, int idx, int sc,
       }
       // new tumor region parameters
       double &t_mu = mu, &t_sigma2 = sigma2; // t_sigma2 has to be non-zero;
-      vector<int> new_region;
-      new_region.push_back( idx );
-      updateParm( t_mu, t_theta, t_sigma2, new_region, ptr_m[ 3 ],
+      zeroVector( t_theta );
+      // use the function for outliers and single voxel tumor regions
+      updateParm( t_mu, t_sigma2, idx, ptr_m[ 3 ],
                   ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ],
-                  ptr_intst, t_label, ptr_lambda2[ 3 ], ptr_seg,
-                  ptr_nidx, ptr_nintst, ptr_alpha[ 3 ],
+                  ptr_intst, ptr_seg,
+                  ptr_alpha[ 3 ],
                   ptr_beta[ 3 ], 20 );
       vector<double> &new_parm = tmp_parm;
       new_parm[ 0 ] = t_label;
