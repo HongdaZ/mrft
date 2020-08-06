@@ -5,43 +5,59 @@
 
 using std::vector;
 
+// calculate energy for tumor regions
 double energyY( const vector<int> &region,
-                double mu,
-                double mk1,
-                double sigma2,
-                double lambda2,
+                const double &mu,
+                const double &mk1,
+                const double &sigma2,
+                const double &lambda2,
                 int *ptr_seg,
                 const int *ptr_nidx,
                 const double *ptr_intst,
                 const double *ptr_nintst,
                 const vector<double> &theta,
-                double alphak,
-                double betak,
-                double a, double b );
-double energyY( const int current_label,
-                const int current_idx,
-                double mu,
-                double sigma2,
+                const double &alphak,
+                const double &betak,
+                const double &a, double &b );
+// Single point energyY for healty voxel
+double energyY( const int &curr_label,
+                const int &curr_idx,
+                const double &mu,
+                const double &sigma2,
                 const int *ptr_seg,
                 const int *ptr_nidx,
                 const double *ptr_intst,
                 const double *ptr_nintst,
                 const vector<double> &theta );
-// Single point energyY for tumor or outlier
+// Single point energyY for tumor voxel
+// having tumor neighbor
 double energyY( const int curr_label,
                 const int curr_idx,
-                double mu,
-                double mk1,
-                double sigma2,
-                double lambda2,
+                const double &mu,
+                const double &mk1,
+                const double &sigma2,
+                const double &lambda2,
                 const int *ptr_seg,
                 const int *ptr_nidx,
                 const double *ptr_intst,
                 const double *ptr_nintst,
                 const vector<double> &theta,
-                double alphak,
-                double betak,
-                double a, double b );
+                const double &alphak,
+                const double &betak,
+                const double &a, const double &b );
+// Single point energyY for tumor without tumor neighbor
+// or outlier
+double energyY( const int &curr_label,
+                const int &curr_idx,
+                const double &mu,
+                const double &mk1,
+                const double &sigma2,
+                const double &lambda2,
+                const int *ptr_seg,
+                const double *ptr_intst,
+                const double &alphak,
+                const double &betak,
+                const double &a, const double &b );
                             
 
 #endif

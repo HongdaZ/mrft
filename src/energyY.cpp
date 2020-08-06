@@ -17,18 +17,18 @@ using std::find;
 // region starts from 1
 // calculate energy for tumor regions
 double energyY( const vector<int> &region,
-               double mu,
-               double mk1,
-               double sigma2,
-               double lambda2,
-               int *ptr_seg,
-               const int *ptr_nidx,
-               const double *ptr_intst,
-               const double *ptr_nintst,
-               const vector<double> &theta,
-               double alphak,
-               double betak,
-               double a, double b ){
+                const double &mu,
+                const double &mk1,
+                const double &sigma2,
+                const double &lambda2,
+                int *ptr_seg,
+                const int *ptr_nidx,
+                const double *ptr_intst,
+                const double *ptr_nintst,
+                const vector<double> &theta,
+                const double &alphak,
+                const double &betak,
+                const double &a, double &b ){
   // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
   labelRegion( region, ptr_seg );
   
@@ -97,10 +97,10 @@ double energyY( const vector<int> &region,
 }
 
 // Single point energyY for healty voxel
-double energyY( const int curr_label,
-                const int curr_idx,
-                double mu,
-                double sigma2,
+double energyY( const int &curr_label,
+                const int &curr_idx,
+                const double &mu,
+                const double &sigma2,
                 const int *ptr_seg,
                 const int *ptr_nidx,
                 const double *ptr_intst,
@@ -132,65 +132,61 @@ double energyY( const int curr_label,
   return energy;
 }
 
-// Single point energyY for tumor or outlier
+// Single point energyY for tumor voxel
+// having tumor neighbor
 double energyY( const int curr_label,
                 const int curr_idx,
-                double mu,
-                double mk1,
-                double sigma2,
-                double lambda2,
+                const double &mu,
+                const double &mk1,
+                const double &sigma2,
+                const double &lambda2,
                 const int *ptr_seg,
                 const int *ptr_nidx,
                 const double *ptr_intst,
                 const double *ptr_nintst,
                 const vector<double> &theta,
-                double alphak,
-                double betak,
-                double a, double b ) {
+                const double &alphak,
+                const double &betak,
+                const double &a, const double &b ) {
   double curr_intst = ptr_intst[ curr_idx - 1 ];
   curr_intst -= mu;
-  double nbr_intst[ 6 ];
-  int count = 0;
+  double energy = curr_intst;
+  double nbr_intst;
   
   for( int i = 0; i < 6; ++ i ) {
     int nidx =  ptr_nidx[ 6 * ( curr_idx - 1 ) + i ];
     if( nidx != NA_INTEGER ) {
       int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
       if( nlabel == curr_label ) {
-        nbr_intst[ i ] = ptr_nintst[ 6 * ( curr_idx - 1 ) + i ] - mu;
-        ++ count;
-      } else {
-        nbr_intst[ i ] = 0;
+        nbr_intst = ptr_nintst[ 6 * ( curr_idx - 1 ) + i ] - mu;
+        energy -= theta[ i ] * nbr_intst;
       }
-    } else {
-      nbr_intst[ i ] = 0;
     }
-  }
-  
-  double energy = curr_intst;
-  for( int i = 0; i < 6; ++ i ) {
-    energy -= theta[ i ] * nbr_intst[ i ];
   }
   energy = pow( energy, 2 ) / ( 2 * sigma2 ) + log( sigma2 ) / 2;
-  
-  if( count == 0 ) {
-    energy = energy + ( a + 1 ) * log( mu - mk1 ) + b / ( mu - mk1 ) - 
-      log( pow( b, a ) / tgamma( a ) );
-    
-    energy = energy + ( alphak + 1 ) * log( sigma2 ) + betak / sigma2 -
-      log( pow( betak, alphak ) / tgamma( alphak ) );
-    int ncol = 6;
-    double pi = 3.1415926;
-    double sum_theta = 0;
-    for( int i = 0; i < 6; ++ i ) {
-      sum_theta += pow( theta[ i ], 2 ); 
-    }
-    
-    energy = energy + log( 2 * pi ) * ncol / 2 + log( lambda2 ) * ncol / 2 + 
-      sum_theta / ( 2 * lambda2 );
-  }
-  
-  
+  return energy;
+}
+// Single point energyY for tumor without tumor neighbor
+// or outlier
+double energyY( const int &curr_label,
+                const int &curr_idx,
+                const double &mu,
+                const double &mk1,
+                const double &sigma2,
+                const double &lambda2,
+                const int *ptr_seg,
+                const double *ptr_intst,
+                const double &alphak,
+                const double &betak,
+                const double &a, const double &b ) {
+  double curr_intst = ptr_intst[ curr_idx - 1 ];
+  curr_intst -= mu;
+  double energy = curr_intst;
+  energy = pow( energy, 2 ) / ( 2 * sigma2 ) + log( sigma2 ) / 2;
+  energy = energy + ( a + 1 ) * log( mu - mk1 ) + b / ( mu - mk1 ) -
+    log( pow( b, a ) / tgamma( a ) );
+  energy = energy + ( alphak + 1 ) * log( sigma2 ) + betak / sigma2 -
+    log( pow( betak, alphak ) / tgamma( alphak ) );
   return energy;
 }
 

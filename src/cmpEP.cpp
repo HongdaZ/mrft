@@ -259,7 +259,7 @@ void cmpEP( vector<int> &region, int idx, int sc,
       }
       out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ],
                              out_sigma2, ptr_lambda2[ 3 ], ptr_seg,
-                             ptr_nidx, ptr_intst, ptr_nintst, out_theta,
+                             ptr_intst,
                              ptr_alpha[ 3 ],ptr_beta[ 3 ], ptr_a[ 0 ],
                              ptr_b[ 0 ] );
       // Rprintf( "out_label = %d; out_energy = %f; out_mu = %f; out_sigma2 = %f\n",
@@ -306,8 +306,8 @@ void cmpEP( vector<int> &region, int idx, int sc,
         t_label = newTumorLabel( 1, tumor_labels );
       }
       // new tumor region parameters
-      double &t_mu = mu, &t_sigma2 = sigma2; // t_sigma2 has to be non-zero;
-      zeroVector( t_theta );
+      // t_sigma2 has to be non-zero;
+      double &t_mu = mu, &t_sigma2 = sigma2; 
       // use the function for outliers and single voxel tumor regions
       updateParm( t_mu, t_sigma2, idx, ptr_m[ 3 ],
                   ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ],
@@ -323,8 +323,7 @@ void cmpEP( vector<int> &region, int idx, int sc,
       }
       double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
                                  t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
-                                 ptr_nidx, ptr_intst, ptr_nintst,
-                                 t_theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
+                                 ptr_intst, ptr_alpha[ 3 ], ptr_beta[ 3 ],
                                  ptr_a[ 0 ], ptr_b[ 0 ] );
       t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
                            ptr_delta[ 0 ], ptr_gamma[ 0 ] );
