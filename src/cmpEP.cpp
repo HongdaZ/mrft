@@ -95,8 +95,8 @@ void cmpEP( vector<int> &region, int idx, int sc,
     double out_energy = energyX( out_label, idx, true, ptr_seg, ptr_nidx,
                                  ptr_delta[ 0 ], ptr_gamma[ 0 ] );
     out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], out_sigma2,
-                           ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_intst,
-                           ptr_nintst, out_theta, ptr_alpha[ 3 ],
+                           ptr_lambda2[ 3 ], ptr_seg, ptr_intst,
+                           ptr_alpha[ 3 ],
                            ptr_beta[ 3 ], ptr_a[ 0 ], ptr_b[ 0 ] );
     
     // single voxel energy ( -1, -2, -3 )
