@@ -67,8 +67,9 @@ SEXP est3( SEXP model, SEXP delta, SEXP gamma,
   vector<double> theta( 6, 0 );
   
   // Initialize parameters for healthy regions
-  initParmHealth3( region, theta, health_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst, 
-                   ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 
+  initParmHealth3( region, theta, health_parm, ptr_res_seg, ptr_m,
+                   ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
+                   ptr_nintst, ptr_alpha, 
                    ptr_res_beta, len, 20 );
   updateBeta3( ptr_res_beta, ptr_alpha, health_parm );
   
@@ -78,7 +79,8 @@ SEXP est3( SEXP model, SEXP delta, SEXP gamma,
              ptr_delta, ptr_gamma, theta );
      
     }
-    initParmHealth3( region, theta, health_parm, ptr_res_seg, ptr_m, ptr_nu2, ptr_intst, 
+    initParmHealth3( region, theta, health_parm, ptr_res_seg, ptr_m,
+                     ptr_nu2, ptr_intst, 
                      ptr_lambda2, ptr_nidx, ptr_nintst, ptr_alpha, 
                      ptr_res_beta, len, 20 );
   }

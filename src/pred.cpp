@@ -10,6 +10,7 @@
 #include "scPred.h"
 #include "initParm.h"
 #include "cmpEP.h"
+#include "cmpE.h"
 #include "updateBeta.h"
 #include "skip.h"
 #include "debug.h"
@@ -121,6 +122,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   int old_label = 0;
   int new_label = 0;
   int curr_idx = 0;
+  int curr_intst = 0;
   auto start = high_resolution_clock::now(); 
   auto stop = high_resolution_clock::now(); 
   auto duration = duration_cast<microseconds>(stop - start); 
@@ -129,36 +131,22 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   for( int i = 0; i < *ptr_maxit; ++ i ) {
     for( int j = 1; j <= len; ++ j ) {
       curr_idx = j;
-      // skip the voxels whose label remain the same in 5 consecutive
-      // updates
-      // skip_curr = skip( j, ptr_res_seg, ptr_nidx, ptr_intst, lower, upper,
-      //                   search[ j - 1 ], 3 );
-
-      old_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
-      // Get starting timepoint
-      start = high_resolution_clock::now();
-      int sc = scPred( labels, regions, front, region, tumor_labels,
-                       n_voxel, ptr_res_seg, ptr_nidx, len, curr_idx );
-      // Get ending timepoint
-      stop = high_resolution_clock::now();
-      // Get duration. Substart timepoints to
-      // get durarion. To cast it to proper unit
-      // use duration cast method
-      duration = duration_cast<microseconds>(stop - start);
-      if( spend < duration.count() ) {
-        spend =  duration.count();
-        max_idx = curr_idx;
+      curr_intst = ptr_intst[ curr_idx - 1 ];
+      if( curr_intst < m[ 2 ] ) {
+        cmpE3( j, health_parm, ptr_res_seg,ptr_nidx, ptr_intst, ptr_nintst, 
+               ptr_delta, ptr_gamma, theta );
+      } else {
+        int sc = scPred( labels, regions, front, region, tumor_labels,
+                         n_voxel, ptr_res_seg, ptr_nidx, len, curr_idx );
+        cmpEP( region, curr_idx, sc, labels, regions, tumor_labels,
+               outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
+               ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
+               ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
+               ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+               new_out_parm, whole_parm, n_tumor, n_outl, len );
       }
 
-      // cmpEP( region, curr_idx, sc, labels, regions, tumor_labels,
-      //        outl_labels, health_parm, tumor_parm, outl_parm, ptr_res_seg,
-      //        ptr_nidx, ptr_intst, ptr_nintst, ptr_delta, ptr_gamma,
-      //        ptr_alpha, ptr_res_beta, ptr_lambda2, ptr_a, ptr_b, ptr_m,
-      //        ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-      //        new_out_parm, whole_parm, n_tumor, n_outl, len );
-      new_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
-      // Rprintf( "j = %d,\t curr_idx = %d,\t sc = %d,\t old = %d,\t new = %d,\t time = %d\n",
-      //          j, curr_idx, sc, old_label, new_label, duration.count() );
+      
     }
     Rprintf( "update parm for healthy and tumorous\n" );
     //update parm for healthy and tumorous regions
