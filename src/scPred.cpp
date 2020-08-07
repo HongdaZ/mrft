@@ -71,12 +71,15 @@ int scPred( int &n_region, list<list<int>> &tumor_regions,
       assignRegion( regions_whole, regions_sub, region, region_label );
       ++ n_region;
     }
+   
     regions_whole.push_back( NA_INTEGER );
     // restore the value of seg[ 2, ] to 0;
     ptr_label[ 2 * start - 1  ] = 0;
     if( n_region < 2 ) {
       return 0;
     } else {
+      // count whole region
+      ++ n_region;
       return 1;
     }
   } else {
@@ -87,7 +90,11 @@ int scPred( int &n_region, list<list<int>> &tumor_regions,
     int combine_label = tumor_label.back();
     regions_whole.push_back( combine_label );
     regions_whole.push_back( start );
-
+    // add whole region
+    ++ n_region;
+    // add sub-regions
+    n_region += tumor_label.size();
+    
     for( list<int>::iterator it = tumor_label.begin();
          it != tumor_label.end(); ++ it ) {
       assignRegion( regions_whole, regions_sub, tumor_regions,

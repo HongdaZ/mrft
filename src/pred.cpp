@@ -137,13 +137,15 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
         int sc = scPred( n_region, tumor_regions, front, region, 
                          tumor_labels, ptr_res_seg, ptr_nidx, 
                          len, curr_idx, regions_whole, regions_sub );
-        cmpEP( region, curr_idx, sc, labels, regions, tumor_labels,
-               outl_labels, health_parm, tumor_parm, outl_parm, 
+        cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
+               tumor_labels, outl_labels, health_parm, 
+               tumor_parm, outl_parm, 
                ptr_res_seg, ptr_nidx, ptr_intst, ptr_nintst, 
                ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta, 
                ptr_lambda2, ptr_a, ptr_b, ptr_m,
                ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-               new_out_parm, whole_parm, n_tumor, n_outl, len );
+               new_out_parm, whole_parm, n_tumor, n_outl, 
+               len, n_region );
       }
 
       

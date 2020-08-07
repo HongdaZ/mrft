@@ -16,8 +16,9 @@
 #include "zeroVector.h"
 
 // compare energy for prediction
-void cmpEP( vector<int> &region, int idx, int sc,
-            const vector<int> &labels, const vector<int> &regions,
+void cmpEP( vector<int> &region, const int &idx, const int &sc,
+            const vector<int> &regions_whole,
+            const vector<int> &regions_sub,
             vector<int> &tumor_labels, vector<int> &outl_labels,
             const vector<double> &health_parm,
             vector<double> &tumor_parm, 
@@ -42,7 +43,7 @@ void cmpEP( vector<int> &region, int idx, int sc,
             // whole_parm( 8, 0 )
             vector<double> &whole_parm,
             int &n_tumor, int &n_outl,
-            const int &len ) {
+            const int &len, const int &n_region ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier or healthy cell
