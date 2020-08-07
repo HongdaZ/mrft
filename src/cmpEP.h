@@ -41,6 +41,8 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
             // whole_parm( 8, 0 )
             vector<double> &whole_parm,
             int &n_tumor, int &n_outl,
-            const int &len, const int &n_region );
+            const int &n_region,
+            list<list<int>> &tumor_regions,
+            const int &n_row );
 
 #endif

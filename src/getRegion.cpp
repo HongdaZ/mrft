@@ -1,24 +1,33 @@
 #include "getRegion.h"
 #include "clearVector.h"
 
-// get the region with label = label
-void getRegion( vector<int> &region, const int &label, const int *ptr_seg,
-                const int &len ){
+// get region and region_label
+void getRegion( int &region_label, vector<int> &region, 
+                const vector<int> &regions_whole, 
+                const vector<int> &regions_sub,
+                const int &order ) {
   clearVector( region );
-  for( int i = 1; i <= len; ++ i ) {
-    if( ptr_seg[ 2 * ( i - 1 ) ] == label ) {
-      region.push_back( i );
+  if( order == 0 ) {
+    region_label = regions_whole.front();
+    for( int i = 1; i < ( regions_whole.size() - 1 ); ++ i ) {
+      region.push_back( regions_whole[ i ] );
     }
-  }
-  return;
-}
-
-void getRegion( vector<int> &region, const list<int> &t_region ){
-  clearVector( region );
-  list<int>::const_iterator it = t_region.begin();
-  ++ it;
-  for( ; it != t_region.end(); ++ it ) {
-    region.push_back( *it );
+  } else {
+    int i = 0;
+    int count = 0;
+    for( ; i < regions_sub.size(); ++ i ) {
+      if( regions_sub[ i ] != NA_INTEGER && regions_sub[ i ] < 0 ) {
+        ++ count;
+        if( count == order ) {
+          break;
+        }
+      }
+    }
+    region_label = regions_sub[ i ];
+    ++ i;
+    while( regions_sub[ i ] != NA_INTEGER ) {
+      region.push_back( regions_sub[ i ] );
+    }
   }
   return;
 }

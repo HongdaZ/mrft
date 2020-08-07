@@ -104,6 +104,9 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   vector<double> new_out_parm( 2, 0 );
   vector<double> whole_parm( 8, 0 );
   
+  int n_row = 1 + 2 + 6;
+  int n_col = 0;
+  
   initRegion( region, front, tumor_regions,
               ptr_res_seg, ptr_nidx, len,
               tumor_labels, n_tumor );
@@ -145,17 +148,17 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
                ptr_lambda2, ptr_a, ptr_b, ptr_m,
                ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
                new_out_parm, whole_parm, n_tumor, n_outl, 
-               len, n_region );
+               n_region, tumor_regions, n_row );
       }
 
       
     }
     Rprintf( "update parm for healthy and tumorous\n" );
     //update parm for healthy and tumorous regions
-    initParm( region, theta, false, health_parm, tumor_parm,
-              ptr_res_seg, ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, 
-              ptr_nidx, ptr_nintst, ptr_alpha, ptr_res_beta, 
-              n_voxel, n_tumor, ptr_a, ptr_b, len, 20 );
+    initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg,
+              ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
+              ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
+              ptr_a, ptr_b, len, 20 );
   }
   // segment zero blocks
   for( int j = 1; j <= len; j ++ ) {
@@ -172,14 +175,13 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
              n_tumor, n_outl, len );
     }
   }
-  int nrow = 1 + 2 + 6;
-  int ncol = n_tumor + 3 + n_outl;
+  n_col = n_tumor + 3 + n_outl;
 
-  SEXP res_parm = PROTECT( allocMatrix( REALSXP, nrow, ncol ) );
+  SEXP res_parm = PROTECT( allocMatrix( REALSXP, n_row, n_col ) );
   SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );
   double *ptr_res_parm = REAL( res_parm );
   int *ptr_res_image = INTEGER( res_image );
-  copyParm( health_parm, tumor_parm, outl_parm, ptr_res_parm, nrow,
+  copyParm( health_parm, tumor_parm, outl_parm, ptr_res_parm, n_row,
             tumor_labels, outl_labels, len );
   restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len );
 

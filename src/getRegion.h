@@ -1,15 +1,15 @@
 #ifndef GETREGION_H
 #define GETREGION_H
 
+#include <Rinternals.h>
+
 #include <vector>
-#include <list>
 
 using std::vector;
-using std::list;
 
-// get the region with label = label
-void getRegion( vector<int> &region, const int &label, const int *ptr_seg,
-                const int &len );
-void getRegion( vector<int> &region, const list<int> &t_region );
-
+// get region and region_label
+void getRegion( int &region_label, vector<int> &region, 
+                const vector<int> &regions_whole, 
+                const vector<int> &regions_sub, 
+                const int &order );
 #endif
