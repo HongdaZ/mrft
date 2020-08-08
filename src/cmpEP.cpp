@@ -56,27 +56,50 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
     double sigma2;
     int region_label;
     int start = -1;
+    int region_idx;
+    double energy;
     for( int i = 0; i < n_region; ++ i ) {
       // get region and region label
       getRegion( region_label, region, regions_whole, regions_sub, 
                  start );
-      updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
-                  ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, region_label,
-                  ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
-                  ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
-      // region_label, mu, sigma2, theta
-      region_parm[ n_row * i ] = region_label;
-      region_parm[ n_row * i + 1 ] = mu;
-      region_parm[ n_row * i + 2 ] = sigma2;
-      for( int j = 0; j < 6; ++ j ) {
-        region_parm[ n_row * i + j + 3 ] = theta[ j ];
+      if( region.size() == 1 ) {
+        region_idx = region[ 0 ];
+        updateParm( mu, sigma2, region_idx, ptr_m[ 3 ], ptr_m[ 2 ],
+                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, ptr_seg,
+                    ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+        // region_label, mu, sigma2, theta
+        region_parm[ n_row * i ] = region_label;
+        region_parm[ n_row * i + 1 ] = mu;
+        region_parm[ n_row * i + 2 ] = sigma2;
+        for( int j = 0; j < 6; ++ j ) {
+          region_parm[ n_row * i + j + 3 ] = 0;
+        }
+        // calculate energy
+        energy = energyY( region_label, region_idx, mu, 
+                          ptr_m[ 2 ], sigma2,
+                          ptr_lambda2[ 3 ], ptr_seg,
+                          ptr_intst,
+                          ptr_alpha[ 3 ], ptr_beta[ 3 ],
+                          ptr_a[ 0 ], ptr_b[ 0 ] );
+      } else {
+        updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
+                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, region_label,
+                    ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
+                    ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+        // region_label, mu, sigma2, theta
+        region_parm[ n_row * i ] = region_label;
+        region_parm[ n_row * i + 1 ] = mu;
+        region_parm[ n_row * i + 2 ] = sigma2;
+        for( int j = 0; j < 6; ++ j ) {
+          region_parm[ n_row * i + j + 3 ] = theta[ j ];
+        }
+        // calculate energy
+        energy = energyY( region, mu, ptr_m[ 2 ], sigma2,
+                          ptr_lambda2[ 3 ], ptr_seg, ptr_nidx,
+                          ptr_intst, ptr_nintst,
+                          theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
+                          ptr_a[ 0 ], ptr_b[ 0 ] );
       }
-      // calculate energy
-      double energy = energyY( region, mu, ptr_m[ 2 ], sigma2,
-                               ptr_lambda2[ 3 ], ptr_seg, ptr_nidx,
-                               ptr_intst, ptr_nintst,
-                               theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
-                               ptr_a[ 0 ], ptr_b[ 0 ] );
       nrg[ i ] = energy;
     }
     // New outlier label

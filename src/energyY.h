@@ -18,7 +18,7 @@ double energyY( const vector<int> &region,
                 const vector<double> &theta,
                 const double &alphak,
                 const double &betak,
-                const double &a, double &b );
+                const double &a, const double &b );
 // Single point energyY for healty voxel
 double energyY( const int &curr_label,
                 const int &curr_idx,

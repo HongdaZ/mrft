@@ -29,7 +29,7 @@ double energyY( const vector<int> &region,
                 const vector<double> &theta,
                 const double &alphak,
                 const double &betak,
-                const double &a, double &b ){
+                const double &a, const double &b ){
   // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
   labelRegion( region, ptr_seg );
   
