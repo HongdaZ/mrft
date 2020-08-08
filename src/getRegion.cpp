@@ -16,7 +16,8 @@ void getRegion( int &region_label, vector<int> &region,
   } else {
     int i = start;
     region_label = regions_sub[ i ];
-    while( regions_sub[ ++ i ] != NA_INTEGER ) {
+    while( ( ++ i ) < regions_sub.size() &&
+           regions_sub[ i ] != NA_INTEGER ) {
       region.push_back( regions_sub[ i ] );
     }
     start = i + 1;

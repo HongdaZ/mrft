@@ -23,7 +23,8 @@ void assignRegion( vector<int> &regions_whole,
                    const list<list<int>> &tumor_regions,
                    const int &label ) {
   list<list<int>>::const_iterator it = tumor_regions.begin();
-  while( it->front() != label ) {
+  while( it != tumor_regions.end() && 
+         it->front() != label ) {
     ++ it;
   }
   list<int>::const_iterator it_region = ++ ( it->begin() );
