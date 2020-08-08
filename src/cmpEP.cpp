@@ -103,7 +103,8 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       nrg[ i ] = energy;
     }
     // New outlier label
-    int out_label = findOutLabel( idx, ptr_seg, outl_labels );
+    int out_label;
+    findOutLabel( out_label, idx, ptr_seg, outl_labels );
 
     // outlier parameters
     double &out_mu = mu;

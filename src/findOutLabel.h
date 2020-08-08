@@ -6,7 +6,7 @@
 using std::vector;
 
 // find an outlier label for current voxel
-int findOutLabel( const int idx, const int *ptr_seg, 
-                  vector<int> &outl_labels );
+void findOutLabel( int &out_label, const int &idx, const int *ptr_seg, 
+                   const vector<int> &outl_labels );
 
 #endif
