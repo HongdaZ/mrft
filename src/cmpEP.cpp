@@ -160,8 +160,8 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       // remove old whole region and add new splitted regions and
       // new outlier if min_label > 1
     } else if ( combine_nrg > split_nrg && sc == 1 ) {
-      eraseRegion( whole_label, tumor_labels, tumor_parm,
-                   n_tumor );
+      eraseRegion( whole_label, tumor_labels, tumor_parm, 
+                   tumor_regions, n_tumor );
       vector<double> new_region_parm( region_parm.begin() + n_row,
                                       region_parm.end() );
       addRegion( ptr_seg, new_region_parm, regions, 1, tumor_labels,

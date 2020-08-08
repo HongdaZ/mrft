@@ -10,9 +10,10 @@ using std::map;
 using std::vector;
 
 // erase single tumor region
-void eraseRegion( const int tumor_label, 
+void eraseRegion( const int &tumor_label, 
                   vector<int> &tumor_labels,
                   vector<double> &tumor_parm,
+                  list<list<int>> &tumor_regions,
                   int &n_tumor );
 
 #endif
