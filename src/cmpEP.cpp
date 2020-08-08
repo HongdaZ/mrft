@@ -164,8 +164,9 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
                    tumor_regions, n_tumor );
       vector<double> new_region_parm( region_parm.begin() + n_row,
                                       region_parm.end() );
-      addRegion( ptr_seg, new_region_parm, regions, 1, tumor_labels,
-                 tumor_parm, n_tumor );
+      // add sub-regions
+      addRegion( ptr_seg, new_region_parm, n_row, tumor_labels,
+                 tumor_parm, tumor_regions, regions_sub, n_tumor );
       
       ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       if( min_label > 0 ) {
