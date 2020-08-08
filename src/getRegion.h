@@ -11,5 +11,5 @@ using std::vector;
 void getRegion( int &region_label, vector<int> &region, 
                 const vector<int> &regions_whole, 
                 const vector<int> &regions_sub, 
-                const int &order );
+                int &start );
 #endif

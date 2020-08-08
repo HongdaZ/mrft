@@ -55,9 +55,11 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
     double mu;
     double sigma2;
     int region_label;
+    int start = -1;
     for( int i = 0; i < n_region; ++ i ) {
       // get region and region label
-      getRegion( region_label, region, regions_whole, regions_sub, i );
+      getRegion( region_label, region, regions_whole, regions_sub, 
+                 start );
       updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
                   ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, region_label,
                   ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,

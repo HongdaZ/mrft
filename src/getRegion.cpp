@@ -5,29 +5,21 @@
 void getRegion( int &region_label, vector<int> &region, 
                 const vector<int> &regions_whole, 
                 const vector<int> &regions_sub,
-                const int &order ) {
+                int &start) {
   clearVector( region );
-  if( order == 0 ) {
+  if( start == -1 ) {
     region_label = regions_whole.front();
     for( int i = 1; i < ( regions_whole.size() - 1 ); ++ i ) {
       region.push_back( regions_whole[ i ] );
     }
+    start = 0;
   } else {
-    int i = 0;
-    int count = 0;
-    for( ; i < regions_sub.size(); ++ i ) {
-      if( regions_sub[ i ] != NA_INTEGER && regions_sub[ i ] < 0 ) {
-        ++ count;
-        if( count == order ) {
-          break;
-        }
-      }
-    }
+    int i = start;
     region_label = regions_sub[ i ];
-    ++ i;
-    while( regions_sub[ i ] != NA_INTEGER ) {
+    while( regions_sub[ ++ i ] != NA_INTEGER ) {
       region.push_back( regions_sub[ i ] );
     }
+    start = i + 1;
   }
   return;
 }
