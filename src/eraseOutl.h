@@ -8,7 +8,7 @@ using std::map;
 using std::vector;
 
 // erase single outlier
-void eraseOutl( const int out_label, 
+void eraseOutl( const int &out_label, 
                 vector<int> &outl_labels,
                 vector<double> &outl_parm,
                 int &n_outl );
