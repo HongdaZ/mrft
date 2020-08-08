@@ -43,6 +43,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
             int &n_tumor, int &n_outl,
             const int &n_region,
             list<list<int>> &tumor_regions,
-            const int &n_row );
+            const int &n_row,
+            const list<int> &tumor_label );
 
 #endif

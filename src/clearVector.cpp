@@ -1,7 +1,8 @@
 #include "clearVector.h"
 
-// erase all elements from a vector
-void clearVector( vector<int> &v ) {
+// erase all elements from a container
+template <typename T >
+void clearVector( T &v ) {
   while( v.size() > 0 ) {
     v.pop_back();
   }

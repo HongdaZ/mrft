@@ -45,7 +45,8 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
             int &n_tumor, int &n_outl,
             const int &n_region,
             list<list<int>> &tumor_regions,
-            const int &n_row ) {
+            const int &n_row,
+            const list<int> &tumor_label ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier or healthy cell
@@ -173,7 +174,8 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
         for( int i = 0; i < 2; ++ i ) {
           new_out_parm[ i ] = outlier_parm[ 1 + i ];
         }
-        addOutl( out_label, new_out_parm, outl_labels, outl_parm, n_outl );
+        addOutl( out_label, new_out_parm, outl_labels, outl_parm,
+                 n_outl );
       }
       // remove old subregions, parameters and labels,
       // add new whole regions label,region and parameters,

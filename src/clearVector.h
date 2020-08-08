@@ -6,6 +6,7 @@
 using std::vector;
 
 // erase all elements from a vector
-void clearVector( vector<int> &v );
+template <typename T >
+void clearVector( T &v );
 
 #endif

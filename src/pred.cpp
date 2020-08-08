@@ -128,6 +128,8 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   auto duration = duration_cast<microseconds>(stop - start); 
   int spend = 0; 
   int max_idx;
+  list<int> tumor_nbr;
+  list<int> tumor_label;
   
   for( int i = 0; i < *ptr_maxit; ++ i ) {
     for( int j = 1; j <= len; ++ j ) {
@@ -139,7 +141,8 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
       } else {
         int sc = scPred( n_region, tumor_regions, front, region, 
                          tumor_labels, ptr_res_seg, ptr_nidx, 
-                         len, curr_idx, regions_whole, regions_sub );
+                         len, curr_idx, regions_whole, regions_sub,
+                         tumor_nbr, tumor_label );
         cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
                tumor_labels, outl_labels, health_parm, 
                tumor_parm, outl_parm, 
@@ -148,7 +151,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
                ptr_lambda2, ptr_a, ptr_b, ptr_m,
                ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
                new_out_parm, whole_parm, n_tumor, n_outl, 
-               n_region, tumor_regions, n_row );
+               n_region, tumor_regions, n_row, tumor_label );
       }
 
       

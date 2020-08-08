@@ -26,14 +26,15 @@ int scPred( int &n_region, list<list<int>> &tumor_regions,
             const vector<int> &tumor_labels,
             int *ptr_label, const int *ptr_nidx, 
             const int &len, const int &start, 
-            vector<int> &regions_whole, vector<int> &regions_sub ) {
+            vector<int> &regions_whole, vector<int> &regions_sub,
+            list<int> &tumor_nbr, list<int> &tumor_label ) {
   n_region = 0;
   clearVector( regions_whole );
   clearVector( regions_sub );
-
+  clearVector( tumor_nbr ); 
+  clearVector( tumor_label ); 
   int current = ptr_label[ 2 * ( start - 1 ) ];
-  list<int> tumor_nbr;
-  list<int> tumor_label;
+
   // Add tumor neighbors to list
   tumorNbrLabel( tumor_label, tumor_nbr, start, ptr_label, ptr_nidx );
   if( tumor_nbr.size() < 2 ) {
