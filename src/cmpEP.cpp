@@ -109,30 +109,28 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
     // outlier parameters
     double &out_mu = mu;
     double &out_sigma2 = sigma2;
-    vector<int> out_region;
-    out_region.push_back( idx );
-    updateParm( out_mu, out_sigma2, out_region, ptr_m[ 3 ], ptr_m[ 2 ],
-                ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, out_label,
-                ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_alpha[ 3 ],
+    updateParm( out_mu, out_sigma2, idx, ptr_m[ 3 ], ptr_m[ 2 ],
+                ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
+                ptr_seg, ptr_alpha[ 3 ],
                 ptr_beta[ 3 ], 20 );
     outlier_parm[ 0 ] = out_label;
     outlier_parm[ 1 ] = out_mu;
     outlier_parm[ 2 ] = out_sigma2;
-    
-    double out_energy = energyX( out_label, idx, true, ptr_seg, ptr_nidx,
+    double &out_energy = energy;
+    out_energy = energyX( out_label, idx, true, ptr_seg, ptr_nidx,
                                  ptr_delta[ 0 ], ptr_gamma[ 0 ] );
-    out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], out_sigma2,
+    out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], 
+                           out_sigma2,
                            ptr_lambda2[ 3 ], ptr_seg, ptr_intst,
                            ptr_alpha[ 3 ],
                            ptr_beta[ 3 ], ptr_a[ 0 ], ptr_b[ 0 ] );
     
     // single voxel energy ( -1, -2, -3 )
-    double energy;
     double min_energy = out_energy;
     int min_label = out_label;
-    
+    int cidx;
     for( int i = - 1; i > - 4; -- i ) {
-      int cidx = label2col( i );
+      cidx = label2col( i );
       getParm( mu, sigma2, theta, health_parm, cidx );
       energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
                         ptr_intst, ptr_nintst, theta );
