@@ -50,9 +50,11 @@ int scPred( int &n_region, list<list<int>> &tumor_regions,
       ptr_label[ 2 * *it - 1 ] = 2;
     }
     bool early_return = 0;
+    int new_label_start = 0;
+    int new_start;
     // find sub-regions
     while( !tumor_nbr.empty() ) {
-      int new_start = tumor_nbr.front();
+      new_start = tumor_nbr.front();
       tumor_nbr.pop_front();
       ptr_label[ 2 * new_start - 1 ] = 0;
       findRegion( region, front, n_region, ptr_label, ptr_nidx, 
@@ -65,7 +67,7 @@ int scPred( int &n_region, list<list<int>> &tumor_regions,
       if( n_region == 0 ) {
         region_label = current;
       } else {
-        region_label = newTumorLabel( n_region, tumor_labels );
+        newTumorLabel( region_label, new_label_start, tumor_labels );
         
       }
       assignRegion( regions_whole, regions_sub, region, region_label );

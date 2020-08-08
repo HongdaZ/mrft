@@ -6,6 +6,7 @@
 using std::vector;
 
 // find an outlier label for current voxel
-int newTumorLabel( const int order, const vector<int> &tumor_labels );
+void newTumorLabel( int &region_label, 
+                    int &start, const vector<int> &tumor_labels );
 
 #endif
