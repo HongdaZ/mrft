@@ -24,5 +24,6 @@ void addRegion( int *ptr_seg,
                 const int &idx,
                 vector<int> &tumor_labels,
                 vector<double> &tumor_parm,
+                list<list<int>> &tumor_regions,
                 int &n_tumor );
 #endif

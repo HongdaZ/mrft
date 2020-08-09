@@ -44,20 +44,18 @@ void addRegion( int *ptr_seg,
                 const int &idx,
                 vector<int> &tumor_labels,
                 vector<double> &tumor_parm,
+                list<list<int>> &tumor_regions,
                 int &n_tumor ) {
-  int nrow = 1 + 2 + 6;
-  int ncol = region_parm.size() / nrow;
-  int new_label;
-  int cidx;
-  for( int i = 0; i < ncol; ++ i ) {
-    new_label = region_parm[ nrow * i ];
-    cidx = label2col( new_label );
-    tumor_labels[ cidx ] = 1;
-    for( int j = 0; j < 8; ++ j ) {
-      tumor_parm[ 8 * cidx + j ] = region_parm[ nrow * i + j + 1 ];
-    }
-    ++ n_tumor;
+  int new_label = region_parm[ 0 ];
+  int cidx = label2col( new_label );
+  tumor_labels[ cidx ] = 1;
+  for( int j = 0; j < 8; ++ j ) {
+    tumor_parm[ 8 * cidx + j ] = region_parm[ j + 1 ];
   }
+  ++ n_tumor;
+  list<int> new_region;
+  new_region.push_back( idx );
+  tumor_regions.push_back( new_region );
   ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
   return;
 }
