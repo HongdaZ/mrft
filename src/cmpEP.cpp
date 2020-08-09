@@ -171,13 +171,16 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       addRegion( ptr_seg, new_region_parm, n_row, tumor_labels,
                  tumor_parm, tumor_regions, regions_sub, n_tumor );
       
-      ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
+      
       if( min_label > 0 ) {
         for( int i = 0; i < 2; ++ i ) {
           new_out_parm[ i ] = outlier_parm[ 1 + i ];
         }
-        addOutl( out_label, new_out_parm, outl_labels, outl_parm,
+        addOutl( ptr_seg, idx, min_label, new_out_parm, 
+                 outl_labels, outl_parm,
                  n_outl );
+      } else {
+        ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       }
       // remove old subregions, parameters and labels,
       // add new whole regions label,region and parameters,
@@ -315,14 +318,12 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
         }
       } else if( min_label >= 1 ) {
         if( curr_label  <= - 4 ) {
-          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           eraseVoxel( idx, curr_label, tumor_regions );
-          addOutl( out_label, new_out_parm, outl_labels, outl_parm,
-                   n_outl );
+          addOutl( ptr_seg, idx, min_label, new_out_parm,
+                   outl_labels, outl_parm, n_outl );
         } else if( curr_label >= - 3 && curr_label <= 0 ) {
-          ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          addOutl( out_label, new_out_parm, outl_labels, outl_parm,
-                   n_outl );
+          addOutl( ptr_seg, idx, min_label, new_out_parm,
+                   outl_labels, outl_parm, n_outl );
         }
       }
       
