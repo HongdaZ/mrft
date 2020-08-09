@@ -57,11 +57,12 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   int start = -1;
   double mu, sigma2, energy;
-  clearVector( region_parm );
+  
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier or healthy cell
     vector<double> nrg( n_region + 1, 0 ); 
     // parameters for regions
+    clearVector( region_parm );
     region_parm.resize( n_row * n_region );
     
     int region_label;
