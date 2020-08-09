@@ -386,11 +386,11 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       if( min_label <= - 4 ) {
         if( curr_label >= - 3 && curr_label <= 0 ) {
           addRegion( ptr_seg, new_parm, idx, tumor_labels,
-                     tumor_parm, n_tumor );
+                     tumor_parm, tumor_regions, n_tumor );
         } else if( curr_label >= 1 ) {
           eraseOutl( curr_label, outl_labels, outl_parm, n_outl );
           addRegion( ptr_seg, new_parm, idx, tumor_labels,
-                     tumor_parm, n_tumor );
+                     tumor_parm, tumor_regions, n_tumor );
         }
       } else if( min_label >= - 3 && min_label <= - 1 ) {
         if( curr_label == 0 ) {
