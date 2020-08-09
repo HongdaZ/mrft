@@ -1,5 +1,4 @@
 #include "newTumorLabel.h"
-#include "algorithm"
 
 // find a new tumor label for current voxel
 void newTumorLabel( int &region_label, 

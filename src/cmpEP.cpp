@@ -50,6 +50,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
             const int &n_row,
             const list<int> &tumor_label ) {
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
+  int start = -1;
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier or healthy cell
     vector<double> nrg( n_region + 1, 0 ); 
@@ -58,7 +59,6 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
     double mu;
     double sigma2;
     int region_label;
-    int start = -1;
     int region_idx;
     double energy;
     for( int i = 0; i < n_region; ++ i ) {
@@ -212,16 +212,16 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
         }
         assignParm( tumor_parm, sub_label, new_parm );
       }
-      ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       // healthy to outlier
       if( min_label > 0 && curr_label < 1 ) {
         for( int i = 0; i < 2; ++ i ) {
           new_out_parm[ i ] = outlier_parm[ 1 + i ];
         }
-        addOutl( out_label, new_out_parm, outl_labels,
-                 outl_parm, n_outl );
+        addOutl( ptr_seg, idx, min_label, new_out_parm, 
+                 outl_labels, outl_parm, n_outl );
         // outlier to healthy
       } else if( min_label < 0 && curr_label > 0 ) {
+        ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
         eraseOutl( out_label, outl_labels, outl_parm, n_outl );
       }
     }
@@ -330,12 +330,12 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       // doesn't have tumor neighbor
     } else {
       // tumor energy
-      
       if( curr_label <= - 4 ) {
         t_label = curr_label;
       } else {
         // Find a new tumor region label;
-        t_label = newTumorLabel( 1, tumor_labels );
+        start = 0;
+        newTumorLabel( t_label, start, tumor_labels );
       }
       // new tumor region parameters
       // t_sigma2 has to be non-zero;
@@ -351,12 +351,13 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       new_parm[ 1 ] = t_mu;
       new_parm[ 2 ] = t_sigma2;
       for( int i = 0; i < 6; ++ i ) {
-        new_parm[ i + 3 ] = t_theta[ i ];
+        new_parm[ i + 3 ] = 0;
       }
-      double t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
-                                 t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
-                                 ptr_intst, ptr_alpha[ 3 ], ptr_beta[ 3 ],
-                                 ptr_a[ 0 ], ptr_b[ 0 ] );
+      double &t_energy = energy;
+      t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
+                          t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
+                          ptr_intst, ptr_alpha[ 3 ], ptr_beta[ 3 ],
+                          ptr_a[ 0 ], ptr_b[ 0 ] );
       t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
                            ptr_delta[ 0 ], ptr_gamma[ 0 ] );
       // Rprintf( "t_label = %d; t_energy = %f; t_mu = %f; t_sigma2 = %f\n",
@@ -365,7 +366,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       int min_label = t_label;
       
       // healthy cell
-      double h_energy;
+      double &h_energy = energy;
       double &h_mu = mu, &h_sigma2 = sigma2;
       vector<double> &h_theta = theta;
       for( int i = - 1; i > - 4; -- i ) {
@@ -384,11 +385,11 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       }
       if( min_label <= - 4 ) {
         if( curr_label >= - 3 && curr_label <= 0 ) {
-          addRegion( ptr_seg, new_parm, new_region, tumor_labels,
+          addRegion( ptr_seg, new_parm, idx, tumor_labels,
                      tumor_parm, n_tumor );
         } else if( curr_label >= 1 ) {
           eraseOutl( curr_label, outl_labels, outl_parm, n_outl );
-          addRegion( ptr_seg, new_parm, new_region, tumor_labels,
+          addRegion( ptr_seg, new_parm, idx, tumor_labels,
                      tumor_parm, n_tumor );
         }
       } else if( min_label >= - 3 && min_label <= - 1 ) {
@@ -396,8 +397,8 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
         } else if( curr_label <= - 4 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
-          eraseRegion( t_label, tumor_labels, tumor_parm,
-                       n_tumor );
+          eraseRegion( curr_label, tumor_labels, tumor_parm,
+                       tumor_regions, n_tumor );
         } else if( curr_label >= 1 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
           eraseOutl( curr_label, outl_labels, outl_parm, n_outl );
