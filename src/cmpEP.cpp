@@ -180,8 +180,6 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       // add sub-regions
       addRegion( ptr_seg, new_region_parm, n_row, tumor_labels,
                  tumor_parm, tumor_regions, regions_sub, n_tumor );
-      
-      
       if( min_label > 0 ) {
         for( int i = 0; i < 2; ++ i ) {
           new_out_parm[ i ] = outlier_parm[ 1 + i ];
@@ -206,12 +204,12 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       // add whole region
       addRegion( ptr_seg, label_whole_parm, n_row, tumor_labels,
                  tumor_parm, tumor_regions, regions_whole, n_tumor );
-      ptr_seg[ 2 * ( idx - 1 ) ] = whole_label;
       if( curr_label > 0 ) {
         eraseOutl( out_label, outl_labels, outl_parm, n_outl );
       }
       // update parameters for subregions
       // possibly remove or add outlier;
+      // update ptr_seg
     } else if( combine_nrg >= split_nrg && sc == 2 ) {
       int sub_label;
       for( int i = 1; i < n_region; ++ i ) {
@@ -233,11 +231,12 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       } else if( min_label < 0 && curr_label > 0 ) {
         ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
         eraseOutl( out_label, outl_labels, outl_parm, n_outl );
+      } else {
+        ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
       }
     }
     // no split or combine
   } else {
-    // check if having tumor neighbor
     int t_label;
     vector<double> &t_theta = theta;
     int cidx;
@@ -295,7 +294,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
         updateParm( out_mu, out_sigma2, idx, ptr_m[ 3 ],
                     ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                     ptr_seg, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
-        new_out_parm[ 0 ]= out_mu;
+        new_out_parm[ 0 ] = out_mu;
         new_out_parm[ 1 ] = out_sigma2;
       }
       out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ],

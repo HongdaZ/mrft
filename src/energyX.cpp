@@ -30,7 +30,6 @@ double energyX( const int curr_label, const int curr_idx, bool region,
                 const int *ptr_seg, const int *ptr_nidx,
                 double delta, double gamma ) {
   double energy = delta * unary( curr_label );
-  int nbr_label[ 6 ] = { 0 };
   int nbr_idx = 0;
   int label;
   double scale;

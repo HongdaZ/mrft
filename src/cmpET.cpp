@@ -161,6 +161,7 @@ void cmpET( vector<int> &region, int idx, int sc,
         }
         assignParm( tumor_parm, sub_label, new_parm );
       }
+      ptr_seg[ 2 * ( idx - 1 ) ] = out_label;
     }
     // no split or combine
   } else {
