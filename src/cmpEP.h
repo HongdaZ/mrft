@@ -42,6 +42,8 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
             vector<double> &whole_parm,
             // label_whole_parm( 9, 0 )
             vector<double> &label_whole_parm,
+            // used to store parameters of whole region and sub-regions
+            vector<double> &region_parm,
             int &n_tumor, int &n_outl,
             const int &n_region,
             list<list<int>> &tumor_regions,

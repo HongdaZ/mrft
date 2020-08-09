@@ -16,6 +16,7 @@
 #include "zeroVector.h"
 #include "addVoxel.h"
 #include "eraseVoxel.h"
+#include "clearVector.h"
 
 // compare energy for prediction
 void cmpEP( vector<int> &region, const int &idx, const int &sc,
@@ -46,6 +47,8 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
             vector<double> &whole_parm,
             // label_whole_parm( 9, 0 )
             vector<double> &label_whole_parm,
+            // used to store parameters of whole region and sub-regions
+            vector<double> &region_parm,
             int &n_tumor, int &n_outl,
             const int &n_region,
             list<list<int>> &tumor_regions,
@@ -54,11 +57,12 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   int start = -1;
   double mu, sigma2, energy;
+  clearVector( region_parm );
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier or healthy cell
     vector<double> nrg( n_region + 1, 0 ); 
     // parameters for regions
-    vector<double> region_parm( n_row * n_region, 0 );
+    region_parm.resize( n_row * n_region );
     
     int region_label;
     int region_idx;
