@@ -103,6 +103,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   vector<double> out_theta( 6, 0 );
   vector<double> new_out_parm( 2, 0 );
   vector<double> whole_parm( 8, 0 );
+  vector<double> label_whole_parm( 9, 0 );
   
   int n_row = 1 + 2 + 6;
   int n_col = 0;
@@ -150,7 +151,8 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
                ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta, 
                ptr_lambda2, ptr_a, ptr_b, ptr_m,
                ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-               new_out_parm, whole_parm, n_tumor, n_outl, 
+               new_out_parm, whole_parm, label_whole_parm,
+               n_tumor, n_outl, 
                n_region, tumor_regions, n_row, tumor_label );
       }
 
