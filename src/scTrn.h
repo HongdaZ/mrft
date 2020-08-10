@@ -1,13 +1,18 @@
 #ifndef SCTRN_H
 #define SCTRN_H
 
+#include <list>
 #include <vector>
 
+using std::list;
 using std::vector;
 
-int scTrn( vector<int> &labels, vector<int> &regions,  vector<int> &front,
-            vector<int> &region, const vector<int> &tumor_labels,
-            const vector<int> &n_voxel, int *ptr_label, const int *ptr_nidx, 
-            const int &len, int start );
+int scTrn( int &n_region, list<list<int>> &tumor_regions,
+           vector<int> &front, vector<int> &region,
+           const vector<int> &tumor_labels,
+           int *ptr_label, const int *ptr_nidx,
+           const int &len, const int &start,
+           vector<int> &regions_whole, vector<int> &regions_sub,
+           list<int> &tumor_nbr, list<int> &tumor_label );
 
 #endif

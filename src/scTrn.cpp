@@ -1,8 +1,7 @@
 #include <R.h>
 #include <Rinternals.h>
 
-#include <list>
-#include <vector>
+
 
 #include "scTrn.h"
 #include "findRegion.h"
