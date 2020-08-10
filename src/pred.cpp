@@ -93,10 +93,6 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   vector<int> region;
   region.reserve( len );
   
-  // number labels
-  vector<int> labels;
-  labels.reserve( 6 );
-
   int n_row = 1 + 2 + 6;
   int n_col = 0;
   
