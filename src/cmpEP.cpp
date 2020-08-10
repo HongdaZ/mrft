@@ -314,7 +314,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
           eraseOutl( out_label, outl_labels, outl_parm, n_outl );
         }
       } else if( min_label >= - 3 && min_label <= -1 ) {
-        if( curr_label == 0 ) {
+        if( curr_label <= 0 && curr_label >= -3 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
         } else if( curr_label <= - 4 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
@@ -333,7 +333,6 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
                    outl_labels, outl_parm, n_outl );
         }
       }
-      
       // doesn't have tumor neighbor
     } else {
       // tumor energy
@@ -400,7 +399,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
                      tumor_parm, tumor_regions, n_tumor );
         }
       } else if( min_label >= - 3 && min_label <= - 1 ) {
-        if( curr_label == 0 ) {
+        if( curr_label <= 0 && curr_label >= -3 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
         } else if( curr_label <= - 4 ) {
           ptr_seg[ 2 * ( idx - 1 ) ] = min_label;
