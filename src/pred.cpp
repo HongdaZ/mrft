@@ -133,32 +133,34 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   int max_idx;
   list<int> tumor_nbr;
   list<int> tumor_label;
-  
+  int sc;
+  bool skip_;
   for( int i = 0; i < *ptr_maxit; ++ i ) {
     for( int j = 1; j <= len; ++ j ) {
       curr_idx = j;
-      curr_intst = ptr_intst[ curr_idx - 1 ];
-      if( curr_intst < ptr_m[ 2 ] ) {
-        cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
-               ptr_nintst, ptr_delta, ptr_gamma, theta );
-      } else {
-        int sc = scPred( n_region, tumor_regions, front, region, 
-                         tumor_labels, ptr_res_seg, ptr_nidx, 
-                         len, curr_idx, regions_whole, regions_sub,
-                         tumor_nbr, tumor_label );
-        cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
-               tumor_labels, outl_labels, health_parm, 
-               tumor_parm, outl_parm, 
-               ptr_res_seg, ptr_nidx, ptr_intst, ptr_nintst, 
-               ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta, 
-               ptr_lambda2, ptr_a, ptr_b, ptr_m,
-               ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-               new_out_parm, whole_parm, label_whole_parm,
-               region_parm, n_tumor, n_outl, 
-               n_region, tumor_regions, n_row, tumor_label );
+      skip_ = skip( curr_idx, ptr_res_seg, ptr_nidx );
+      if( ! skip_ ) {
+        curr_intst = ptr_intst[ curr_idx - 1 ];
+        if( curr_intst < ptr_m[ 2 ] ) {
+          cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
+                 ptr_nintst, ptr_delta, ptr_gamma, theta );
+        } else {
+          sc = scPred( n_region, tumor_regions, front, region, 
+                       tumor_labels, ptr_res_seg, ptr_nidx, 
+                       len, curr_idx, regions_whole, regions_sub,
+                       tumor_nbr, tumor_label );
+          cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
+                 tumor_labels, outl_labels, health_parm, 
+                 tumor_parm, outl_parm, 
+                 ptr_res_seg, ptr_nidx, ptr_intst, ptr_nintst, 
+                 ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta, 
+                 ptr_lambda2, ptr_a, ptr_b, ptr_m,
+                 ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+                 new_out_parm, whole_parm, label_whole_parm,
+                 region_parm, n_tumor, n_outl, 
+                 n_region, tumor_regions, n_row, tumor_label );
+        }
       }
-
-      
     }
     Rprintf( "update parm for healthy and tumorous\n" );
     //update parm for healthy and tumorous regions
@@ -170,16 +172,21 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   // segment zero blocks
   for( int j = 1; j <= len; j ++ ) {
     if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
-      int curr_idx = j;
-      int sc = scPred( labels, regions, front, region, tumor_labels,
-                       n_voxel, ptr_res_seg, ptr_nidx, len, curr_idx );
-      cmpEP( region, curr_idx, sc, labels, regions, tumor_labels,
-             outl_labels, health_parm, tumor_parm, outl_parm,
+      curr_idx = j;
+      sc = scPred( n_region, tumor_regions, front, region,
+                   tumor_labels, ptr_res_seg, ptr_nidx,
+                   len, curr_idx, regions_whole, regions_sub,
+                   tumor_nbr, tumor_label );
+      cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
+             tumor_labels, outl_labels, health_parm,
+             tumor_parm, outl_parm,
              ptr_res_seg, ptr_nidx, ptr_intst, ptr_nintst,
              ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta,
-             ptr_lambda2, ptr_a, ptr_b, ptr_m, ptr_nu2, outlier_parm, 
-             theta, tmp_parm, out_theta, new_out_parm, whole_parm, 
-             n_tumor, n_outl, len );
+             ptr_lambda2, ptr_a, ptr_b, ptr_m,
+             ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+             new_out_parm, whole_parm, label_whole_parm,
+             region_parm, n_tumor, n_outl,
+             n_region, tumor_regions, n_row, tumor_label );
     }
   }
   n_col = n_tumor + 3 + n_outl;
