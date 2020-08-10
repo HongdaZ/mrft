@@ -311,9 +311,9 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
           // use the function for outliers and single voxel tumor regions
           updateParm( t_mu, t_sigma2, idx, ptr_m[ 3 ],
                       ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ],
-                                                   ptr_intst, ptr_seg,
-                                                   ptr_alpha[ 3 ],
-                                                            ptr_beta[ 3 ], 20 );
+                      ptr_intst, ptr_seg,
+                      ptr_alpha[ 3 ],
+                      ptr_beta[ 3 ], 20 );
           vector<double> &new_parm = tmp_parm;
           new_parm[ 0 ] = t_label;
           new_parm[ 1 ] = t_mu;
