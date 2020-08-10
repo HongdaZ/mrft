@@ -2,7 +2,6 @@
 #include <Rinternals.h>
 
 #include <vector>
-#include <set>
 #include <chrono> 
 
 #include "helper.h"
@@ -18,7 +17,6 @@
 #include "restoreImg.h"
 
 using std::vector;
-using std::set;
 using namespace std::chrono; 
 
 // predict the labels for T1ce or T2 images
@@ -119,7 +117,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   int old_label = 0;
   int new_label = 0;
   int curr_idx = 0;
-  int curr_intst = 0;
+  double curr_intst = 0;
   int n_region;
   
   auto start = high_resolution_clock::now(); 

@@ -15,8 +15,9 @@ using std::map;
 using std::list;
 
 // compare energy for training
-void cmpET( vector<int> &region, int idx, int sc,
-            const vector<int> &labels, const vector<int> &regions,
+void cmpET( vector<int> &region, const int &idx, const int &sc,
+            const vector<int> &regions_whole,
+            const vector<int> &regions_sub,
             vector<int> &tumor_labels, vector<int> &outl_labels,
             const vector<double> &health_parm,
             vector<double> &tumor_parm, 
@@ -40,7 +41,14 @@ void cmpET( vector<int> &region, int idx, int sc,
             vector<double> &new_out_parm,
             // whole_parm( 8, 0 )
             vector<double> &whole_parm,
+            // label_whole_parm( 9, 0 )
+            vector<double> &label_whole_parm,
+            // used to store parameters of whole region and sub-regions
+            vector<double> &region_parm,
             int &n_tumor, int &n_outl,
-            const int &len );
+            const int &n_region,
+            list<list<int>> &tumor_regions,
+            const int &n_row,
+            const list<int> &tumor_label );
 
 #endif
