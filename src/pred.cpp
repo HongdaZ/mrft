@@ -196,7 +196,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   double *ptr_res_parm = REAL( res_parm );
   int *ptr_res_image = INTEGER( res_image );
   copyParm( health_parm, tumor_parm, outl_parm, ptr_res_parm, n_row,
-            tumor_labels, outl_labels, len );
+            tumor_regions, outl_labels, len );
   restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len );
 
   // results to list
