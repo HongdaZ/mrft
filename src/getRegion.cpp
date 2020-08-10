@@ -24,3 +24,21 @@ void getRegion( int &region_label, vector<int> &region,
   }
   return;
 }
+// get region from tumor region
+void getRegion( vector<int> &region, const list<int> &t_region ) {
+  clearVector( region );
+  for( list<int>::const_iterator it = ++ ( t_region.begin() );
+       it != t_region.end(); ++ it ) {
+    region.push_back( *it );
+  }
+}
+// get healthy region
+void getRegion( vector<int> &region, const int &curr_label, 
+                const int *ptr_seg, const int &len ) {
+  clearVector( region );
+  for( int i = 1; i <= len; ++ i ) {
+    if( ptr_seg[ 2 * ( i - 1 ) ] == curr_label ) {
+      region.push_back( i );
+    }
+  }
+}

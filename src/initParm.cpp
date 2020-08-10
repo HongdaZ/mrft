@@ -11,7 +11,7 @@
 
 // Initialize parameters
 void initParm( vector<int> &region, vector<double> &theta, 
-               const bool first_run, vector<double> &health_parm,
+               const bool &first_run, vector<double> &health_parm,
                vector<double> &tumor_parm,
                int *ptr_seg, const double *ptr_m,
                const double *ptr_nu2, const double *ptr_intst, 
@@ -20,9 +20,9 @@ void initParm( vector<int> &region, vector<double> &theta,
                const double *ptr_beta,
                const list<list<int>> &tumor_regions,
                const double *ptr_a, const double *ptr_b, const int &len, 
-               int maxit ) {
+               const int &maxit ) {
   // update parameters for tumor regions
-  double mu = -1, sigma2 = 1; // sigma2 has to be non-zero;
+  double mu, sigma2;
   int curr_label;
   list<list<int>>::const_iterator it = tumor_regions.begin();
   for( ;it != tumor_regions.end(); ++ it ) {
@@ -68,7 +68,7 @@ void initParmHealth3( vector<int> &region, vector<double> &theta,
                       const double *ptr_lambda2, const int *ptr_nidx,
                       const double *ptr_nintst, const double *ptr_alpha,
                       const double *ptr_beta, const int &len, 
-                      int maxit ) {
+                      const int &maxit ) {
   // Initialize parameters for healthy regions
   int curr_label;
   int h_idx;
