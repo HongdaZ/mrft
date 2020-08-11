@@ -22,11 +22,12 @@ void initParm( vector<int> &region, vector<double> &theta,
                const double *ptr_a, const double *ptr_b, const int &len, 
                const int &maxit ) {
   // update parameters for tumor regions
+  Rprintf( "update parm for tumor regions\n" );
   double mu, sigma2;
   int curr_label;
   list<list<int>>::const_iterator it = tumor_regions.begin();
   for( ;it != tumor_regions.end(); ++ it ) {
-    if( first_run || it->size() > 2 ) {
+    if( first_run || it->size() > 100 ) {
       curr_label = it->front();
       // region starts from 1
       const list<int> &t_region = *it;
@@ -45,12 +46,18 @@ void initParm( vector<int> &region, vector<double> &theta,
       assignParm( tumor_parm, curr_label, mu, sigma2, theta );
     }
   }
+  // Rprintf( "update parm for healthy regions\n" );
   // Initialize parameters for healthy regions
   int h_idx;
   for( int i = - 1; i > - 4;  -- i ) {
     curr_label = i;
     // Rprintf( "curr_label = %d \n", curr_label );
     getRegion( region, curr_label, ptr_seg, len );
+    // Rprintf( "curr_label = %d, region size = %d\n", 
+    //          curr_label, region.size() );
+    if( region.size() == 0 ) {
+      continue;
+    }
     h_idx = label2col( curr_label ); // == 0, 1, 2
     updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], 
                 ptr_nu2[ h_idx ], ptr_intst, curr_label, 
@@ -76,6 +83,9 @@ void initParmHealth3( vector<int> &region, vector<double> &theta,
   for( int i = - 1; i > - 4;  -- i ) {
     curr_label = i;
     getRegion( region, curr_label, ptr_seg, len );
+    if( region.size() == 0 ) {
+      continue;
+    }
     h_idx = label2col( curr_label ); // == 0, 1, 2
     updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], 
                 ptr_nu2[ h_idx ], ptr_intst, curr_label,
