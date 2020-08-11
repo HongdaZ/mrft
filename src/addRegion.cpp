@@ -54,6 +54,7 @@ void addRegion( int *ptr_seg,
   }
   ++ n_tumor;
   list<int> new_region;
+  new_region.push_back( new_label );
   new_region.push_back( idx );
   tumor_regions.push_back( new_region );
   ptr_seg[ 2 * ( idx - 1 ) ] = new_label;
