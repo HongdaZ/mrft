@@ -22,12 +22,11 @@ void initParm( vector<int> &region, vector<double> &theta,
                const double *ptr_a, const double *ptr_b, const int &len, 
                const int &maxit ) {
   // update parameters for tumor regions
-  Rprintf( "update parm for tumor regions\n" );
   double mu, sigma2;
   int curr_label;
   list<list<int>>::const_iterator it = tumor_regions.begin();
   for( ;it != tumor_regions.end(); ++ it ) {
-    if( first_run || it->size() > 100 ) {
+    if( first_run ) {
       curr_label = it->front();
       // region starts from 1
       const list<int> &t_region = *it;
@@ -43,6 +42,12 @@ void initParm( vector<int> &region, vector<double> &theta,
                     curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
                     ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
       }
+      assignParm( tumor_parm, curr_label, mu, sigma2, theta );
+    } else if( it->size() > 125 ) {
+      updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
+                  ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
+                  curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
+                  ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
       assignParm( tumor_parm, curr_label, mu, sigma2, theta );
     }
   }
