@@ -122,18 +122,23 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   
   auto start = high_resolution_clock::now(); 
   auto stop = high_resolution_clock::now(); 
-  auto duration = duration_cast<microseconds>(stop - start); 
+  auto duration = duration_cast< microseconds > ( stop - start ); 
   int spend = 0; 
   int max_idx;
   list<int> tumor_nbr;
   list<int> tumor_label;
   int sc;
   bool skip_;
+  
   for( int i = 0; i < *ptr_maxit; ++ i ) {
     for( int j = 1; j <= len; ++ j ) {
       curr_idx = j;
       skip_ = skip( curr_idx, ptr_res_seg, ptr_nidx );
       if( ! skip_ ) {
+        // debug
+        old_label = ptr_res_seg[ 2 * ( j - 1 ) ];
+        start = high_resolution_clock::now(); 
+        ////////
         curr_intst = ptr_intst[ curr_idx - 1 ];
         if( curr_intst < ptr_m[ 2 ] ) {
           cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
@@ -154,6 +159,13 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
                  region_parm, n_tumor, n_outl, 
                  n_region, tumor_regions, n_row, tumor_label );
         }
+        // debug 
+        new_label = ptr_res_seg[ 2 * ( j - 1 ) ];
+        stop = high_resolution_clock::now(); 
+        duration = duration_cast< microseconds > ( stop - start );
+        Rprintf( "idx = %d, old = %d, new = %d, time spent = %d microseconds\n",
+                 j, old_label, new_label, duration.count() );
+        ////////
       }
     }
     Rprintf( "update parm for healthy and tumorous\n" );
