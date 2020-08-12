@@ -45,7 +45,7 @@ void initParm( vector<int> &region, vector<double> &theta,
                     ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
       }
       assignParm( tumor_parm, curr_label, mu, sigma2, theta );
-    } else if( it->size() > 125 ) {
+    } else if( it->size() > 27 ) {
       updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
                   ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                   curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
