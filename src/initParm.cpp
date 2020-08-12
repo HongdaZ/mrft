@@ -26,11 +26,11 @@ void initParm( vector<int> &region, vector<double> &theta,
   int curr_label;
   list<list<int>>::const_iterator it = tumor_regions.begin();
   for( ;it != tumor_regions.end(); ++ it ) {
+    curr_label = it->front();
+    // region starts from 1
+    const list<int> &t_region = *it;
+    getRegion( region, t_region );
     if( first_run ) {
-      curr_label = it->front();
-      // region starts from 1
-      const list<int> &t_region = *it;
-      getRegion( region, t_region );
       if( region.size() == 1 ) {
         zeroVector( theta );
         updateParm( mu, sigma2, region.front(), ptr_m[ 3 ], 
