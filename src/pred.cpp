@@ -202,6 +202,11 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
       }
     }
   }
+  //update parm for the last time
+  initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg,
+            ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
+            ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
+            ptr_a, ptr_b, len, 20 );
   n_col = n_tumor + 3 + n_outl;
 
   SEXP res_parm = PROTECT( allocMatrix( REALSXP, n_row, n_col ) );
