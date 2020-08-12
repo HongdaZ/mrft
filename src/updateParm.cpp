@@ -32,7 +32,6 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   int i = 0;
   double tol = 1;
   double tmp = 0;
-  mu = - 1;
   // Initialize matrices and vectors
   int len_region = region.size();
   int nrow = len_region;
@@ -97,7 +96,6 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   int i = 0;
   double tol = 1;
   double tmp = 0;
-  mu = - 1;
   int len_region = region.size();
   // the voxel in region is labelled as 3 in ptr_seg[ 2, ]
   labelRegion( region, ptr_seg );
@@ -113,10 +111,11 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   
   initMV( region, yln_, yln_i,yl_, sum_y, ptr_intst, ptr_nidx, ptr_nintst, 
           ptr_seg, curr_label );
+  
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
-
   double sum_theta;
+  
   while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
     sum_theta = 0;
     for( int j = 0; j < 6; ++ j ) {
@@ -161,7 +160,6 @@ void updateParm( double &mu, double &sigma2,
   int i = 0;
   double tol = 1;
   double tmp = 0;
-  mu = - 1;
   double sum_y = ptr_intst[ idx - 1 ];
   int n = 1;
   while(  i < 2 || ( i < maxit && tol > .0001 ) ) {

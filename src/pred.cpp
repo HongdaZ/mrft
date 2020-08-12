@@ -16,6 +16,10 @@
 #include "copyParm.h"
 #include "restoreImg.h"
 
+// debug
+#include "getRegion.h"
+////////
+
 using std::vector;
 using namespace std::chrono; 
 
@@ -129,51 +133,61 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   int sc;
   bool skip_;
 
-  // for( int i = 0; i < *ptr_maxit; ++ i ) {
-  //   Rprintf( "i = %d\n", i );
-  //   for( int j = 1; j <= len; ++ j ) {
-  //     curr_idx = j;
-  //     sc = scPred( n_region, tumor_regions, front, region,
-  //                  tumor_labels, ptr_res_seg, ptr_nidx,
-  //                  len, curr_idx, regions_whole, regions_sub,
-  //                  tumor_nbr, tumor_label );
-  //     cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
-  //            tumor_labels, outl_labels, health_parm,
-  //            tumor_parm, outl_parm,
-  //            ptr_res_seg, ptr_nidx, ptr_intst, ptr_nintst,
-  //            ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta,
-  //            ptr_lambda2, ptr_a, ptr_b, ptr_m,
-  //            ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-  //            new_out_parm, whole_parm, label_whole_parm,
-  //            region_parm, n_tumor, n_outl,
-  //            n_region, tumor_regions, n_row, tumor_label );
-  //   }
-  //   //update parm for healthy and tumorous regions
-  //   initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg,
-  //             ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
-  //             ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
-  //             ptr_a, ptr_b, len, 20 );
-  // }
-  // // segment zero blocks
-  // for( int j = 1; j <= len; j ++ ) {
-  //   if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
-  //     curr_idx = j;
-  //     sc = scPred( n_region, tumor_regions, front, region,
-  //                  tumor_labels, ptr_res_seg, ptr_nidx,
-  //                  len, curr_idx, regions_whole, regions_sub,
-  //                  tumor_nbr, tumor_label );
-  //     cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
-  //            tumor_labels, outl_labels, health_parm,
-  //            tumor_parm, outl_parm,
-  //            ptr_res_seg, ptr_nidx, ptr_intst, ptr_nintst,
-  //            ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta,
-  //            ptr_lambda2, ptr_a, ptr_b, ptr_m,
-  //            ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
-  //            new_out_parm, whole_parm, label_whole_parm,
-  //            region_parm, n_tumor, n_outl,
-  //            n_region, tumor_regions, n_row, tumor_label );
-  //   }
-  // }
+  for( int i = 0; i < *ptr_maxit; ++ i ) {
+    for( int j = 1; j <= len; ++ j ) {
+      curr_idx = j;
+      curr_intst = ptr_intst[ curr_idx - 1 ];
+      if( curr_intst < ptr_m[ 2 ] ) {
+        cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
+               ptr_nintst, ptr_delta, ptr_gamma, theta );
+      } else {
+        sc = scPred( n_region, tumor_regions, front, region,
+                     tumor_labels, ptr_res_seg, ptr_nidx,
+                     len, curr_idx, regions_whole, regions_sub,
+                     tumor_nbr, tumor_label );
+        cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
+               tumor_labels, outl_labels, health_parm,
+               tumor_parm, outl_parm,
+               ptr_res_seg, ptr_nidx, ptr_intst, ptr_nintst,
+               ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta,
+               ptr_lambda2, ptr_a, ptr_b, ptr_m,
+               ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+               new_out_parm, whole_parm, label_whole_parm,
+               region_parm, n_tumor, n_outl,
+               n_region, tumor_regions, n_row, tumor_label );
+      }
+    }
+    //update parm for healthy and tumorous regions
+    initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg,
+              ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
+              ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
+              ptr_a, ptr_b, len, 20 );
+  }
+  // segment zero blocks
+  for( int j = 1; j <= len; j ++ ) {
+    if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
+      curr_idx = j;
+      if( curr_intst < ptr_m[ 2 ] ) {
+        cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
+               ptr_nintst, ptr_delta, ptr_gamma, theta );
+      } else {
+        sc = scPred( n_region, tumor_regions, front, region,
+                     tumor_labels, ptr_res_seg, ptr_nidx,
+                     len, curr_idx, regions_whole, regions_sub,
+                     tumor_nbr, tumor_label );
+        cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
+               tumor_labels, outl_labels, health_parm,
+               tumor_parm, outl_parm,
+               ptr_res_seg, ptr_nidx, ptr_intst, ptr_nintst,
+               ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta,
+               ptr_lambda2, ptr_a, ptr_b, ptr_m,
+               ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+               new_out_parm, whole_parm, label_whole_parm,
+               region_parm, n_tumor, n_outl,
+               n_region, tumor_regions, n_row, tumor_label );
+      }
+    }
+  }
   n_col = n_tumor + 3 + n_outl;
 
   SEXP res_parm = PROTECT( allocMatrix( REALSXP, n_row, n_col ) );
