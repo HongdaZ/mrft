@@ -27,6 +27,8 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  const double &alphal,
                  const double &betal,
                  const int &maxit ) {
+
+  zeroVector( theta );
   int i = 0;
   double tol = 1;
   double tmp = 0;
@@ -90,6 +92,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
                  const double alphal,
                  const double betal,
                  const int &maxit ) {
+  zeroVector( theta );
   int i = 0;
   double tol = 1;
   double tmp = 0;

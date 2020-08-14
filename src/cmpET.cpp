@@ -57,7 +57,7 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   int start = -1;
   double mu, sigma2, energy;
-  int cidx;
+  
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier
     vector<double> nrg( n_region + 1, 0 );
@@ -72,14 +72,6 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
       // get region and region label
       getRegion( region_label, region, regions_whole, regions_sub,
                  start );
-      cidx = label2col( region_label );
-      if( tumor_labels[ cidx ] == 1 ) {
-        getParm( mu, sigma2, theta, tumor_parm, cidx );
-      } else {
-        mu = ptr_m[ 3 ];
-        sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
-        zeroVector( theta );
-      }
       if( region.size() == 1 ) {
         region_idx = region[ 0 ];
         updateParm( mu, sigma2, region_idx, ptr_m[ 3 ], ptr_m[ 2 ],
@@ -129,17 +121,11 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
     double &out_mu = mu;
     double &out_sigma2 = sigma2;
     double &out_energy = energy;
-    cidx = label2col( out_label );
-    if( outl_labels[ cidx ] == 1 ) {
-      getParm( out_mu, out_sigma2, outl_parm, cidx );
-    } else {
-      out_mu = ptr_m[ 3 ];
-      out_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
-    }
+    
     updateParm( out_mu, out_sigma2, idx, ptr_m[ 3 ], ptr_m[ 2 ],
                 ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                 ptr_seg, ptr_alpha[ 3 ],
-                ptr_beta[ 3 ], 20 );
+                                  ptr_beta[ 3 ], 20 );
     outlier_parm[ 0 ] = out_label;
     outlier_parm[ 1 ] = out_mu;
     outlier_parm[ 2 ] = out_sigma2;
@@ -285,8 +271,6 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
           cidx = label2col( curr_label );
           getParm( out_mu, out_sigma2, outl_parm, cidx );
         } else {
-          out_mu = ptr_m[ 3 ];
-          out_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
           updateParm( out_mu, out_sigma2, idx, ptr_m[ 3 ],
                       ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                       ptr_seg, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
@@ -318,14 +302,12 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
         // not have tumor  
       } else {
         if( curr_label > 0 ) {
-          // new tumor region parameters
-          double &t_mu = mu, &t_sigma2 = sigma2;
           // Find a new tumor region label;
           int new_label;
           int start = 0;
           newTumorLabel( new_label, start, tumor_labels );
-          t_mu = ptr_m[ 3 ];
-          t_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
+          // new tumor region parameters
+          double &t_mu = mu, &t_sigma2 = sigma2;
           // use the function for outliers and single voxel tumor regions
           updateParm( t_mu, t_sigma2, idx, ptr_m[ 3 ],
                       ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ],
