@@ -154,7 +154,6 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
     // single voxel energy ( -1, -2, -3 )
     double min_energy = out_energy;
     int min_label = out_label;
-    int cidx;
     for( int i = - 1; i > - 4; -- i ) {
       cidx = label2col( i );
       getParm( mu, sigma2, theta, health_parm, cidx );
@@ -351,6 +350,8 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       }
       // doesn't have tumor neighbor
     } else {
+      // new tumor region parameters
+      // t_sigma2 has to be non-zero;
       double &t_mu = mu, &t_sigma2 = sigma2; 
       // tumor energy
       if( curr_label <= - 4 ) {
@@ -364,8 +365,6 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
         t_mu = ptr_m[ 3 ];
         t_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
       }
-      // new tumor region parameters
-      // t_sigma2 has to be non-zero;
       // use the function for outliers and single voxel tumor regions
       updateParm( t_mu, t_sigma2, idx, ptr_m[ 3 ],
                   ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ],
