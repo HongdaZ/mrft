@@ -17,6 +17,7 @@ void addRegion( int *ptr_seg,
   for( int i = 0; i < ncol; ++ i ) {
     list<int> new_region;
     new_label = region_parm[ n_row * i ];
+    new_region.push_back( new_label );
     cidx = label2col( new_label );
     tumor_labels[ cidx ] = 1;
     for( int j = 0; j < 8; ++ j ) {
