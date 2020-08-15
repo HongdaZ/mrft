@@ -67,7 +67,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
     
     int region_label;
     int region_idx;
-    
+    sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
     for( int i = 0; i < n_region; ++ i ) {
       // get region and region label
       getRegion( region_label, region, regions_whole, regions_sub, 
@@ -120,7 +120,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
     double &out_mu = mu;
     double &out_sigma2 = sigma2;
     double &out_energy = energy;
-    
+    out_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
     updateParm( out_mu, out_sigma2, idx, ptr_m[ 3 ], ptr_m[ 2 ],
                 ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                 ptr_seg, ptr_alpha[ 3 ],
@@ -291,6 +291,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
         cidx = label2col( curr_label );
         getParm( out_mu, out_sigma2, outl_parm, cidx );
       } else {
+        out_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
         updateParm( out_mu, out_sigma2, idx, ptr_m[ 3 ],
                     ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                     ptr_seg, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
@@ -346,6 +347,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
       // new tumor region parameters
       // t_sigma2 has to be non-zero;
       double &t_mu = mu, &t_sigma2 = sigma2; 
+      t_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
       // use the function for outliers and single voxel tumor regions
       updateParm( t_mu, t_sigma2, idx, ptr_m[ 3 ],
                   ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ],
