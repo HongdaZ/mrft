@@ -8,7 +8,6 @@
 #include "assignParm.h"
 #include "label2col.h"
 #include "zeroVector.h"
-#include "getParm.h"
 
 // Initialize parameters
 void initParm( vector<int> &region, vector<double> &theta, 
@@ -24,23 +23,22 @@ void initParm( vector<int> &region, vector<double> &theta,
                const int &maxit ) {
   // update parameters for tumor regions
   double mu, sigma2;
-  int curr_label, cidx;
+  int curr_label;
   list<list<int>>::const_iterator it = tumor_regions.begin();
   for( ;it != tumor_regions.end(); ++ it ) {
     curr_label = it->front();
+    mu = ptr_m[ 3 ];
+    sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
     // region starts from 1
     const list<int> &t_region = *it;
     getRegion( region, t_region );
     if( first_run ) {
-      mu = ptr_m[ 3 ];
-      sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
       if( region.size() == 1 ) {
         zeroVector( theta );
         updateParm( mu, sigma2, region.front(), ptr_m[ 3 ], 
                     ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                     ptr_seg, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
       } else {
-        zeroVector( theta );
         updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
                     ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                     curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
@@ -48,8 +46,6 @@ void initParm( vector<int> &region, vector<double> &theta,
       }
       assignParm( tumor_parm, curr_label, mu, sigma2, theta );
     } else if( it->size() > 27 ) {
-      cidx = label2col( curr_label );
-      getParm( mu, sigma2, theta, tumor_parm, cidx );
       updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
                   ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
                   curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
@@ -63,7 +59,8 @@ void initParm( vector<int> &region, vector<double> &theta,
   for( int i = - 1; i > - 4;  -- i ) {
     curr_label = i;
     h_idx = label2col( curr_label );// == 0, 1, 2
-    getParm( mu, sigma2, theta, health_parm, h_idx );
+    mu = ptr_m[ h_idx ];
+    sigma2 = ptr_beta[ h_idx ] / ( ptr_alpha[ h_idx ] + 1 );
     // Rprintf( "curr_label = %d \n", curr_label );
     getRegion( region, curr_label, ptr_seg, len );
     // Rprintf( "curr_label = %d, region size = %d\n", 
@@ -95,7 +92,8 @@ void initParmHealth3( vector<int> &region, vector<double> &theta,
   for( int i = - 1; i > - 4;  -- i ) {
     curr_label = i;
     h_idx = label2col( curr_label );// == 0, 1, 2
-    getParm( mu, sigma2, theta, health_parm, h_idx );
+    mu = ptr_m[ h_idx ];
+    sigma2 = ptr_beta[ h_idx ] / ( ptr_alpha[ h_idx ] + 1 );
     getRegion( region, curr_label, ptr_seg, len );
     if( region.size() == 0 ) {
       continue;
