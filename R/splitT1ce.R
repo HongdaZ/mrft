@@ -40,7 +40,7 @@ splitT1ce3 <- function( t1ce, flair ) {
   return( res )
 }
 # split t1ce images for prediction
-splitT1ce4 <- function( t1ce, t1ce_seg ) {
+splitT1ce4 <- function( t1ce, t1ce_seg, t1ce_factor ) {
   label <- array( NA_integer_, dim = dim( t1ce ) )
   label[ ! is.nan( t1ce ) ] <- 0L
   label[ t1ce_seg$image == -1 ] <- -1L
@@ -49,7 +49,7 @@ splitT1ce4 <- function( t1ce, t1ce_seg ) {
   m_3 <- t1ce_seg$parm[ 2, 1 ]
   sigma2_3 <- t1ce_seg$parm[ 3, 1 ]
   # threshold for enhancing tumor core
-  m_4 <- m_3 + sqrt( sigma2_3 ) * 12
+  m_4 <- m_3 + sqrt( sigma2_3 ) * t1ce_factor
   label[ t1ce > m_4 ] <- 4L
   m_1 <- t1ce_seg$parm[ 2, 3 ]
   m_2 <- t1ce_seg$parm[ 2, 2 ]
