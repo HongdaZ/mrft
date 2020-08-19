@@ -1,7 +1,7 @@
 # split T1ce to CSF & necrosis, grey matter and white matter
 splitT1ce3 <- function( t1ce, flair ) {
   
-  label <- array( NA_integer_, dim = dim( t1ce ) )
+  label <- array( -4L, dim = dim( flair ) )
   label[ ! is.nan( t1ce ) ] <- 0L
   q_flair <- quantile( flair, probs = .30, na.rm = T )
   q_t1ce <- quantile( t1ce, probs = .30, na.rm = T )
@@ -11,7 +11,7 @@ splitT1ce3 <- function( t1ce, flair ) {
   # Remove bright regions
   q_t1ce <- quantile( t1ce, probs = .90, na.rm = T )
   bright <- t1ce > q_t1ce
-  label[ bright ] <- NA_integer_
+  label[ bright ] <- -4L
   
   tbd <- label == 0
   
@@ -27,6 +27,8 @@ splitT1ce3 <- function( t1ce, flair ) {
   # find grey matter
   label[ tbd ][ sub_flair > q_flair[ 2 ] & sub_t1ce < q_t1ce[ 1 ] ] <- -2L
   
+  label[ label == -4L ] <- NA_integer_
+  
   # normalize intensity
   mean_csf <- mean( t1ce[ label == -1 ], na.rm = T )
   mean_grey <- mean( t1ce[ label == -2 ], na.rm = T )
@@ -41,13 +43,13 @@ splitT1ce3 <- function( t1ce, flair ) {
 # split flair to CSF & necrosis, grey matter and white matter
 splitFlair3 <- function( flair, t1ce_seg ) {
   
-  label <- array( NA_integer_, dim = dim( flair ) )
+  label <- array( -4L, dim = dim( flair ) )
   label[ ! is.nan( flair ) ] <- 0L
   
   # Find the brightest 25% percent
   q_flair <- quantile( flair, probs = .75, na.rm = T )
   bright <- flair > q_flair
-  label[ bright ] <- NA_integer_
+  label[ bright ] <- -4L
   
   # Find CSF & necrosis
   q_flair <- quantile( flair, probs = .30, na.rm = T )
@@ -66,6 +68,8 @@ splitFlair3 <- function( flair, t1ce_seg ) {
   gm <- sub_image == -2L & sub_flair > q_flair[ 2 ]
   label[ tbd ][ gm ] <- -3L
   
+  label[ label == -4L ] <- NA_integer_
+  
   # Normalize intensity
   mean_csf <- mean( flair[ label == -1 ], na.rm =  T )
   mean_white <- mean( flair[ label == -2 ], na.rm = T )
@@ -79,7 +83,7 @@ splitFlair3 <- function( flair, t1ce_seg ) {
 }
 # split t1ce or flair images for prediction
 split4 <- function( x, x_seg, x_factor ) {
-  label <- array( NA_integer_, dim = dim( x ) )
+  label <- array( -4L, dim = dim( x ) )
   label[ ! is.nan( x ) ] <- 0L
   label[ x_seg$image == -1 ] <- -1L
   label[ x_seg$image == -2 ] <- -2L
@@ -91,6 +95,8 @@ split4 <- function( x, x_seg, x_factor ) {
   label[ x > m_4 ] <- 4L
   m_1 <- x_seg$parm[ 2, 3 ]
   m_2 <- x_seg$parm[ 2, 2 ]
+  
+  label[ label == -4L ] <- NA_integer_
   
   res <- list( label = label, intst = x, 
                m = c( m_1, m_2, m_3, m_4 ) )
