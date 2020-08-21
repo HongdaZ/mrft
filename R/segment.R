@@ -17,7 +17,7 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 1,
   ## estimate parameters of t1ce or FLAIR images without tumor
   t1ce_seg <- est3( t1ce_model, delta, gamma,
                     alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ], 
-                    m, nu2[ 1 : 3 ], maxit )
+                    m, nu2[ 1 : 3 ], 4 * maxit )
   ## update beta
   sigma2 <- rev( t1ce_seg$parm[ 3, ] )
   beta[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
@@ -27,8 +27,9 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 1,
   b <- getB( m, a )
   t1ce_model <- initEst( t1ce_data$label, t1ce_data$intst )
   # sink( '/media/hzhang/ZHD-U1/result/output.txt' )
-  t1ce_seg <- pred4( t1ce_model, delta, gamma, alpha, beta, 
-                     lambda2, a, b, m, nu2, maxit )
+  system.time( t1ce_seg <- pred4( t1ce_model, delta, gamma, alpha, beta, 
+                                  lambda2, a, b, m, nu2, maxit ) )
+  
   # sink();
   ## split flair images to CSF & necrosis, white matter and grey matter
   flair_data <- splitFlair3( images$flair, t1ce_seg )
@@ -37,7 +38,7 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 1,
   ## estimate parameters of t1ce or FLAIR images without tumor
   flair_seg <- est3( flair_model, delta, gamma, 
                      alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ],
-                     m, nu2[ 1 : 3 ], maxit )
+                     m, nu2[ 1 : 3 ], 4 * maxit )
   ## update beta
   sigma2 <- rev( flair_seg$parm[ 3, ] )
   beta[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )

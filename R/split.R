@@ -3,8 +3,8 @@ splitT1ce3 <- function( t1ce, flair ) {
   
   label <- array( -4L, dim = dim( flair ) )
   label[ ! is.nan( t1ce ) ] <- 0L
-  q_flair <- quantile( flair, probs = .30, na.rm = T )
-  q_t1ce <- quantile( t1ce, probs = .30, na.rm = T )
+  q_flair <- quantile( flair, probs = .15, na.rm = T )
+  q_t1ce <- quantile( t1ce, probs = .15, na.rm = T )
   
   # find CSF & necrosis
   label[ flair < q_flair & t1ce < q_t1ce ] <- -1L
