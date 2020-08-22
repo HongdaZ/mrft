@@ -1,7 +1,7 @@
 # segment the MR images 
 # beta and nu2 influenced by normalization
 
-segment <- function( patient, delta = 5 ^ 2, gamma = 1, 
+segment <- function( patient, delta = 5 ^ 2, gamma = 2, 
                      alpha = rep( 10, 4 ),
                      beta = rep( 1, 4 ),
                      lambda2 = rep( 1 , 4 ), 
@@ -17,7 +17,7 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 1,
   ## estimate parameters of t1ce or FLAIR images without tumor
   t1ce_seg <- est3( t1ce_model, delta, gamma,
                     alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ], 
-                    m, nu2[ 1 : 3 ], 4 * maxit )
+                    m, nu2[ 1 : 3 ], 4L * maxit )
   ## update beta
   sigma2 <- rev( t1ce_seg$parm[ 3, ] )
   beta[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
