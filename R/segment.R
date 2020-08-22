@@ -15,9 +15,10 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 2,
   m <- t1ce_data$m
   t1ce_model <- initEst( t1ce_data$label, t1ce_data$t1ce )
   ## estimate parameters of t1ce or FLAIR images without tumor
-  t1ce_seg <- est3( t1ce_model, delta, gamma,
-                    alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ], 
-                    m, nu2[ 1 : 3 ], 4L * maxit )
+  system.time( t1ce_seg <- est3( t1ce_model, delta, gamma,
+                                 alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ], 
+                                 m, nu2[ 1 : 3 ], 4L * maxit ) )
+  
   ## update beta
   beta[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
   t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, t1ce_factor )
