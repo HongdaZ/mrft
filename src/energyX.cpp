@@ -34,35 +34,15 @@ double energyX( const int &curr_label, const int &curr_idx,
   int nbr_idx = 0;
   int label;
   double scale;
-  double binary;
-  
-  if( ! region ) {
+  for( int i = 0; i < 6; ++ i ) {
     scale = 1;
-    for( int i = 0; i < 6; ++ i ) {
-      nbr_idx = ptr_nidx[ 6 * ( curr_idx - 1 ) + i ];
-      if( nbr_idx != NA_INTEGER ) {
-        label = ptr_seg[ 2 * ( nbr_idx - 1 ) ];
-        binary = pairwise( curr_label, label );
-        if( binary != 0 ) {
-          energy += scale * gamma * binary;
-        }
+    nbr_idx = ptr_nidx[ 6 * ( curr_idx - 1 ) + i ];
+    if( nbr_idx != NA_INTEGER ) {
+      label = ptr_seg[ 2 * ( nbr_idx - 1 ) ];
+      if( region && label < - 3 ) {
+        scale = 2;
       }
-    }
-  } else {
-    for( int i = 0; i < 6; ++ i ) {
-      nbr_idx = ptr_nidx[ 6 * ( curr_idx - 1 ) + i ];
-      if( nbr_idx != NA_INTEGER ) {
-        label = ptr_seg[ 2 * ( nbr_idx - 1 ) ];
-        binary = pairwise( curr_label, label );
-        if( binary != 0 ) {
-          if( label < - 3 ) {
-            scale = 2;
-          } else { 
-            scale = 1;
-          }
-          energy += scale * gamma * binary;
-        }
-      }
+      energy += scale * gamma * pairwise( curr_label, label );
     }
   }
   return energy;
