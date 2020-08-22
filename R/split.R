@@ -88,12 +88,12 @@ split4 <- function( x, x_seg, x_factor ) {
   label[ x_seg$image == -1 ] <- -1L
   label[ x_seg$image == -2 ] <- -2L
   label[ x_seg$image == -3 ] <- -3L
-  m_3 <- x_seg$parm[ 2, 1 ]
+  m_3 <- x_seg$parm[ 2, 3 ]
   sigma2_3 <- x_seg$parm[ 3, 1 ]
   # threshold for enhancing tumor core
   m_4 <- m_3 + sqrt( sigma2_3 ) * x_factor
   label[ x > m_4 ] <- 4L
-  m_1 <- x_seg$parm[ 2, 3 ]
+  m_1 <- x_seg$parm[ 2, 1 ]
   m_2 <- x_seg$parm[ 2, 2 ]
   
   label[ label == -4L ] <- NA_integer_
