@@ -9,7 +9,7 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 2,
                      nu2 = rep( .25, 3 ), 
                      maxit = 10L,
                      t1ce_factor = 36L,
-                     flair_factor = 12L ) {
+                     flair_factor = 36L ) {
   images <- readImage( patient )
   t1ce_data <- splitT1ce3( images$t1ce, images$flair )
   m <- t1ce_data$m
@@ -19,7 +19,6 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 2,
                     alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ], 
                     m, nu2[ 1 : 3 ], 4L * maxit )
   ## update beta
-  sigma2 <- rev( t1ce_seg$parm[ 3, ] )
   beta[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
   t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, t1ce_factor )
   ## update m
