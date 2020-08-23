@@ -1,7 +1,7 @@
 # segment the MR images 
 # beta and nu2 influenced by normalization
 
-segment <- function( patient, delta = c( 12 ^ 2 / 2, 6 ^ 2 / 2 ), 
+segment <- function( patient, delta = c( 12 ^ 2 / 2, 12 ^ 2 / 2 ), 
                      gamma = 2, 
                      alpha = rep( 10, 4 ),
                      beta = rep( 1, 4 ),

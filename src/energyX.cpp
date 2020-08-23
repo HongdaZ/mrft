@@ -18,11 +18,13 @@ double pairwise( const int &left, const int &right ) {
 // ptr_delta[ 0 ] for tumor and ptr_delta[ 0 ] + ptr_delta[ 1 ] 
 // for outliers
 double unary( const int &label, const double *ptr_delta ) {
-  double ans = 0;
+  double ans;
   if( label < -3 ) {
     ans = ptr_delta[ 0 ];
   } else if ( label > 0 ) {
     ans = ptr_delta[ 0 ] + ptr_delta[ 1 ];
+  } else if( label >= -3 && label <= -1 ) {
+    ans = 0;
   }
   return ans;
 }
