@@ -1,7 +1,8 @@
 # segment the MR images 
 # beta and nu2 influenced by normalization
 
-segment <- function( patient, delta = 5 ^ 2, gamma = 2, 
+segment <- function( patient, delta = c( 12 ^ 2 / 2, 6 ^ 2 / 2 ), 
+                     gamma = 2, 
                      alpha = rep( 10, 4 ),
                      beta = rep( 1, 4 ),
                      lambda2 = rep( 1 , 4 ), 
@@ -42,7 +43,7 @@ segment <- function( patient, delta = 5 ^ 2, gamma = 2,
                      alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ],
                      m, nu2[ 1 : 3 ], 4 * maxit )
   ## update beta
-  sigma2 <- rev( flair_seg$parm[ 3, ] )
+  sigma2 <- flair_seg$parm[ 3, ]
   beta[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
   flair_data <- split4( flair_data$flair, flair_seg, flair_factor )
   ## update m

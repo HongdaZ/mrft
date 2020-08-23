@@ -21,7 +21,7 @@ void cmpE3( int idx, vector<double> &health_parm,
     energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
                       ptr_intst, ptr_nintst, theta );
     energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
-                       ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+                       ptr_delta, ptr_gamma[ 0 ] );
     if( i == - 1 ) {
       min_energy = energy;
       min_label = i;

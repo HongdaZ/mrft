@@ -12,4 +12,4 @@ using std::vector;
 double energyX( const int &curr_label, const int &curr_idx, 
                 const bool &region,
                 const int *ptr_seg, const int *ptr_nidx,
-                const double &delta, const double &gamma );
+                const double *ptr_delta, const double &gamma );

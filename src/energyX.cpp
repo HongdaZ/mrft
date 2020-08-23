@@ -15,11 +15,14 @@ double pairwise( const int &left, const int &right ) {
   }
   return ans;
 }
-
-double unary( const int &label ) {
+// ptr_delta[ 0 ] for tumor and ptr_delta[ 0 ] + ptr_delta[ 1 ] 
+// for outliers
+double unary( const int &label, const double *ptr_delta ) {
   double ans = 0;
-  if( label > 0 ) {
-    ans = 1;
+  if( label < -3 ) {
+    ans = ptr_delta[ 0 ];
+  } else if ( label > 0 ) {
+    ans = ptr_delta[ 0 ] + ptr_delta[ 1 ];
   }
   return ans;
 }
@@ -29,8 +32,8 @@ double unary( const int &label ) {
 double energyX( const int &curr_label, const int &curr_idx, 
                 const bool &region,
                 const int *ptr_seg, const int *ptr_nidx,
-                const double &delta, const double &gamma ) {
-  double energy = delta * unary( curr_label );
+                const double *ptr_delta, const double &gamma ) {
+  double energy = unary( curr_label, ptr_delta );
   int nbr_idx = 0;
   int label;
   double scale;

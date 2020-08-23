@@ -131,7 +131,7 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
     outlier_parm[ 2 ] = out_sigma2;
     
     out_energy = energyX( out_label, idx, true, ptr_seg, ptr_nidx,
-                          ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+                          ptr_delta, ptr_gamma[ 0 ] );
     out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ],
                            out_sigma2,
                            ptr_lambda2[ 3 ], ptr_seg, ptr_intst,
@@ -220,7 +220,7 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
         h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,
                             ptr_intst, ptr_nintst, h_theta );
         h_energy += energyX( i, idx, false, ptr_seg, ptr_nidx,
-                             ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+                             ptr_delta, ptr_gamma[ 0 ] );
         // Rprintf( "h_label = %d; h_energy = %f; h_mu = %f; h_sigma2 = %f;\n",
         //          i, energy, mu, sigma2 );
         if( i == - 1 ) {
@@ -254,7 +254,7 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
                             t_theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
                             ptr_a[ 0 ], ptr_b[ 0 ] );
         t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
-                             ptr_delta[ 0 ], ptr_gamma[ 0 ] );
+                             ptr_delta, ptr_gamma[ 0 ] );
         // Rprintf( "t_label = %d; t_energy = %f; t_mu = %f; t_sigma2 = %f;\n",
         //          t_label, t_energy, t_mu, t_sigma2 );
         // Outlier energy
@@ -263,8 +263,8 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
         findOutLabel( out_label, idx, ptr_seg, outl_labels );
         double &out_energy = energy;
         out_energy = energyX( out_label, idx, false, ptr_seg,
-                              ptr_nidx, ptr_delta[ 0 ],
-                                                 ptr_gamma[ 0 ] );
+                              ptr_nidx, ptr_delta,
+                              ptr_gamma[ 0 ] );
         // outlier parameters
         double &out_mu = mu, &out_sigma2 = sigma2;
         if( curr_label > 0 ) {
