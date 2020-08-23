@@ -1,7 +1,10 @@
 # segment the MR images 
 # beta and nu2 influenced by normalization
 
-segment <- function( patient, delta = c( 12 ^ 2 / 2, 12 ^ 2 / 2 ), 
+segment <- function( patient, 
+                     delta = list( t1ce = c( 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                                   flair = c( 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                                   t1 = c( 4 ^ 2 / 2, 4 ^ 2 / 2 ) ), 
                      gamma = 2, 
                      alpha = rep( 10, 4 ),
                      beta = rep( 1, 4 ),
@@ -16,7 +19,7 @@ segment <- function( patient, delta = c( 12 ^ 2 / 2, 12 ^ 2 / 2 ),
   m <- t1ce_data$m
   t1ce_model <- initEst( t1ce_data$label, t1ce_data$t1ce )
   ## estimate parameters of t1ce or FLAIR images without tumor
-  system.time( t1ce_seg <- est3( t1ce_model, delta, gamma,
+  system.time( t1ce_seg <- est3( t1ce_model, delta$t1ce, gamma,
                                  alpha[ 1 : 3 ], beta[ 1 : 3 ], 
                                  lambda2[ 1 : 3 ], 
                                  m, nu2[ 1 : 3 ], 4L * maxit ) )
@@ -30,7 +33,8 @@ segment <- function( patient, delta = c( 12 ^ 2 / 2, 12 ^ 2 / 2 ),
   b <- getB( m, a )
   t1ce_model <- initEst( t1ce_data$label, t1ce_data$intst )
   # sink( '/media/hzhang/ZHD-U1/result/output.txt' )
-  system.time( t1ce_seg <- pred4( t1ce_model, delta, gamma, alpha, beta, 
+  system.time( t1ce_seg <- pred4( t1ce_model, delta$t1ce, 
+                                  gamma, alpha, beta, 
                                   lambda2, a, b, m, nu2, maxit ) )
   
   # sink();
@@ -39,7 +43,7 @@ segment <- function( patient, delta = c( 12 ^ 2 / 2, 12 ^ 2 / 2 ),
   m <- flair_data$m
   flair_model <- initEst( flair_data$label, flair_data$flair )
   ## estimate parameters of t1ce or FLAIR images without tumor
-  flair_seg <- est3( flair_model, delta, gamma, 
+  flair_seg <- est3( flair_model, delta$flair, gamma, 
                      alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ],
                      m, nu2[ 1 : 3 ], 4 * maxit )
   ## update beta
@@ -50,7 +54,8 @@ segment <- function( patient, delta = c( 12 ^ 2 / 2, 12 ^ 2 / 2 ),
   m <- flair_data$m
   b <- getB( m, a )
   flair_model <- initEst( flair_data$label, flair_data$intst )
-  system.time( flair_seg <- pred4( flair_model, delta, gamma, alpha, beta,
+  system.time( flair_seg <- pred4( flair_model, delta$flair,
+                                   gamma, alpha, beta,
                                    lambda2, a, b, m, nu2, 1L ) )
   
 }
