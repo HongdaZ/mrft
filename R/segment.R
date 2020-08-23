@@ -5,15 +5,15 @@ segment <- function( patient,
                      delta = list( t1ce = c( 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                                    flair = c( 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                                    t1 = c( 4 ^ 2 / 2, 4 ^ 2 / 2 ) ), 
-                     gamma = 2, 
+                     gamma = 1, 
                      alpha = rep( 10, 4 ),
                      beta = rep( 1, 4 ),
                      lambda2 = rep( 1 , 4 ), 
                      a = 5,
                      nu2 = rep( .25, 3 ), 
-                     maxit = 10L,
-                     t1ce_factor = 36L,
-                     flair_factor = 36L ) {
+                     maxit = list( t1ce = 10L, flair = 10L, t2 = 10L ),
+                     t1ce_factor = 18L,
+                     flair_factor = 18L ) {
   images <- readImage( patient )
   t1ce_data <- splitT1ce3( images$t1ce, images$flair )
   m <- t1ce_data$m
@@ -22,7 +22,7 @@ segment <- function( patient,
   system.time( t1ce_seg <- est3( t1ce_model, delta$t1ce, gamma,
                                  alpha[ 1 : 3 ], beta[ 1 : 3 ], 
                                  lambda2[ 1 : 3 ], 
-                                 m, nu2[ 1 : 3 ], 4L * maxit ) )
+                                 m, nu2[ 1 : 3 ], 4L * maxit$t1ce ) )
   
   ## update beta
   sigma2 <- t1ce_seg$parm[ 3, ]
@@ -35,7 +35,7 @@ segment <- function( patient,
   # sink( '/media/hzhang/ZHD-U1/result/output.txt' )
   system.time( t1ce_seg <- pred4( t1ce_model, delta$t1ce, 
                                   gamma, alpha, beta, 
-                                  lambda2, a, b, m, nu2, maxit ) )
+                                  lambda2, a, b, m, nu2, maxit$t1ce ) )
   
   # sink();
   ## split flair images to CSF & necrosis, white matter and grey matter
@@ -45,7 +45,7 @@ segment <- function( patient,
   ## estimate parameters of t1ce or FLAIR images without tumor
   flair_seg <- est3( flair_model, delta$flair, gamma, 
                      alpha[ 1 : 3 ], beta[ 1 : 3 ], lambda2[ 1 : 3 ],
-                     m, nu2[ 1 : 3 ], 4 * maxit )
+                     m, nu2[ 1 : 3 ], 4L * maxit$flair )
   ## update beta
   sigma2 <- flair_seg$parm[ 3, ]
   beta[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
@@ -56,6 +56,6 @@ segment <- function( patient,
   flair_model <- initEst( flair_data$label, flair_data$intst )
   system.time( flair_seg <- pred4( flair_model, delta$flair,
                                    gamma, alpha, beta,
-                                   lambda2, a, b, m, nu2, 1L ) )
+                                   lambda2, a, b, m, nu2, maxit$flair ) )
   
 }
