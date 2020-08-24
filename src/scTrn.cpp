@@ -19,7 +19,7 @@ using std::vector;
 // start = 1 to length array
 // nidx also starts from 1
 int scTrn( int &n_region, list<list<int>> &tumor_regions,
-           vector<int> &front, vector<int> &region,
+           vector<int> &region,
            const vector<int> &tumor_labels,
            int *ptr_label, const int *ptr_nidx,
            const int &len, const int &start,
@@ -60,7 +60,7 @@ int scTrn( int &n_region, list<list<int>> &tumor_regions,
         new_start = tumor_nbr.front();
         tumor_nbr.pop_front();
         ptr_label[ 2 * new_start - 1 ] = 0;
-        findRegion( region, front, n_region, ptr_label, ptr_nidx,
+        findRegion( region, n_region, ptr_label, ptr_nidx,
                     false, tumor_nbr, early_return, new_start );
         if( early_return ) {
           ptr_label[ 2 * start - 1  ] = 0;

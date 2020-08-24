@@ -88,9 +88,6 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   vector<int> regions_sub;
   regions_sub.reserve( len );
   
-  // frontier in search
-  vector<int> front;
-  front.reserve( len );
   // store the result of findRegion
   vector<int> region;
   region.reserve( len );
@@ -107,7 +104,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   vector<double> label_whole_parm( 9, 0 );
   vector<double> region_parm;
   region_parm.reserve( n_row * 7 );
-  initRegion( region, front, tumor_regions,
+  initRegion( region, tumor_regions,
               ptr_res_seg, ptr_nidx, len,
               tumor_labels, n_tumor );
   initParm( region, theta, true, health_parm, tumor_parm, ptr_res_seg,
@@ -143,7 +140,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
           cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
                  ptr_nintst, ptr_delta, ptr_gamma, theta );
         } else {
-          sc = scPred( n_region, tumor_regions, front, region,
+          sc = scPred( n_region, tumor_regions, region,
                        tumor_labels, ptr_res_seg, ptr_nidx,
                        len, curr_idx, regions_whole, regions_sub,
                        tumor_nbr, tumor_label );
@@ -166,6 +163,82 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
               ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
               ptr_a, ptr_b, len, 20 );
   }
+  // // print idx, intst, old_label, time for skip(), cmpE3 or sc & cmpEP,
+  // // new_label
+  // for( int i = 0; i < *ptr_maxit; ++ i ) {
+  //   for( int j = 1; j <= len; j ++ ) {
+  //     curr_idx = j;
+  //     // debug: speedup
+  //     Rprintf( "%d, %f, %d, ", j, ptr_intst[ curr_idx - 1 ], 
+  //              ptr_res_seg[ 2 * ( curr_idx - 1 ) ] );
+  //     start = high_resolution_clock::now();
+  //     /////////////////
+  //     skip_ = skip( curr_idx, ptr_res_seg, ptr_nidx );
+  //     // debug: speedup
+  //     stop = high_resolution_clock::now();
+  //     duration = duration_cast< microseconds > ( stop - start );
+  //     spend = duration.count();
+  //     Rprintf( "%d, ", spend );
+  //     ////////////////
+  //     if( ! skip_ ) {
+  //       curr_intst = ptr_intst[ curr_idx - 1 ];
+  //       if( curr_intst < ptr_m[ 2 ] ) {
+  //         // debug: speedup
+  //         start = high_resolution_clock::now();
+  //         /////////////////
+  //         cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
+  //                ptr_nintst, ptr_delta, ptr_gamma, theta );
+  //         // debug: speedup
+  //         stop = high_resolution_clock::now();
+  //         duration = duration_cast< microseconds > ( stop - start );
+  //         spend = duration.count();
+  //         Rprintf( "%d, ", spend );
+  //         ////////////////
+  //       } else {
+  //         // debug: speedup
+  //         start = high_resolution_clock::now();
+  //         /////////////////
+  //         sc = scPred( n_region, tumor_regions, region,
+  //                      tumor_labels, ptr_res_seg, ptr_nidx,
+  //                      len, curr_idx, regions_whole, regions_sub,
+  //                      tumor_nbr, tumor_label );
+  //         // debug: speedup
+  //         stop = high_resolution_clock::now();
+  //         duration = duration_cast< microseconds > ( stop - start );
+  //         spend = duration.count();
+  //         Rprintf( "%d, ", spend );
+  //         ////////////////
+  //         // debug: speedup
+  //         start = high_resolution_clock::now();
+  //         /////////////////
+  //         cmpEP( region, curr_idx, sc, regions_whole, regions_sub,
+  //                tumor_labels, outl_labels, health_parm,
+  //                tumor_parm, outl_parm,
+  //                ptr_res_seg, ptr_nidx, ptr_intst, ptr_nintst,
+  //                ptr_delta, ptr_gamma, ptr_alpha, ptr_res_beta,
+  //                ptr_lambda2, ptr_a, ptr_b, ptr_m,
+  //                ptr_nu2, outlier_parm, theta, tmp_parm, out_theta,
+  //                new_out_parm, whole_parm, label_whole_parm,
+  //                region_parm, n_tumor, n_outl,
+  //                n_region, tumor_regions, n_row, tumor_label );
+  //         // debug: speedup
+  //         stop = high_resolution_clock::now();
+  //         duration = duration_cast< microseconds > ( stop - start );
+  //         spend = duration.count();
+  //         Rprintf( "%d, ", spend );
+  //       }
+  //       // debug: speedup
+  //       Rprintf( "%d\n", ptr_res_seg[ 2 * ( curr_idx - 1 ) ] );
+  //       /////////////////
+  //     }
+  //   }
+  //   //update parm for healthy and tumorous regions
+  //   initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg,
+  //             ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
+  //             ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
+  //             ptr_a, ptr_b, len, 20 );
+  // }
+  
   // segment zero blocks
   for( int j = 1; j <= len; ++ j ) {
     if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
@@ -175,7 +248,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
         cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
                ptr_nintst, ptr_delta, ptr_gamma, theta );
       } else {
-        sc = scPred( n_region, tumor_regions, front, region,
+        sc = scPred( n_region, tumor_regions, region,
                      tumor_labels, ptr_res_seg, ptr_nidx,
                      len, curr_idx, regions_whole, regions_sub,
                      tumor_nbr, tumor_label );

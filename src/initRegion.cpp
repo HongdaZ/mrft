@@ -7,7 +7,7 @@
 #include "initRegion.h"
 #include "label2col.h"
 
-void initRegion( vector<int> &region, vector<int> &front, 
+void initRegion( vector<int> &region,
                  list<list<int>> &tumor_regions, 
                  int *ptr_seg, 
                  const int *ptr_nidx, const int &len,
@@ -22,7 +22,7 @@ void initRegion( vector<int> &region, vector<int> &front,
       list<int> new_region;
       new_region.push_back( tumor_label );
       bool early_return;
-      findRegion( region, front, n_region, ptr_seg, ptr_nidx, true, 
+      findRegion( region, n_region, ptr_seg, ptr_nidx, true, 
                   tumor_nbr, early_return, i + 1 );
       for( vector<int>::iterator it = region.begin(); it != region.end(); 
       ++ it ) {

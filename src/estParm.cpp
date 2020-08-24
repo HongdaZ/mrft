@@ -104,7 +104,7 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   vector<double> region_parm;
   region_parm.reserve( n_row * 7 );
   
-  initRegion( region, front, tumor_regions,
+  initRegion( region, tumor_regions,
               ptr_res_seg, ptr_nidx, len,
               tumor_labels, n_tumor );
   initParm( region, theta, true, health_parm, tumor_parm, ptr_res_seg,
@@ -140,7 +140,7 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
           cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
                  ptr_nintst, ptr_delta, ptr_gamma, theta );
         } else {
-          sc = scTrn( n_region, tumor_regions, front, region, 
+          sc = scTrn( n_region, tumor_regions, region, 
                        tumor_labels, ptr_res_seg, ptr_nidx, 
                        len, curr_idx, regions_whole, regions_sub,
                        tumor_nbr, tumor_label );
@@ -168,7 +168,7 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   for( int j = 1; j <= len; j ++ ) {
     if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
       curr_idx = j;
-      sc = scTrn( n_region, tumor_regions, front, region,
+      sc = scTrn( n_region, tumor_regions, region,
                    tumor_labels, ptr_res_seg, ptr_nidx,
                    len, curr_idx, regions_whole, regions_sub,
                    tumor_nbr, tumor_label );

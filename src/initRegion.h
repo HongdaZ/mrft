@@ -10,7 +10,7 @@ using std::map;
 using std::list;
 using std::vector;
 
-void initRegion( vector<int> &region, vector<int> &front, 
+void initRegion( vector<int> &region,
                  list<list<int>> &tumor_regions, 
                  int *ptr_seg, 
                  const int *ptr_nidx, const int &len,

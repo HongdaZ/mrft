@@ -3,12 +3,12 @@
 #include "Rinternals.h"
 
 void search( const int n_region, const bool init, int *label,
-             const int *nidx, vector<int>& front, const int & l,
+             const int *nidx, queue<int>& front, const int & l,
              vector<int>& region, list<int> &tumor_nbr, 
              bool &early_return ) {
   while( !front.empty() ) {
-    int index = front.back();
-    front.pop_back();
+    int index = front.front();
+    front.pop();
     int n_idx;
     for( int i = 0; i < 6; ++ i ) {
       n_idx = nidx[ 6 * ( index - 1 ) + i ];
@@ -32,7 +32,7 @@ void search( const int n_region, const bool init, int *label,
             }
           }
           // Rprintf( "neighbor = %d \n", n_idx );
-          front.push_back( n_idx );
+          front.push( n_idx );
           region.push_back( n_idx );
           label[ 2 * n_idx - 1 ] = 1;
         }

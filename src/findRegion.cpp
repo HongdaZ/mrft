@@ -10,15 +10,15 @@
 
 using std::vector;
 
-void findRegion( vector<int> &region, vector<int> &front,
+void findRegion( vector<int> &region,
                  const int &n_region, int *ptr_label, const int *ptr_nidx, 
                  const bool &init, list<int> &tumor_nbr, bool &early_return, 
                  const int &start ) {
-  clearVector( front );
+  queue<int> front;
   clearVector( region );
   
   int l = ptr_label[ 2 * ( start - 1 ) ];
-  front.push_back( start );
+  front.push( start );
   region.push_back( start );
   ptr_label[ 2 * start - 1 ] = 1;
   search( n_region, init, ptr_label, ptr_nidx, front, l, region, tumor_nbr,

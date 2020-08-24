@@ -8,7 +8,7 @@ using std::list;
 using std::vector;
 
 int scTrn( int &n_region, list<list<int>> &tumor_regions,
-           vector<int> &front, vector<int> &region,
+           vector<int> &region,
            const vector<int> &tumor_labels,
            int *ptr_label, const int *ptr_nidx,
            const int &len, const int &start,
