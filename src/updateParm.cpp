@@ -49,7 +49,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double *yl = new double[ nrow ];
   
   double sum_theta;
-  while( i < 2 || ( i < maxit && tol > .0001 )  ) {
+  while( i < 1 || ( i < maxit && tol > .0001 )  ) {
     sum_theta = 0;
     for( int j = 0; j < 6; ++ j ) {
       sum_theta += theta[ j ];
@@ -118,7 +118,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   double *yl = new double[ nrow ];
   double sum_theta;
   
-  while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
+  while(  i < 1 || ( i < maxit && tol > .0001 ) ) {
     sum_theta = 0;
     for( int j = 0; j < 6; ++ j ) {
       sum_theta += theta[ j ];
@@ -165,7 +165,7 @@ void updateParm( double &mu, double &sigma2,
   double tmp = 0;
   double sum_y = ptr_intst[ idx - 1 ];
   int n = 1;
-  while(  i < 2 || ( i < maxit && tol > .0001 ) ) {
+  while(  i < 1 || ( i < maxit && tol > .0001 ) ) {
     tmp = updateMu( n, sigma2, m, mk_1, a, b, sum_y );
     // Rprintf( "mu = %f \n", tmp );
     tol = abs( mu - tmp );

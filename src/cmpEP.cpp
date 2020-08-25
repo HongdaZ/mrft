@@ -95,7 +95,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
         updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
                     ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, region_label,
                     ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
-                    ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+                    ptr_alpha[ 3 ], ptr_beta[ 3 ], 1 );
         // region_label, mu, sigma2, theta
         region_parm[ n_row * i ] = region_label;
         region_parm[ n_row * i + 1 ] = mu;
