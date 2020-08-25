@@ -12,29 +12,42 @@ void initMV( const vector<int> &region, double *yln_,
   int nrow = region.size();
   int ncol = 6;
   int idx;
+  int nidx;
+  int nlabel;
   for( int j = 0; j < nrow; ++ j ) {
     idx = region[ j ];
     yl_[ j ] = ptr_intst[ idx - 1 ];
     sum_y += yl_[ j ];
   }
-  for( int i = 0; i < 6; ++ i ) {
-    for( int j = 0; j < nrow; ++ j ) {
-      idx = region[ j ];
-      int nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
-      if( nidx != NA_INTEGER ) {
-        // healthy
-        if( curr_label < 0 && curr_label > - 4 ) {
-          int nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
+  // healthy
+  if( curr_label < 0 && curr_label > - 4 ) {
+    for( int i = 0; i < 6; ++ i ) {
+      for( int j = 0; j < nrow; ++ j ) {
+        idx = region[ j ];
+        nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
+        if( nidx != NA_INTEGER ) {
+          nlabel = ptr_seg[ 2 * ( nidx - 1 ) ];
           if( nlabel == curr_label ) {
             yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
             yln_i[ i * nrow + j ] = 1;
           } else {
             yln_[ i * nrow + j ] = 0;
             yln_i[ i * nrow + j ] = 0;
-          }
-          // tumor
+          } 
         } else {
-          int nlabel = ptr_seg[ 2 * nidx - 1 ];
+          yln_[ i * nrow + j ] = 0;
+          yln_i[ i * nrow + j ] = 0;
+        }
+      }
+    }
+  // tumor
+  } else {
+    for( int i = 0; i < 6; ++ i ) {
+      for( int j = 0; j < nrow; ++ j ) {
+        idx = region[ j ];
+        nidx =  ptr_nidx[ 6 * ( idx - 1 ) + i ];
+        if( nidx != NA_INTEGER ) {
+          nlabel = ptr_seg[ 2 * nidx - 1 ];
           if( nlabel == 3 ) {
             yln_[ i * nrow + j ] = ptr_nintst[ 6 * ( idx - 1 ) + i ];
             yln_i[ i * nrow + j ] = 1;
@@ -42,10 +55,10 @@ void initMV( const vector<int> &region, double *yln_,
             yln_[ i * nrow + j ] = 0;
             yln_i[ i * nrow + j ] = 0;
           }
-        } 
-      } else {
-        yln_[ i * nrow + j ] = 0;
-        yln_i[ i * nrow + j ] = 0;
+        } else {
+          yln_[ i * nrow + j ] = 0;
+          yln_i[ i * nrow + j ] = 0;
+        }
       }
     }
   }
