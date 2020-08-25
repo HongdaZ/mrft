@@ -129,6 +129,8 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
   list<int> tumor_label;
   int sc;
   bool skip_;
+  // whether getParm or updateParm
+  list<int> update_parm;
   
   for( int i = 0; i < *ptr_maxit; ++ i ) {
     for( int j = 1; j <= len; j ++ ) {
@@ -140,7 +142,7 @@ SEXP pred4( SEXP model, SEXP delta, SEXP gamma,
           cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
                  ptr_nintst, ptr_delta, ptr_gamma, theta );
         } else {
-          sc = scPred( n_region, tumor_regions, region,
+          sc = scPred( n_region, update_parm, tumor_regions, region,
                        tumor_labels, ptr_res_seg, ptr_nidx,
                        len, curr_idx, regions_whole, regions_sub,
                        tumor_nbr, tumor_label );

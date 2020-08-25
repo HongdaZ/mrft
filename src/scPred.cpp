@@ -21,14 +21,18 @@ using std::vector;
 // nidx also starts from 1
 
 // split or combine for prediction
-int scPred( int &n_region, list<list<int>> &tumor_regions, 
+int scPred( int &n_region, list<int> &update_parm, 
+            list<list<int>> &tumor_regions, 
             vector<int> &region, 
             const vector<int> &tumor_labels,
             int *ptr_label, const int *ptr_nidx, 
             const int &len, const int &start, 
             vector<int> &regions_whole, vector<int> &regions_sub,
             list<int> &tumor_nbr, list<int> &tumor_label ) {
+  list<double> region_size;
   n_region = 0;
+  // 0: updateParm; < 0; getParm
+  clearVector( update_parm );
   clearVector( regions_whole );
   clearVector( regions_sub );
   clearVector( tumor_nbr ); 
@@ -72,9 +76,10 @@ int scPred( int &n_region, list<list<int>> &tumor_regions,
         
       }
       assignRegion( regions_whole, regions_sub, region, region_label );
+      region_size.push_back( region.size() );
       ++ n_region;
     }
-   
+    region_size.push_front( regions_whole.size() - 1 );
     regions_whole.push_back( NA_INTEGER );
     // restore the value of seg[ 2, ] to 0;
     ptr_label[ 2 * start - 1  ] = 0;
@@ -83,6 +88,17 @@ int scPred( int &n_region, list<list<int>> &tumor_regions,
     } else {
       // count whole region
       ++ n_region;
+      // getParm or updateParm
+      update_parm.push_back( current );
+      list<double>::iterator it = region_size.begin();
+      int whole_size = *it;
+      for( ++ it; it != region_size.end(); ++ it ) {
+        if( ( *it / whole_size ) > .99 ) {
+          update_parm.push_back( current );
+        } else {
+          update_parm.push_back( 0 );
+        }
+      }
       return 1;
     }
   } else {
@@ -90,6 +106,7 @@ int scPred( int &n_region, list<list<int>> &tumor_regions,
       return 0;
     }
     // possibly combine
+    int combine_parm_label = 0;
     int combine_label = tumor_label.back();
     regions_whole.push_back( combine_label );
     regions_whole.push_back( start );
@@ -97,13 +114,26 @@ int scPred( int &n_region, list<list<int>> &tumor_regions,
     ++ n_region;
     // add sub-regions
     n_region += tumor_label.size();
-    
+    update_parm = tumor_label;
+    int r_size;
     for( list<int>::iterator it = tumor_label.begin();
          it != tumor_label.end(); ++ it ) {
       assignRegion( regions_whole, regions_sub, tumor_regions,
-                    *it );
+                    *it, r_size );
+      region_size.push_back( r_size );
     }
+    region_size.push_front( regions_whole.size() - 1 );
     regions_whole.push_back( NA_INTEGER );
+    
+    list<double>::iterator it = region_size.begin();
+    int whole_size = *it;
+    list<int>::const_iterator it_tlabel = tumor_label.begin();
+    for( ++ it; it != region_size.end(); ++ it, ++ it_tlabel ) {
+      if( ( *it / whole_size ) > .99 ) {
+        combine_parm_label = *it_tlabel;
+      }
+    }
+    update_parm.push_front( combine_parm_label );
     return 2;
   }
 }

@@ -15,6 +15,7 @@ void assignRegion( vector<int> &regions_whole,
 void assignRegion( vector<int> &regions_whole,  
                    vector<int> &regions_sub,
                    const list<list<int>> &tumor_regions,
-                   const int &label );
+                   const int &label, 
+                   int &r_size );
 
 #endif

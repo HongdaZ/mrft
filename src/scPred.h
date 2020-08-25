@@ -8,7 +8,8 @@ using std::vector;
 using std::list; 
 
 // split or combine for prediction
-int scPred( int &n_region, list<list<int>> &tumor_regions, 
+int scPred( int &n_region, list<int> &update_parm, 
+            list<list<int>> &tumor_regions, 
             vector<int> &region, 
             const vector<int> &tumor_labels,
             int *ptr_label, const int *ptr_nidx, 
