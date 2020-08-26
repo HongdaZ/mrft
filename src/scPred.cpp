@@ -31,6 +31,8 @@ int scPred( int &n_region, list<int> &update_parm,
             list<int> &tumor_nbr, list<int> &tumor_label ) {
   list<double> region_size;
   n_region = 0;
+  // getParm or updateParm
+  const double proportion = .95;
   // 0: updateParm; < 0; getParm
   clearVector( update_parm );
   clearVector( regions_whole );
@@ -95,7 +97,7 @@ int scPred( int &n_region, list<int> &update_parm,
       if( whole_size > 100 ) {
         update_parm.push_back( current );
         for( ++ it; it != region_size.end(); ++ it ) {
-          if( ( *it / whole_size ) > .99 ) {
+          if( ( *it / whole_size ) > proportion ) {
             update_parm.push_back( current );
           } else {
             update_parm.push_back( 0 );
@@ -137,7 +139,7 @@ int scPred( int &n_region, list<int> &update_parm,
       update_parm = tumor_label;
       list<int>::const_iterator it_tlabel = tumor_label.begin();
       for( ++ it; it != region_size.end(); ++ it, ++ it_tlabel ) {
-        if( ( *it / whole_size ) > .99 ) {
+        if( ( *it / whole_size ) > proportion ) {
           combine_parm_label = *it_tlabel;
           break;
         }

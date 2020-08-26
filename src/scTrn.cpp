@@ -35,6 +35,7 @@ int scTrn( int &n_region, list<int> &update_parm,
     return 0;
   } else {
     n_region = 0;
+    const double proportion = .95;
     clearVector( regions_whole );
     clearVector( regions_sub );
     clearVector( tumor_nbr );
@@ -97,7 +98,7 @@ int scTrn( int &n_region, list<int> &update_parm,
         if( whole_size > 100 ) {
           update_parm.push_back( current );
           for( ++ it; it != region_size.end(); ++ it ) {
-            if( ( *it / whole_size ) > .99 ) {
+            if( ( *it / whole_size ) > proportion ) {
               update_parm.push_back( current );
             } else {
               update_parm.push_back( 0 );
@@ -139,7 +140,7 @@ int scTrn( int &n_region, list<int> &update_parm,
         update_parm = tumor_label;
         list<int>::const_iterator it_tlabel = tumor_label.begin();
         for( ++ it; it != region_size.end(); ++ it, ++ it_tlabel ) {
-          if( ( *it / whole_size ) > .99 ) {
+          if( ( *it / whole_size ) > proportion ) {
             combine_parm_label = *it_tlabel;
             break;
           }
