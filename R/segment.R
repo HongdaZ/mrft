@@ -32,12 +32,12 @@ segment <- function( patient,
   m <- t1ce_data$m
   b <- getB( m, a )
   t1ce_model <- initEst( t1ce_data$label, t1ce_data$intst )
-  # sink( '/media/hzhang/ZHD-U1/result/output.txt' )
+  sink( '/home/hzhang/Documents/t1ce_output.txt' )
   system.time( t1ce_seg <- pred4( t1ce_model, delta$t1ce, 
                                   gamma, alpha, beta, 
                                   lambda2, a, b, m, nu2, maxit$t1ce ) )
   
-  # sink();
+  sink()
   ## split flair images to CSF & necrosis, white matter and grey matter
   flair_data <- splitFlair3( images$flair, t1ce_seg )
   m <- flair_data$m
@@ -54,8 +54,11 @@ segment <- function( patient,
   m <- flair_data$m
   b <- getB( m, a )
   flair_model <- initEst( flair_data$label, flair_data$intst )
+  sink( '/home/hzhang/Documents/flair_output.txt' )
   system.time( flair_seg <- pred4( flair_model, delta$flair,
                                    gamma, alpha, beta,
-                                   lambda2, a, b, m, nu2, 1L ) )
+                                   lambda2, a, b, m, nu2, 
+                                   maxit$flair ) )
+  sink()
   
 }

@@ -19,7 +19,8 @@
 #include "clearVector.h"
 
 // compare energy for prediction
-void cmpEP( vector<int> &region, const int &idx, const int &sc,
+void cmpEP( const list<int> &update_parm,
+            vector<int> &region, const int &idx, const int &sc,
             const vector<int> &regions_whole,
             const vector<int> &regions_sub,
             vector<int> &tumor_labels, vector<int> &outl_labels,
@@ -57,7 +58,7 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   int start = -1;
   double mu, sigma2, energy;
-  
+  int cidx = 0; 
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier or healthy cell
     vector<double> nrg( n_region + 1, 0 ); 
@@ -68,15 +69,21 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
     int region_label;
     int region_idx;
     sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
-    for( int i = 0; i < n_region; ++ i ) {
+    list<int>::const_iterator it = update_parm.begin();
+    for( int i = 0; i < n_region; ++ i, ++ it ) {
       // get region and region label
       getRegion( region_label, region, regions_whole, regions_sub, 
                  start );
       if( region.size() == 1 ) {
         region_idx = region[ 0 ];
-        updateParm( mu, sigma2, region_idx, ptr_m[ 3 ], ptr_m[ 2 ],
-                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, ptr_seg,
-                    ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+        if( *it == 0 ) {
+          updateParm( mu, sigma2, region_idx, ptr_m[ 3 ], ptr_m[ 2 ],
+                      ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, ptr_seg,
+                      ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+        } else if( *it < - 3 ){
+          cidx = label2col( *it );
+          getParm( mu, sigma2, theta, tumor_parm, cidx );
+        }
         // region_label, mu, sigma2, theta
         region_parm[ n_row * i ] = region_label;
         region_parm[ n_row * i + 1 ] = mu;
@@ -92,10 +99,15 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
                           ptr_alpha[ 3 ], ptr_beta[ 3 ],
                           ptr_a[ 0 ], ptr_b[ 0 ] );
       } else {
-        updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
-                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, region_label,
-                    ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
-                    ptr_alpha[ 3 ], ptr_beta[ 3 ], 1 );
+        if( *it == 0 ) {
+          updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
+                      ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, region_label,
+                      ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
+                      ptr_alpha[ 3 ], ptr_beta[ 3 ], 1 );
+        } else if( *it < -3 ){
+          cidx = label2col( *it );
+          getParm( mu, sigma2, theta, tumor_parm, cidx );
+        }
         // region_label, mu, sigma2, theta
         region_parm[ n_row * i ] = region_label;
         region_parm[ n_row * i + 1 ] = mu;
@@ -140,7 +152,6 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
     // single voxel energy ( -1, -2, -3 )
     double min_energy = out_energy;
     int min_label = out_label;
-    int cidx;
     for( int i = - 1; i > - 4; -- i ) {
       cidx = label2col( i );
       getParm( mu, sigma2, theta, health_parm, cidx );
@@ -239,7 +250,6 @@ void cmpEP( vector<int> &region, const int &idx, const int &sc,
   } else {
     int t_label;
     vector<double> &t_theta = theta;
-    int cidx;
     // have tumor neighbor
     if( tumor_label.size() > 0 ) {
       double &t_energy = energy;

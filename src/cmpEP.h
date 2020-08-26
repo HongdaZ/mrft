@@ -14,7 +14,8 @@ using std::map;
 using std::list;
 
 // compare energy for prediction
-void cmpEP( vector<int> &region, const int &idx, const int &sc,
+void cmpEP( const list<int> &update_parm,
+            vector<int> &region, const int &idx, const int &sc,
             const vector<int> &regions_whole,
             const vector<int> &regions_sub,
             vector<int> &tumor_labels, vector<int> &outl_labels,

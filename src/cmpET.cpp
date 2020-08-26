@@ -19,7 +19,8 @@
 #include "clearVector.h"
 
 // compare energy for training
-void cmpET( vector<int> &region, const int &idx, const int &sc,
+void cmpET( const list<int> &update_parm,
+            vector<int> &region, const int &idx, const int &sc,
             const vector<int> &regions_whole,
             const vector<int> &regions_sub,
             vector<int> &tumor_labels, vector<int> &outl_labels,
@@ -57,7 +58,7 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
   int curr_label = ptr_seg[ 2 * ( idx - 1 ) ];
   int start = -1;
   double mu, sigma2, energy;
-  
+  int cidx = 0;
   if( sc != 0 ) {  // split or combine
     // energy of whole region, subregions and outlier
     vector<double> nrg( n_region + 1, 0 );
@@ -68,15 +69,21 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
     int region_label;
     int region_idx;
     sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
+    list<int>::const_iterator it = update_parm.begin();
     for( int i = 0; i < n_region; ++ i ) {
       // get region and region label
       getRegion( region_label, region, regions_whole, regions_sub,
                  start );
       if( region.size() == 1 ) {
         region_idx = region[ 0 ];
-        updateParm( mu, sigma2, region_idx, ptr_m[ 3 ], ptr_m[ 2 ],
-                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, ptr_seg,
-                    ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+        if( *it == 0 ) {
+          updateParm( mu, sigma2, region_idx, ptr_m[ 3 ], ptr_m[ 2 ],
+                      ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, ptr_seg,
+                      ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+        } else if( *it < - 3 ){
+          cidx = label2col( *it );
+          getParm( mu, sigma2, theta, tumor_parm, cidx );
+        }
         // region_label, mu, sigma2, theta
         region_parm[ n_row * i ] = region_label;
         region_parm[ n_row * i + 1 ] = mu;
@@ -90,12 +97,17 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
                           ptr_lambda2[ 3 ], ptr_seg,
                           ptr_intst,
                           ptr_alpha[ 3 ], ptr_beta[ 3 ],
-                          ptr_a[ 0 ], ptr_b[ 0 ] );
+                                                  ptr_a[ 0 ], ptr_b[ 0 ] );
       } else {
-        updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
-                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, region_label,
-                    ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
-                    ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+        if( *it == 0 ) {
+          updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
+                      ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, region_label,
+                      ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
+                      ptr_alpha[ 3 ], ptr_beta[ 3 ], 1 );
+        } else if( *it < -3 ){
+          cidx = label2col( *it );
+          getParm( mu, sigma2, theta, tumor_parm, cidx );
+        }
         // region_label, mu, sigma2, theta
         region_parm[ n_row * i ] = region_label;
         region_parm[ n_row * i + 1 ] = mu;
@@ -108,7 +120,7 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
                           ptr_lambda2[ 3 ], ptr_seg, ptr_nidx,
                           ptr_intst, ptr_nintst,
                           theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
-                          ptr_a[ 0 ], ptr_b[ 0 ] );
+                           ptr_a[ 0 ], ptr_b[ 0 ] );
       }
       nrg[ i ] = energy;
     }
@@ -209,7 +221,6 @@ void cmpET( vector<int> &region, const int &idx, const int &sc,
   } else {
     double min_energy;
     int min_label;
-    int cidx;
     if( curr_label > - 4 && curr_label < 1 ) {
       double &h_energy = energy;
       double &h_mu = mu, &h_sigma2 = sigma2;
