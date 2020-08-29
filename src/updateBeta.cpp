@@ -37,3 +37,12 @@ void updateBeta3( double *ptr_beta, const double *ptr_alpha,
     ptr_beta[ i ] = ( ptr_alpha[ i ] + 1 ) * sigma2;
   }
 }
+// update beta for t2 images
+void updateBeta2( double *ptr_beta, const double *ptr_alpha, 
+                  const vector<double> &health_parm ) {
+  double sigma2;
+  for( int i = 0; i < 2; ++ i ) {
+    sigma2 = health_parm[ i * 8 + 1 ];
+    ptr_beta[ i ] = ( ptr_alpha[ i ] + 1 ) * sigma2;
+  }
+}

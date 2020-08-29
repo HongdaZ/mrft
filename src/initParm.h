@@ -30,5 +30,14 @@ void initParmHealth3( vector<int> &region, vector<double> &theta,
                       const double *ptr_nintst, const double *ptr_alpha,
                       const double *ptr_beta, const int &len, 
                       const int &maxit );
+// Initialize parameters for t2 images
+void initParmHealth2( vector<int> &region, vector<double> &theta,
+                      vector<double> &health_parm,
+                      int *ptr_seg, const double *ptr_m,
+                      const double *ptr_nu2, const double *ptr_intst, 
+                      const double *ptr_lambda2, const int *ptr_nidx,
+                      const double *ptr_nintst, const double *ptr_alpha,
+                      const double *ptr_beta, const int &len, 
+                      const int &maxit );
 
 #endif

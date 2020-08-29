@@ -16,5 +16,11 @@ void cmpE3( int idx, vector<double> &health_parm,
             const double *ptr_intst, const double *ptr_nintst,
             const double *ptr_delta, const double *ptr_gamma,
             vector<double> &theta );
+// compare energy for t2 images in estimation
+void cmpE2( int idx, vector<double> &health_parm,
+            int *ptr_seg, const int *ptr_nidx,
+            const double *ptr_intst, const double *ptr_nintst,
+            const double *ptr_delta, const double *ptr_gamma,
+            vector<double> &theta );
 
 #endif
