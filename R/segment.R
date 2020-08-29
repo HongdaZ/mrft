@@ -12,7 +12,9 @@ segment <- function( patient,
                                   t2 = rep( 1, 3 ) ),
                      lambda2 = rep( 1 , 4 ), 
                      a = 5,
-                     nu2 = rep( .25, 3 ), 
+                     nu2 = list( t1ce = rep( .25, 3 ),
+                                 flair = rep( .25, 3 ),
+                                 t2 = c( .25, .01 ) ),
                      maxit = list( t1ce = 10L, flair = 1L, t2 = 1L ),
                      factor = list( t1ce = 18L, flair = 18L, t2 = 18L ) ) {
   images <- readImage( patient )
@@ -24,7 +26,7 @@ segment <- function( patient,
   t1ce_seg <- est3( t1ce_model, delta$t1ce, gamma,
                     alpha[ 1 : 3 ], beta$t1ce[ 1 : 3 ], 
                     lambda2[ 1 : 3 ], 
-                    m, nu2[ 1 : 3 ], 40L )
+                    m, nu2$t1ce, 40L )
   ## update beta
   sigma2 <- t1ce_seg$parm[ 3, ]
   beta$t1ce[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
@@ -36,12 +38,12 @@ segment <- function( patient,
   # sink( '/home/hzhang/Documents/t1ce_output.txt' )
   # system.time( t1ce_seg <- pred4( t1ce_model, delta$t1ce, 
   #                                 gamma, alpha, beta$t1ce, 
-  #                                 lambda2, a, b, m, nu2, maxit$t1ce ) )
+  #                                 lambda2, a, b, m, nu2$t1ce, maxit$t1ce ) )
   # 
   # sink()
   t1ce_seg <- pred4( t1ce_model, delta$t1ce, 
                      gamma, alpha, beta$t1ce, 
-                     lambda2, a, b, m, nu2, maxit$t1ce )
+                     lambda2, a, b, m, nu2$t1ce, maxit$t1ce )
   ## Both tumor and outliers are regarded as tumor
   t1ce_seg$image[ t1ce_seg$image < -3 | t1ce_seg$image > 0 ] <- -4L
   
@@ -52,7 +54,7 @@ segment <- function( patient,
   ## estimate parameters of t1ce or FLAIR images without tumor
   flair_seg <- est3( flair_model, delta$flair, gamma, 
                      alpha[ 1 : 3 ], beta$flair[ 1 : 3 ], lambda2[ 1 : 3 ],
-                     m, nu2[ 1 : 3 ], 40L )
+                     m, nu2$flair, 40L )
   ## update beta
   sigma2 <- flair_seg$parm[ 3, ]
   beta$flair[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
@@ -64,12 +66,12 @@ segment <- function( patient,
   # sink( '/home/hzhang/Documents/flair_output.txt' )
   # system.time( flair_seg <- pred4( flair_model, delta$flair,
   #                                  gamma, alpha, beta,
-  #                                  lambda2, a, b, m, nu2, 
+  #                                  lambda2, a, b, m, nu2$flair, 
   #                                  maxit$flair ) )
   # sink()
   flair_seg <- pred4( flair_model, delta$flair,
                       gamma, alpha, beta$flair,
-                      lambda2, a, b, m, nu2, 
+                      lambda2, a, b, m, nu2$flair, 
                       maxit$flair )
   ## Both tumor and outliers are regarded as tumor
   flair_seg$image[ flair_seg$image < -3 | flair_seg$image > 0 ] <- -4L
@@ -79,8 +81,10 @@ segment <- function( patient,
   m <- t2_data$m
   t2_model <- initEst( t2_data$label, t2_data$t2 )
   ## estimate parameters of t2 images without tumor and CSF & necrosis
+  sink( '/home/hzhang/Documents/t2_output.txt' )
   t2_seg <- est2( t2_model, delta$t2, gamma, 
                      alpha[ 1 : 2 ], beta$t2[ 1 : 2 ], lambda2[ 1 : 2 ],
-                     m, nu2[ 1 : 2 ], 40L )
+                     m, nu2$t2, 40L )
+  sink()
   
 }
