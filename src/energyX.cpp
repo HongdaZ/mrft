@@ -20,11 +20,13 @@ double pairwise( const int &left, const int &right ) {
 double unary( const int &label, const double *ptr_delta ) {
   double ans;
   if( label < -3 ) {
-    ans = ptr_delta[ 0 ];
+    ans = ptr_delta[ 2 ];
   } else if ( label > 0 ) {
-    ans = ptr_delta[ 0 ] + ptr_delta[ 1 ];
-  } else if( label >= -3 && label <= -1 ) {
-    ans = 0;
+    ans = ptr_delta[ 2 ] + ptr_delta[ 3 ];
+  } else if( label == -2 ) {
+    ans = ptr_delta[ 0 ];
+  } else if( label == -3 ) {
+    ans = ptr_delta[ 1 ];
   }
   return ans;
 }
