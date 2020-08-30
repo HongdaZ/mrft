@@ -28,28 +28,34 @@ void initParm( const int &n_health,
   list<list<int>>::const_iterator it = tumor_regions.begin();
   for( ;it != tumor_regions.end(); ++ it ) {
     curr_label = it->front();
-    sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
+    sigma2 = ptr_beta[ n_health ] / ( ptr_alpha[ n_health ] + 1 );
     // region starts from 1
     const list<int> &t_region = *it;
     getRegion( region, t_region );
     if( first_run ) {
       if( region.size() == 1 ) {
         zeroVector( theta );
-        updateParm( mu, sigma2, region.front(), ptr_m[ 3 ], 
-                    ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
-                    ptr_seg, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
+        updateParm( mu, sigma2, region.front(), ptr_m[ n_health ], 
+                    ptr_m[ n_health - 1 ], 
+                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
+                    ptr_seg, ptr_alpha[ n_health ],
+                    ptr_beta[ n_health ], maxit );
       } else {
-        updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
-                    ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
-                    curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
-                    ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
+        updateParm( mu, theta, sigma2, region, ptr_m[ n_health ], 
+                    ptr_m[ n_health - 1 ],
+                    ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
+                    curr_label, ptr_lambda2[ n_health ],
+                    ptr_seg, ptr_nidx, 
+                    ptr_nintst, ptr_alpha[ n_health ],
+                    ptr_beta[ n_health ], maxit );
       }
       assignParm( tumor_parm, curr_label, mu, sigma2, theta );
     } else if( it->size() > 27 ) {
-      updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], 
-                  ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
-                  curr_label, ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, 
-                  ptr_nintst, ptr_alpha[ 3 ], ptr_beta[ 3 ], maxit );
+      updateParm( mu, theta, sigma2, region, ptr_m[ n_health ], 
+                  ptr_m[ n_health - 1 ], ptr_a[ 0 ], ptr_b[ 0 ], 
+                  ptr_intst, curr_label, ptr_lambda2[ n_health ], 
+                  ptr_seg, ptr_nidx, ptr_nintst, ptr_alpha[ n_health ], 
+                  ptr_beta[ n_health ], maxit );
       assignParm( tumor_parm, curr_label, mu, sigma2, theta );
     }
   }

@@ -143,7 +143,7 @@ SEXP pred( SEXP model, SEXP delta, SEXP gamma,
       skip_ = skip( curr_idx, ptr_res_seg, ptr_nidx );
       if( ! skip_ ) {
         curr_intst = ptr_intst[ curr_idx - 1 ];
-        if( curr_intst < ptr_m[ 2 ] ) {
+        if( curr_intst < ptr_m[ n_health - 1 ] ) {
           cmpE( n_health, 
                 curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
                 ptr_nintst, ptr_delta, ptr_gamma, theta );
@@ -179,7 +179,7 @@ SEXP pred( SEXP model, SEXP delta, SEXP gamma,
     if( ptr_res_seg[ 2 * ( j - 1 ) ] == 0 ) {
       curr_idx = j;
       curr_intst = ptr_intst[ curr_idx - 1 ];
-      if( curr_intst < ptr_m[ 2 ] ) {
+      if( curr_intst < ptr_m[ n_health - 1 ] ) {
         cmpE( n_health,
               curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
               ptr_nintst, ptr_delta, ptr_gamma, theta );

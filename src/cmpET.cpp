@@ -19,7 +19,8 @@
 #include "clearVector.h"
 
 // compare energy for training
-void cmpET( const list<int> &update_parm,
+void cmpET( const int &n_health,
+            const list<int> &update_parm,
             vector<int> &region, const int &idx, const int &sc,
             const vector<int> &regions_whole,
             const vector<int> &regions_sub,
@@ -225,7 +226,7 @@ void cmpET( const list<int> &update_parm,
       double &h_energy = energy;
       double &h_mu = mu, &h_sigma2 = sigma2;
       vector<double> &h_theta = theta;
-      for( int i = - 1; i > - 4; -- i ) {
+      for( int i = - 1; i > - ( n_health + 1 ); -- i ) {
         cidx = label2col( i );
         getParm( h_mu, h_sigma2, h_theta, health_parm, cidx );
         h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,

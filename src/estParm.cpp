@@ -109,11 +109,13 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   initRegion( region, tumor_regions,
               ptr_res_seg, ptr_nidx, len,
               tumor_labels, n_tumor );
-  initParm( region, theta, true, health_parm, tumor_parm, ptr_res_seg,
+  initParm( n_health,
+            region, theta, true, health_parm, tumor_parm, ptr_res_seg,
             ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
             ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
             ptr_a, ptr_b, len, 20 );
-  updateBeta( ptr_res_beta, ptr_alpha, health_parm, tumor_regions,
+  updateBeta( n_health,
+              ptr_res_beta, ptr_alpha, health_parm, tumor_regions,
               tumor_parm );
   
   int old_label = 0;
@@ -149,7 +151,8 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
                        tumor_labels, ptr_res_seg, ptr_nidx, 
                        len, curr_idx, regions_whole, regions_sub,
                        tumor_nbr, tumor_label );
-          cmpET( update_parm,
+          cmpET( n_health, 
+                 update_parm,
                  region, curr_idx, sc, regions_whole, regions_sub,
                  tumor_labels, outl_labels, health_parm,
                  tumor_parm, outl_parm, 
@@ -165,7 +168,8 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
     }
     Rprintf( "update parm for healthy and tumorous\n" );
     //update parm for healthy and tumorous regions
-    initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg,
+    initParm( n_health,
+              region, theta, false, health_parm, tumor_parm, ptr_res_seg,
               ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
               ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
               ptr_a, ptr_b, len, 20 );
@@ -178,7 +182,8 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
                    tumor_labels, ptr_res_seg, ptr_nidx,
                    len, curr_idx, regions_whole, regions_sub,
                    tumor_nbr, tumor_label );
-      cmpET( update_parm, 
+      cmpET( n_health,
+             update_parm, 
              region, curr_idx, sc, regions_whole, regions_sub,
              tumor_labels, outl_labels, health_parm,
              tumor_parm, outl_parm,
@@ -197,7 +202,8 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );
   double *ptr_res_parm = REAL( res_parm );
   int *ptr_res_image = INTEGER( res_image );
-  copyParm( health_parm, tumor_parm, outl_parm, ptr_res_parm, n_row,
+  copyParm( n_health,
+            health_parm, tumor_parm, outl_parm, ptr_res_parm, n_row,
             tumor_regions, outl_labels, len );
   restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len );
   
