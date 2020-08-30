@@ -55,6 +55,8 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
   const int *ptr_maxit = INTEGER( maxit );
   
   int len = length( idx );
+  // number of types of healthy regions
+  int n_health = length( alpha );
   // a copy of seg and beta
   SEXP res_seg = PROTECT( allocMatrix( INTSXP, 2, len ) );
   SEXP res_beta = PROTECT( allocVector( REALSXP, 4 ) );
@@ -139,8 +141,9 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
       if( ! skip_ ) {
         curr_label = ptr_res_seg[ 2 * ( curr_idx - 1 ) ];
         if( curr_label < 1 && curr_label > -4 ) {
-          cmpE3( curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
-                 ptr_nintst, ptr_delta, ptr_gamma, theta );
+          cmpE( n_health,
+                curr_idx, health_parm, ptr_res_seg, ptr_nidx, ptr_intst,
+                ptr_nintst, ptr_delta, ptr_gamma, theta );
         } else {
           sc = scTrn( n_region, update_parm, tumor_regions, region, 
                        tumor_labels, ptr_res_seg, ptr_nidx, 

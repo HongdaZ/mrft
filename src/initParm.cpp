@@ -74,53 +74,23 @@ void initParm( vector<int> &region, vector<double> &theta,
   }
   return;
 }
-// Initialize parameters for t1ce and flair images
-void initParmHealth3( vector<int> &region, vector<double> &theta,
-                      vector<double> &health_parm,
-                      int *ptr_seg, const double *ptr_m,
-                      const double *ptr_nu2, const double *ptr_intst, 
-                      const double *ptr_lambda2, const int *ptr_nidx,
-                      const double *ptr_nintst, const double *ptr_alpha,
-                      const double *ptr_beta, const int &len, 
-                      const int &maxit ) {
+// Initialize parameters for t1ce, flair and t2 images
+void initParmHealth( const int &n_health, 
+                     vector<int> &region, vector<double> &theta,
+                     vector<double> &health_parm,
+                     int *ptr_seg, const double *ptr_m,
+                     const double *ptr_nu2, const double *ptr_intst, 
+                     const double *ptr_lambda2, const int *ptr_nidx,
+                     const double *ptr_nintst, const double *ptr_alpha,
+                     const double *ptr_beta, const int &len, 
+                     const int &maxit ) {
   // Initialize parameters for healthy regions
   int curr_label;
   int h_idx;
   double mu, sigma2;
-  for( int i = - 1; i > - 4;  -- i ) {
+  for( int i = - 1; i > - ( n_health + 1 ) ;  -- i ) {
     curr_label = i;
-    h_idx = label2col( curr_label );// == 0, 1, 2
-    sigma2 = ptr_beta[ h_idx ] / ( ptr_alpha[ h_idx ] + 1 );
-    getRegion( region, curr_label, ptr_seg, len );
-    if( region.size() == 0 ) {
-      continue;
-    }
-    h_idx = label2col( curr_label ); // == 0, 1, 2
-    updateParm( mu, theta, sigma2, region, ptr_m[ h_idx ], 
-                ptr_nu2[ h_idx ], ptr_intst, curr_label,
-                ptr_lambda2[ h_idx ], ptr_seg, ptr_nidx, ptr_nintst, 
-                ptr_alpha[ h_idx ], ptr_beta[ h_idx ], maxit );
-    
-    assignParm( health_parm, curr_label, mu, sigma2, theta );
-  }
-  return;
-}
-// Initialize parameters for t2 images
-void initParmHealth2( vector<int> &region, vector<double> &theta,
-                      vector<double> &health_parm,
-                      int *ptr_seg, const double *ptr_m,
-                      const double *ptr_nu2, const double *ptr_intst, 
-                      const double *ptr_lambda2, const int *ptr_nidx,
-                      const double *ptr_nintst, const double *ptr_alpha,
-                      const double *ptr_beta, const int &len, 
-                      const int &maxit ) {
-  // Initialize parameters for healthy regions
-  int curr_label;
-  int h_idx;
-  double mu, sigma2;
-  for( int i = - 1; i > - 3;  -- i ) {
-    curr_label = i;
-    h_idx = label2col( curr_label );// == 0, 1
+    h_idx = label2col( curr_label );// == 0, 1, 2 or 0, 1
     sigma2 = ptr_beta[ h_idx ] / ( ptr_alpha[ h_idx ] + 1 );
     getRegion( region, curr_label, ptr_seg, len );
     if( region.size() == 0 ) {
