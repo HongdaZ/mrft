@@ -19,7 +19,8 @@
 #include "clearVector.h"
 
 // compare energy for prediction
-void cmpEP( const list<int> &update_parm,
+void cmpEP( const int & n_health,
+            const list<int> &update_parm,
             vector<int> &region, const int &idx, const int &sc,
             const vector<int> &regions_whole,
             const vector<int> &regions_sub,
@@ -149,10 +150,10 @@ void cmpEP( const list<int> &update_parm,
                            ptr_alpha[ 3 ],
                            ptr_beta[ 3 ], ptr_a[ 0 ], ptr_b[ 0 ] );
     
-    // single voxel energy ( -1, -2, -3 )
+    // single voxel energy ( -1, -2, -3 ) or ( -1, -2 )
     double min_energy = out_energy;
     int min_label = out_label;
-    for( int i = - 1; i > - 4; -- i ) {
+    for( int i = - 1; i > - ( n_health + 1 ); -- i ) {
       cidx = label2col( i );
       getParm( mu, sigma2, theta, health_parm, cidx );
       energy = energyY( i, idx, mu, sigma2, ptr_seg, ptr_nidx,
@@ -273,7 +274,7 @@ void cmpEP( const list<int> &update_parm,
       double &h_energy = energy;
       double &h_mu = mu, &h_sigma2 = sigma2;
       vector<double> &h_theta = theta;
-      for( int i = - 1; i > - 4; -- i ) {
+      for( int i = - 1; i > - ( n_health + 1 ); -- i ) {
         cidx = label2col( i );
         getParm( h_mu, h_sigma2, h_theta, health_parm, cidx );
         h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,
@@ -387,7 +388,7 @@ void cmpEP( const list<int> &update_parm,
       double &h_energy = energy;
       double &h_mu = mu, &h_sigma2 = sigma2;
       vector<double> &h_theta = theta;
-      for( int i = - 1; i > - 4; -- i ) {
+      for( int i = - 1; i > - ( n_health + 1 ); -- i ) {
         cidx = label2col( i );
         getParm( h_mu, h_sigma2, h_theta, health_parm, cidx );
         h_energy = energyY( i, idx, h_mu, h_sigma2, ptr_seg, ptr_nidx,
