@@ -135,3 +135,22 @@ split4 <- function( x, x_seg, x_factor ) {
                m = c( m_1, m_2, m_3, m_4 ) )
   return( res )
 }
+## split t2 images for prediction
+split3 <- function( x, x_seg, x_factor ) {
+  label <- array( -4L, dim = dim( x ) )
+  label[ ! is.nan( x ) ] <- 0L
+  label[ x_seg$image == -1 ] <- -1L
+  label[ x_seg$image == -2 ] <- -2L
+  m_2 <- x_seg$parm[ 2, 2 ]
+  sigma2_2 <- x_seg$parm[ 3, 2 ]
+  ## threshold for enhancing tumor core
+  m_3 <- m_2 + sqrt( sigma2_2 ) * x_factor
+  label[ x > m_3 ] <- 4L
+  m_1 <- x_seg$parm[ 2, 1 ]
+  
+  label[ label == -4L ] <- NA_integer_
+  
+  res <- list( label = label, intst = x, 
+               m = c( m_1, m_2, m_3 ) )
+  return( res )
+}

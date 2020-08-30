@@ -2,11 +2,13 @@
 # beta and nu2 influenced by normalization
 
 segment <- function( patient, 
-                     delta = list( t1ce = c( 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                                   flair = c( 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                                   t2 = c( 4 ^ 2 / 2, 4 ^ 2 / 2 ) ), 
+                     delta = list( t1ce = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                                   flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                                   t2 = c( 8, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ) ), 
                      gamma = 1, 
-                     alpha = rep( 10, 4 ),
+                     alpha = list( t1ce = rep( 10, 4 ),
+                                   flair = rep( 10, 4 ),
+                                   t2 = rep( 10, 3 ) ),
                      beta = list( t1ce = rep( 1, 4 ),
                                   flair = rep( 1, 4 ),
                                   t2 = rep( 1, 3 ) ),
@@ -24,12 +26,12 @@ segment <- function( patient,
   t1ce_model <- initEst( t1ce_data$label, t1ce_data$t1ce )
   ## estimate parameters of t2 images without tumor and CSF & necrosis
   t1ce_seg <- est3( t1ce_model, delta$t1ce, gamma,
-                    alpha[ 1 : 3 ], beta$t1ce[ 1 : 3 ], 
+                    alpha$t1ce[ 1 : 3 ], beta$t1ce[ 1 : 3 ], 
                     lambda2[ 1 : 3 ], 
                     m, nu2$t1ce, 40L )
   ## update beta
   sigma2 <- t1ce_seg$parm[ 3, ]
-  beta$t1ce[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
+  beta$t1ce[ 1 : 3 ] <- ( alpha$t1ce[ 1 : 3 ] + 1 ) * ( sigma2 )
   t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, factor$t1ce )
   ## update m
   m <- t1ce_data$m
@@ -37,12 +39,12 @@ segment <- function( patient,
   t1ce_model <- initEst( t1ce_data$label, t1ce_data$intst )
   # sink( '/home/hzhang/Documents/t1ce_output.txt' )
   # system.time( t1ce_seg <- pred4( t1ce_model, delta$t1ce, 
-  #                                 gamma, alpha, beta$t1ce, 
+  #                                 gamma, alpha$t1ce, beta$t1ce, 
   #                                 lambda2, a, b, m, nu2$t1ce, maxit$t1ce ) )
   # 
   # sink()
   t1ce_seg <- pred4( t1ce_model, delta$t1ce, 
-                     gamma, alpha, beta$t1ce, 
+                     gamma, alpha$t1ce, beta$t1ce, 
                      lambda2, a, b, m, nu2$t1ce, maxit$t1ce )
   ## Both tumor and outliers are regarded as tumor
   t1ce_seg$image[ t1ce_seg$image < -3 | t1ce_seg$image > 0 ] <- -4L
@@ -53,11 +55,11 @@ segment <- function( patient,
   flair_model <- initEst( flair_data$label, flair_data$flair )
   ## estimate parameters of t1ce or FLAIR images without tumor
   flair_seg <- est3( flair_model, delta$flair, gamma, 
-                     alpha[ 1 : 3 ], beta$flair[ 1 : 3 ], lambda2[ 1 : 3 ],
+                     alpha$flair[ 1 : 3 ], beta$flair[ 1 : 3 ], lambda2[ 1 : 3 ],
                      m, nu2$flair, 40L )
   ## update beta
   sigma2 <- flair_seg$parm[ 3, ]
-  beta$flair[ 1 : 3 ] <- ( alpha[ 1 : 3 ] + 1 ) * ( sigma2 )
+  beta$flair[ 1 : 3 ] <- ( alpha$flair[ 1 : 3 ] + 1 ) * ( sigma2 )
   flair_data <- split4( flair_data$flair, flair_seg, factor$flair )
   ## update m
   m <- flair_data$m
@@ -65,12 +67,12 @@ segment <- function( patient,
   flair_model <- initEst( flair_data$label, flair_data$intst )
   # sink( '/home/hzhang/Documents/flair_output.txt' )
   # system.time( flair_seg <- pred4( flair_model, delta$flair,
-  #                                  gamma, alpha, beta,
+  #                                  gamma, alpha$flair, beta,
   #                                  lambda2, a, b, m, nu2$flair, 
   #                                  maxit$flair ) )
   # sink()
   flair_seg <- pred4( flair_model, delta$flair,
-                      gamma, alpha, beta$flair,
+                      gamma, alpha$flair, beta$flair,
                       lambda2, a, b, m, nu2$flair, 
                       maxit$flair )
   ## Both tumor and outliers are regarded as tumor
@@ -81,10 +83,14 @@ segment <- function( patient,
   m <- t2_data$m
   t2_model <- initEst( t2_data$label, t2_data$t2 )
   ## estimate parameters of t2 images without tumor and CSF & necrosis
-  sink( '/home/hzhang/Documents/t2_output.txt' )
+  # sink( '/home/hzhang/Documents/t2_output.txt' )
   t2_seg <- est2( t2_model, delta$t2, gamma, 
-                     alpha[ 1 : 2 ], beta$t2[ 1 : 2 ], lambda2[ 1 : 2 ],
+                     alpha$t2[ 1 : 2 ], beta$t2[ 1 : 2 ], lambda2[ 1 : 2 ],
                      m, nu2$t2, 40L )
-  sink()
+  # sink()
+  ## update beta
+  sigma2 <- t2_seg$parm[ 3, ]
+  beta$t2[ 1 : 2 ] <- ( alpha$t2[ 1 : 2 ] + 1 ) * sigma2
+  t2_data <- split3( t2_data$t2, t2_seg, factor$t2 )
   
 }
