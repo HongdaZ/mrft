@@ -196,7 +196,7 @@ SEXP estParm( SEXP model, SEXP delta, SEXP gamma,
              n_region, tumor_regions, n_row, tumor_label );
     }
   }
-  n_col = n_tumor + 3 + n_outl;
+  n_col = n_tumor + n_health + n_outl;
   
   SEXP res_parm = PROTECT( allocMatrix( REALSXP, n_row, n_col ) );
   SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );
