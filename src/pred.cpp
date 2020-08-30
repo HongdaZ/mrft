@@ -167,7 +167,8 @@ SEXP pred( SEXP model, SEXP delta, SEXP gamma,
       }
     }
     //update parm for healthy and tumorous regions
-    initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg,
+    initParm( n_health,
+              region, theta, false, health_parm, tumor_parm, ptr_res_seg,
               ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
               ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
               ptr_a, ptr_b, len, 20 );
@@ -201,7 +202,8 @@ SEXP pred( SEXP model, SEXP delta, SEXP gamma,
     }
   }
   //update parm for the last time
-  initParm( region, theta, false, health_parm, tumor_parm, ptr_res_seg,
+  initParm( n_health,
+            region, theta, false, health_parm, tumor_parm, ptr_res_seg,
             ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
             ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
             ptr_a, ptr_b, len, 20 );

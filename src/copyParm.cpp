@@ -2,7 +2,8 @@
 #include "label2col.h"
 
 // copy estimated parameters to SEXP
-void copyParm( vector<double> &health_parm,
+void copyParm( const int &n_health,
+               vector<double> &health_parm,
                vector<double> &tumor_parm,
                vector<double> &outl_parm,
                double *ptr_res_parm, const int &nrow, 
@@ -21,7 +22,7 @@ void copyParm( vector<double> &health_parm,
     }
     ++ j;
   }
-  for( int i = 0; i < 3; ++ i ) {
+  for( int i = 0; i < n_health; ++ i ) {
     curr_label = - i - 1;
     ptr_res_parm[ nrow * j ] = curr_label;
     for( int k = 0; k < 8; ++ k ) {

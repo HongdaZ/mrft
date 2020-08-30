@@ -8,7 +8,8 @@ using std::list;
 using std::vector;
 
 // copy estimated parameters to SEXP
-void copyParm( vector<double> &health_parm,
+void copyParm( const int &n_health,
+               vector<double> &health_parm,
                vector<double> &tumor_parm,
                vector<double> &outl_parm,
                double *ptr_res_parm, const int &nrow, 
