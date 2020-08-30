@@ -27,7 +27,7 @@ void updateBeta( const int &n_health,
   }
   int cidx = label2col( max_label );
   sigma2 = tumor_parm[ 8 * cidx + 1 ];
-  ptr_beta[ 3 ] = ( ptr_alpha[ 3 ] + 1 ) * sigma2;
+  ptr_beta[ n_health ] = ( ptr_alpha[ n_health ] + 1 ) * sigma2;
 }
 // update beta for t1ce, flair or t2 images
 void updateBeta( const int &n_health,
