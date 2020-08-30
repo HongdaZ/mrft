@@ -63,13 +63,13 @@ SEXP pred( SEXP model, SEXP delta, SEXP gamma,
   int n_health = length( alpha ) - 1;
   // a copy of seg and beta
   SEXP res_seg = PROTECT( allocMatrix( INTSXP, 2, len ) );
-  SEXP res_beta = PROTECT( allocVector( REALSXP, 4 ) );
+  SEXP res_beta = PROTECT( allocVector( REALSXP, n_health + 1 ) );
   int *ptr_res_seg = INTEGER( res_seg );
   for( int i = 0; i < 2 * len; ++ i ) {
     ptr_res_seg[ i ] = old_seg[ i ];
   }
   double *ptr_res_beta = REAL( res_beta );
-  for( int i = 0; i < 4; ++ i ) {
+  for( int i = 0; i < ( n_health + 1 ); ++ i ) {
     ptr_res_beta[ i ] = old_beta[ i ];
   }
   vector<int> tumor_labels( len, 0 );
@@ -77,7 +77,8 @@ SEXP pred( SEXP model, SEXP delta, SEXP gamma,
   int n_tumor = 0;
   int n_outl = 0;
   // 0, 1, 2 = -1, -2, -3
-  vector<double> health_parm( 8 * 3, 0 );
+  // or 0, 1 = -1, -2
+  vector<double> health_parm( 8 * n_health, 0 );
   // 0, 1, 2, ... = -4, -5, -6, ...
   vector<double> tumor_parm( 8 * len, 0 );
   // 0, 1, 2, ... = 1, 2, 3, ...

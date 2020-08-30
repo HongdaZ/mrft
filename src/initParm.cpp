@@ -10,7 +10,8 @@
 #include "zeroVector.h"
 
 // Initialize parameters
-void initParm( vector<int> &region, vector<double> &theta, 
+void initParm( const int &n_health,
+               vector<int> &region, vector<double> &theta, 
                const bool &first_run, vector<double> &health_parm,
                vector<double> &tumor_parm,
                int *ptr_seg, const double *ptr_m,
@@ -55,7 +56,7 @@ void initParm( vector<int> &region, vector<double> &theta,
   // Rprintf( "update parm for healthy regions\n" );
   // Initialize parameters for healthy regions
   int h_idx;
-  for( int i = - 1; i > - 4;  -- i ) {
+  for( int i = - 1; i > - ( n_health + 1 );  -- i ) {
     curr_label = i;
     h_idx = label2col( curr_label );// == 0, 1, 2
     sigma2 = ptr_beta[ h_idx ] / ( ptr_alpha[ h_idx ] + 1 );
@@ -88,7 +89,7 @@ void initParmHealth( const int &n_health,
   int curr_label;
   int h_idx;
   double mu, sigma2;
-  for( int i = - 1; i > - ( n_health + 1 ) ;  -- i ) {
+  for( int i = - 1; i > - ( n_health + 1 );  -- i ) {
     curr_label = i;
     h_idx = label2col( curr_label );// == 0, 1, 2 or 0, 1
     sigma2 = ptr_beta[ h_idx ] / ( ptr_alpha[ h_idx ] + 1 );
