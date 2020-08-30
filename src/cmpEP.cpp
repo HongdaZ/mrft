@@ -69,7 +69,7 @@ void cmpEP( const int & n_health,
     
     int region_label;
     int region_idx;
-    sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
+    sigma2 = ptr_beta[ n_health ] / ( ptr_alpha[ n_health ] + 1 );
     list<int>::const_iterator it = update_parm.begin();
     for( int i = 0; i < n_region; ++ i, ++ it ) {
       // get region and region label
@@ -78,9 +78,10 @@ void cmpEP( const int & n_health,
       if( region.size() == 1 ) {
         region_idx = region[ 0 ];
         if( *it == 0 ) {
-          updateParm( mu, sigma2, region_idx, ptr_m[ 3 ], ptr_m[ 2 ],
-                      ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, ptr_seg,
-                      ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+          updateParm( mu, sigma2, region_idx, ptr_m[ n_health ],
+                      ptr_m[ n_health - 1 ], ptr_a[ 0 ], ptr_b[ 0 ],
+                      ptr_intst, ptr_seg, ptr_alpha[ n_health ], 
+                      ptr_beta[ n_health ], 20 );
         } else if( *it < - 3 ){
           cidx = label2col( *it );
           getParm( mu, sigma2, theta, tumor_parm, cidx );
@@ -94,17 +95,18 @@ void cmpEP( const int & n_health,
         }
         // calculate energy
         energy = energyY( region_label, region_idx, mu, 
-                          ptr_m[ 2 ], sigma2,
-                          ptr_lambda2[ 3 ], ptr_seg,
-                          ptr_intst,
-                          ptr_alpha[ 3 ], ptr_beta[ 3 ],
+                          ptr_m[ n_health - 1 ], sigma2,
+                          ptr_lambda2[ n_health ], ptr_seg,
+                          ptr_intst, ptr_alpha[ n_health ], 
+                          ptr_beta[ n_health ],
                           ptr_a[ 0 ], ptr_b[ 0 ] );
       } else {
         if( *it == 0 ) {
-          updateParm( mu, theta, sigma2, region, ptr_m[ 3 ], ptr_m[ 2 ],
-                      ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst, region_label,
-                      ptr_lambda2[ 3 ], ptr_seg, ptr_nidx, ptr_nintst,
-                      ptr_alpha[ 3 ], ptr_beta[ 3 ], 1 );
+          updateParm( mu, theta, sigma2, region, ptr_m[ n_health ], 
+                      ptr_m[ n_health - 1 ], ptr_a[ 0 ], ptr_b[ 0 ], 
+                      ptr_intst, region_label, ptr_lambda2[ n_health ], 
+                      ptr_seg, ptr_nidx, ptr_nintst,
+                      ptr_alpha[ n_health ], ptr_beta[ n_health ], 1 );
         } else if( *it < -3 ){
           cidx = label2col( *it );
           getParm( mu, sigma2, theta, tumor_parm, cidx );
@@ -117,10 +119,10 @@ void cmpEP( const int & n_health,
           region_parm[ n_row * i + j + 3 ] = theta[ j ];
         }
         // calculate energy
-        energy = energyY( region, mu, ptr_m[ 2 ], sigma2,
-                          ptr_lambda2[ 3 ], ptr_seg, ptr_nidx,
-                          ptr_intst, ptr_nintst,
-                          theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
+        energy = energyY( region, mu, ptr_m[ n_health - 1 ], sigma2,
+                          ptr_lambda2[ n_health ], ptr_seg, ptr_nidx,
+                          ptr_intst, ptr_nintst, theta, 
+                          ptr_alpha[ n_health ], ptr_beta[ n_health ],
                           ptr_a[ 0 ], ptr_b[ 0 ] );
       }
       nrg[ i ] = energy;
@@ -133,22 +135,21 @@ void cmpEP( const int & n_health,
     double &out_mu = mu;
     double &out_sigma2 = sigma2;
     double &out_energy = energy;
-    out_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
-    updateParm( out_mu, out_sigma2, idx, ptr_m[ 3 ], ptr_m[ 2 ],
-                ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
-                ptr_seg, ptr_alpha[ 3 ],
-                ptr_beta[ 3 ], 20 );
+    out_sigma2 = ptr_beta[ n_health ] / ( ptr_alpha[ n_health ] + 1 );
+    updateParm( out_mu, out_sigma2, idx, ptr_m[ n_health ], 
+                ptr_m[ n_health - 1 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
+                ptr_seg, ptr_alpha[ n_health ],
+                ptr_beta[ n_health ], 20 );
     outlier_parm[ 0 ] = out_label;
     outlier_parm[ 1 ] = out_mu;
     outlier_parm[ 2 ] = out_sigma2;
     
     out_energy = energyX( out_label, idx, true, ptr_seg, ptr_nidx,
                                  ptr_delta, ptr_gamma[ 0 ] );
-    out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ], 
-                           out_sigma2,
-                           ptr_lambda2[ 3 ], ptr_seg, ptr_intst,
-                           ptr_alpha[ 3 ],
-                           ptr_beta[ 3 ], ptr_a[ 0 ], ptr_b[ 0 ] );
+    out_energy += energyY( out_label, idx, out_mu, ptr_m[ n_health - 1 ], 
+                           out_sigma2, ptr_lambda2[ n_health ],
+                           ptr_seg, ptr_intst, ptr_alpha[ n_health ],
+                           ptr_beta[ n_health ], ptr_a[ 0 ], ptr_b[ 0 ] );
     
     // single voxel energy ( -1, -2, -3 ) or ( -1, -2 )
     double min_energy = out_energy;
@@ -259,11 +260,11 @@ void cmpEP( const int & n_health,
       cidx = label2col( t_label );
       double &t_mu = mu, &t_sigma2 = sigma2;
       getParm( t_mu, t_sigma2, t_theta, tumor_parm, cidx );
-      t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
-                          t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
+      t_energy = energyY( t_label, idx, t_mu, ptr_m[ n_health - 1 ],
+                          t_sigma2, ptr_lambda2[ n_health ], ptr_seg,
                           ptr_nidx, ptr_intst, ptr_nintst,
-                          t_theta, ptr_alpha[ 3 ], ptr_beta[ 3 ],
-                          ptr_a[ 0 ], ptr_b[ 0 ] );
+                          t_theta, ptr_alpha[ n_health ], 
+                          ptr_beta[ n_health ], ptr_a[ 0 ], ptr_b[ 0 ] );
       t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
                            ptr_delta, ptr_gamma[ 0 ] );
       double min_energy = t_energy;
@@ -302,17 +303,18 @@ void cmpEP( const int & n_health,
         cidx = label2col( curr_label );
         getParm( out_mu, out_sigma2, outl_parm, cidx );
       } else {
-        out_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
-        updateParm( out_mu, out_sigma2, idx, ptr_m[ 3 ],
-                    ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ], ptr_intst,
-                    ptr_seg, ptr_alpha[ 3 ], ptr_beta[ 3 ], 20 );
+        out_sigma2 = ptr_beta[ n_health ] / ( ptr_alpha[ n_health ] + 1 );
+        updateParm( out_mu, out_sigma2, idx, ptr_m[ n_health ],
+                    ptr_m[ n_health - 1 ], ptr_a[ 0 ], ptr_b[ 0 ],
+                    ptr_intst, ptr_seg, ptr_alpha[ n_health ], 
+                    ptr_beta[ n_health ], 20 );
         new_out_parm[ 0 ] = out_mu;
         new_out_parm[ 1 ] = out_sigma2;
       }
-      out_energy += energyY( out_label, idx, out_mu, ptr_m[ 2 ],
-                             out_sigma2, ptr_lambda2[ 3 ], ptr_seg,
-                             ptr_intst, ptr_alpha[ 3 ],ptr_beta[ 3 ],
-                             ptr_a[ 0 ], ptr_b[ 0 ] );
+      out_energy += energyY( out_label, idx, out_mu, ptr_m[ n_health - 1 ],
+                             out_sigma2, ptr_lambda2[ n_health ], ptr_seg,
+                             ptr_intst, ptr_alpha[ n_health ],
+                             ptr_beta[ n_health ], ptr_a[ 0 ], ptr_b[ 0 ] );
       // Rprintf( "out_label = %d; out_energy = %f; out_mu = %f; out_sigma2 = %f\n",
       //          out_label, out_energy, out_mu, out_sigma2 );
       if( out_energy < min_energy ) {
@@ -358,13 +360,13 @@ void cmpEP( const int & n_health,
       // new tumor region parameters
       // t_sigma2 has to be non-zero;
       double &t_mu = mu, &t_sigma2 = sigma2; 
-      t_sigma2 = ptr_beta[ 3 ] / ( ptr_alpha[ 3 ] + 1 );
+      t_sigma2 = ptr_beta[ n_health ] / ( ptr_alpha[ n_health ] + 1 );
       // use the function for outliers and single voxel tumor regions
-      updateParm( t_mu, t_sigma2, idx, ptr_m[ 3 ],
-                  ptr_m[ 2 ], ptr_a[ 0 ], ptr_b[ 0 ],
+      updateParm( t_mu, t_sigma2, idx, ptr_m[ n_health ],
+                  ptr_m[ n_health - 1 ], ptr_a[ 0 ], ptr_b[ 0 ],
                   ptr_intst, ptr_seg,
-                  ptr_alpha[ 3 ],
-                  ptr_beta[ 3 ], 20 );
+                  ptr_alpha[ n_health ],
+                  ptr_beta[ n_health ], 20 );
       vector<double> &new_parm = tmp_parm;
       new_parm[ 0 ] = t_label;
       new_parm[ 1 ] = t_mu;
@@ -373,10 +375,10 @@ void cmpEP( const int & n_health,
         new_parm[ i + 3 ] = 0;
       }
       double &t_energy = energy;
-      t_energy = energyY( t_label, idx, t_mu, ptr_m[ 2 ],
-                          t_sigma2, ptr_lambda2[ 3 ], ptr_seg,
-                          ptr_intst, ptr_alpha[ 3 ], ptr_beta[ 3 ],
-                          ptr_a[ 0 ], ptr_b[ 0 ] );
+      t_energy = energyY( t_label, idx, t_mu, ptr_m[ n_health - 1 ],
+                          t_sigma2, ptr_lambda2[ n_health ], ptr_seg,
+                          ptr_intst, ptr_alpha[ n_health ], 
+                          ptr_beta[ n_health ], ptr_a[ 0 ], ptr_b[ 0 ] );
       t_energy += energyX( t_label, idx, false, ptr_seg, ptr_nidx,
                            ptr_delta, ptr_gamma[ 0 ] );
       // Rprintf( "t_label = %d; t_energy = %f; t_mu = %f; t_sigma2 = %f\n",
