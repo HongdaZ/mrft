@@ -2,12 +2,13 @@
 #include "label2col.h"
 
 // update beta for healthy and tumor regions
-void updateBeta( double *ptr_beta, const double *ptr_alpha, 
+void updateBeta( const int &n_health,
+                 double *ptr_beta, const double *ptr_alpha, 
                  const vector<double> &health_parm,  
                  const list<list<int>> &tumor_regions,
                  const vector<double> &tumor_parm ) {
   double sigma2;
-  for( int i = 0; i < 3; ++ i ) {
+  for( int i = 0; i < n_health; ++ i ) {
     sigma2 = health_parm[ i * 8 + 1 ];
     ptr_beta[ i ] = ( ptr_alpha[ i ] + 1 ) * sigma2;
   }
@@ -30,8 +31,8 @@ void updateBeta( double *ptr_beta, const double *ptr_alpha,
 }
 // update beta for t1ce, flair or t2 images
 void updateBeta( const int &n_health,
-                  double *ptr_beta, const double *ptr_alpha, 
-                  const vector<double> &health_parm ) {
+                 double *ptr_beta, const double *ptr_alpha, 
+                 const vector<double> &health_parm ) {
   double sigma2;
   for( int i = 0; i < n_health; ++ i ) {
     sigma2 = health_parm[ i * 8 + 1 ];

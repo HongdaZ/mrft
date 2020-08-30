@@ -10,7 +10,8 @@ using std::map;
 using std::list;
 
 // update beta for healthy and tumor regions
-void updateBeta( double *ptr_beta, const double *ptr_alpha, 
+void updateBeta( const int &n_health,
+                 double *ptr_beta, const double *ptr_alpha, 
                  const vector<double> &health_parm,  
                  const list<list<int>> &tumor_regions,
                  const vector<double> &tumor_parm );

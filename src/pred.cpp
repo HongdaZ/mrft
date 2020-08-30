@@ -110,11 +110,13 @@ SEXP pred( SEXP model, SEXP delta, SEXP gamma,
   initRegion( region, tumor_regions,
               ptr_res_seg, ptr_nidx, len,
               tumor_labels, n_tumor );
-  initParm( region, theta, true, health_parm, tumor_parm, ptr_res_seg,
+  initParm( n_health,
+            region, theta, true, health_parm, tumor_parm, ptr_res_seg,
             ptr_m, ptr_nu2, ptr_intst, ptr_lambda2, ptr_nidx,
             ptr_nintst, ptr_alpha, ptr_res_beta, tumor_regions,
             ptr_a, ptr_b, len, 20 );
-  updateBeta( ptr_res_beta, ptr_alpha, health_parm, tumor_regions,
+  updateBeta( n_health,
+              ptr_res_beta, ptr_alpha, health_parm, tumor_regions,
               tumor_parm );
   
   int old_label = 0;
