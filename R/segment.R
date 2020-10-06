@@ -3,7 +3,7 @@
 
 segment <- function( patient, 
                      delta = list( t1ce = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                                   flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                                   flair = c( 0, 0, 10, 4 ^ 2 / 2 ),
                                    t2 = c( 8, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ) ), 
                      gamma = 1, 
                      alpha = list( t1ce = rep( 10, 4 ),
@@ -101,9 +101,11 @@ segment <- function( patient,
   m <- t2_data$m
   b <- getB( m, a )
   t2_model <- initEst( t2_data$label, t2_data$intst )
-  sink( '/home/hzhang/Documents/t2_output.txt' )
-  system.time( t2_seg <- 
-                 pred( t2_model, delta$t2, gamma, alpha$t2, beta$t2,
-                               lambda2$t2, a, b, m, nu2$t2, maxit$t2 ) )
-  sink()
+  # sink( '/home/hzhang/Documents/t2_output.txt' )
+  # system.time( t2_seg <- 
+  #                pred( t2_model, delta$t2, gamma, alpha$t2, beta$t2,
+  #                              lambda2$t2, a, b, m, nu2$t2, maxit$t2 ) )
+  # sink()
+  t2_seg <- pred( t2_model, delta$t2, gamma, alpha$t2, beta$t2,
+          lambda2$t2, a, b, m, nu2$t2, maxit$t2 )
 }
