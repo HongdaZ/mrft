@@ -6,7 +6,7 @@
 using std::vector;
 
 // Find convex hull
-vector<int> cHull( vector<int> &a ) {
+vector<int> cHull( const vector<int> &a ) {
   using P = point<int>;
   using S = std::vector<P>;
   using I = typename S::iterator;
