@@ -8,6 +8,7 @@
 using std::vector;
 
 // Check if the points are inside the convex hull
+// works for closed polygon
 extern "C" SEXP inSide( SEXP p, SEXP poly );
 
 SEXP inSide( SEXP p, SEXP poly ) {

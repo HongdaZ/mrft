@@ -1,102 +1,98 @@
-#include	<stdio.h>
-#include	<math.h>
-#define	ERROR	1
-#define	X	0
-#define	Y	1
+#include <vector>
 
-#define DIM     2               /* Dimension of points */
-typedef int     tPointi[DIM];   /* type integer point */
-typedef double  tPointd[DIM];   /* type double point */
-#define PMAX    1000            /* Max # of pts in polygon */
+#include "inpoly.h"
 
-typedef tPointi tPolygoni[PMAX];/* type integer polygon */
+using std::vector;
 
-void	PrintPoly( int n, tPolygoni P );
-void	PrintPoint( tPointi p );
-bool	InPoly( tPointi q, tPolygoni P, int n );
+// Copyright 2000 softSurfer, 2012 Dan Sunday
+// This code may be freely used and modified for any purpose
+// providing that this copyright notice is included with it.
+// SoftSurfer makes no warranty for this code, and cannot be held
+// liable for any real or imagined damage resulting from its use.
+// Users of this code must verify correctness for their application.
 
-/*
- Returns true if q is inside polygon P.
- */
-bool	InPoly( tPointi q, tPolygoni P, int n )
+
+// a Point is defined by its coordinates {int x, y;}
+//===================================================================
+
+typedef struct {int x, y;} Point;
+// isLeft(): tests if a point is Left|On|Right of an infinite line.
+//    Input:  three points P0, P1, and P2
+//    Return: >0 for P2 left of the line through P0 and P1
+//            =0 for P2  on the line
+//            <0 for P2  right of the line
+//    See: Algorithm 1 "Area of Triangles and Polygons"
+inline int
+isLeft( Point P0, Point P1, Point P2 )
 {
-  int	i, i1;		/* point index; i1 = i-1 mod n */
-int	d;		/* dimension index */
-double	x;		/* x intersection of e with ray */
-int	crossings = 0;	/* number of edge/ray crossings */
-
-printf("\n==>In: u = "); PrintPoint(q); putchar('\n');
-
-/* Shift so that q is the origin. */
-for( i = 0; i < n; i++ ) {
-  for( d = 0; d < DIM; d++ )
-    P[i][d] = P[i][d] - q[d];
+  return ( (P1.x - P0.x) * (P2.y - P0.y)
+             - (P2.x -  P0.x) * (P1.y - P0.y) );
 }
+//===================================================================
 
-/* For each edge e=(i-1,i), see if crosses ray. */
-for( i = 0; i < n; i++ ) {
-  i1 = ( i + n - 1 ) % n;
-  printf("e=(%d,%d)\t", i1, i);
-  /* if e straddles the x-axis... */
-  if( ( ( P[i] [Y] > 0 ) && ( P[i1][Y] <= 0 ) ) ||
-  ( ( P[i1][Y] > 0 ) && ( P[i] [Y] <= 0 ) ) ) {
-    /* e straddles ray, so compute intersection with ray. */
-    x = (P[i][X] * P[i1][Y] - P[i1][X] * P[i][Y])
-    / (double)(P[i1][Y] - P[i][Y]);
-    printf("straddles: x = %g\t", x);
-    /* crosses ray if strictly positive intersection. */
-    if (x > 0) crossings++;
+
+// cn_PnPoly(): crossing number test for a point in a polygon
+//      Input:   P = a point,
+//               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
+//      Return:  0 = outside, 1 = inside
+// This code is patterned after [Franklin, 2000]
+int
+cn_PnPoly( Point P, Point* V, int n )
+{
+  int    cn = 0;    // the  crossing number counter
+  
+  // loop through all edges of the polygon
+  for (int i=0; i<n; i++) {    // edge from V[i]  to V[i+1]
+    if (((V[i].y <= P.y) && (V[i+1].y > P.y))     // an upward crossing
+          || ((V[i].y > P.y) && (V[i+1].y <=  P.y))) { // a downward crossing
+      // compute  the actual edge-ray intersect x-coordinate
+      float vt = (float)(P.y  - V[i].y) / (V[i+1].y - V[i].y);
+      if (P.x <  V[i].x + vt * (V[i+1].x - V[i].x)) // P.x < intersect
+        ++cn;   // a valid crossing of y=P.y right of P.x
+    }
   }
-  printf("crossings=%d\n", crossings);
-}
-/* q inside if an odd number of crossings. */
-if( (crossings % 2) == 1 )
-  return	true;
-else	return	false;
-}
-void	PrintPoint( tPointi p )
-{
-  int	i;
+  return (cn&1);    // 0 if even (out), and 1 if  odd (in)
   
-  putchar('(');
-  for ( i = 0; i < DIM; i++ ) {
-    printf("%d", p[i]);
-    if ( i != DIM-1 ) putchar(',');
-  }
-  putchar(')');
 }
-/*
- Reads in the coordinates of the vertices of a polygon from stdin,
- puts them into P, and returns n, the number of vertices.
- Formatting conventions: etc.
- */
-int	ReadPoly( tPolygoni P )
-{
-  int	n = 0;
-  
-  printf("Polygon:\n");
-  printf("  i   x   y\n");
-  while ( (n < PMAX) && (scanf("%d %d",&P[n][0],&P[n][1]) != EOF) ) {
-    printf("%3d%4d%4d\n", n, P[n][0], P[n][1]);
-    ++n;
-  }
-  if (n < PMAX)
-    printf("n = %3d vertices read\n",n);
-  else	printf("Error in read_poly:  too many points; max is %d\n", PMAX);
-  putchar('\n');
-  
-  return	n;
-}
+//===================================================================
 
-void	PrintPoly( int n, tPolygoni P )
+
+// wn_PnPoly(): winding number test for a point in a polygon
+//      Input:   P = a point,
+//               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
+//      Return:  wn = the winding number (=0 only when P is outside)
+int
+wn_PnPoly( const Point &P, const vector<Point> &V )
 {
-  int	i;
+  int n = V.size() - 1;
+  int    wn = 0;    // the  winding number counter
   
-  printf("Polygon:\n");
-  printf("  i   x   y\n");
-  for( i = 0; i < n; i++ )
-    printf("%3d%4d%4d\n", i, P[i][0], P[i][1]);
+  // loop through all edges of the polygon
+  if( V[ n ].x == P.x && V[ n ].y == P.y ) {
+    return 0;
+  } 
+  for (int i=0; i<n; i++) {   // edge from V[i] to  V[i+1]
+    if( V[ i ].x == P.x && V[ i ].y == P.y ) {
+      return 0;
+    } else if( ( V[ i ].x - P.x ) * ( V[ i + 1 ].y - P.y  ) ==
+      ( V[ i + 1 ].x - P.x ) * ( V[ i ].y - P.y  ) ) {
+      return 0;
+    }else {
+      if (V[i].y <= P.y) {          // start y <= P.y
+        if (V[i+1].y  > P.y)      // an upward crossing
+          if (isLeft( V[i], V[i+1], P) > 0)  // P left of  edge
+            ++wn;            // have  a valid up intersect
+      }
+      else {                        // start y > P.y (no test needed)
+        if (V[i+1].y  <= P.y)     // a downward crossing
+          if (isLeft( V[i], V[i+1], P) < 0)  // P right of  edge
+            --wn;            // have  a valid down intersect
+      }
+    }
+  }
+  return wn;
 }
+//===================================================================
 vector<int> inpoly( const vector<int> &p, const vector<int> &poly ) {
   int len = poly.size() / 2;
   int n_point = p.size() / 2;
@@ -110,7 +106,7 @@ vector<int> inpoly( const vector<int> &p, const vector<int> &poly ) {
   for( int i = 0; i < n_point; ++ i ) {
     point.x = p[ 2 * i ];
     point.y = p[ 2 * i + 1 ];
-    inside[ i ] = isInside( polygon, len, point );
+    inside[ i ] = ( wn_PnPoly( point, polygon ) == 0 ) ? 0 : 1;
   }
   return inside;
 }
