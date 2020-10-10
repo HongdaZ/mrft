@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "inpoly.h"
+#include "inPoly.h"
 
 using std::vector;
 
