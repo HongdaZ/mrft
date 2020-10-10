@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "inpoly.h"
+#include "inPoly.h"
 
 using std::vector;
 
@@ -27,7 +27,7 @@ SEXP inSide( SEXP p, SEXP poly ) {
     b[ i ] = ptr_poly[ i ];
   }
   
-  vector<int> res = inpoly( a, b );
+  vector<int> res = inPoly( a, b );
   int len = res.size();
   SEXP inside = PROTECT( allocVector( INTSXP, len ) );
   int *ptr_inside = INTEGER( inside );
