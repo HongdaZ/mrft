@@ -93,7 +93,7 @@ wn_PnPoly( const Point &P, const vector<Point> &V )
   return wn;
 }
 //===================================================================
-vector<int> inpoly( const vector<int> &p, const vector<int> &poly ) {
+vector<int> inPoly( const vector<int> &p, const vector<int> &poly ) {
   int len = poly.size() / 2;
   int n_point = p.size() / 2;
   vector<Point> polygon( len );

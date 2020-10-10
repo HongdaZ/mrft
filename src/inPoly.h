@@ -6,6 +6,6 @@
 using std::vector;
 
 // Find convex hull of points a
-vector<int> inpoly( const vector<int> &p, const vector<int> &poly );
+vector<int> inPoly( const vector<int> &p, const vector<int> &poly );
 
 #endif
