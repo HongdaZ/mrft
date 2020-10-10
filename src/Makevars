@@ -1,5 +1,5 @@
-CXX_STD = CXX17
-PKG_CXXFLAGS = -O3 -std=c++17 -x c++ -Wall -Wextra -fconcepts -DNDEBUG
-PKG_CPPFLAGS += -I../inst/include/ -DDOUBLE_PRECISION
+CXX = g++
+PKG_CXXFLAGS = -O3 -x c++ -Wall -Wextra -fconcepts -DNDEBUG
+PKG_CPPFLAGS += -I../inst/include/
 PKG_LIBS = -L/usr/lib64/
 PKG_LIBS += $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
