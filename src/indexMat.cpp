@@ -47,9 +47,7 @@ SEXP indexMat( SEXP img, SEXP label ) {
   const int vlen = n_valid;
   n_valid = 0;
   int vec_index = 0;
-  int tmp_index = 0;
 
-  int i_ = 0, j_ = 0, k_ = 0;
   for( int k = 0; k < ns; ++ k ) {
     for( int j = 0; j < nc; ++ j ) {
       for( int i = 0; i < nr; ++ i ) {

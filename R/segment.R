@@ -2,9 +2,10 @@
 # beta and nu2 influenced by normalization
 
 segment <- function( patient, 
-                     delta = list( t1ce = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                                   flair = c( 0, 0, 10, 4 ^ 2 / 2 ),
-                                   t2 = c( 8, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ) ), 
+                     delta = 
+                       list( t1ce = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                             flair = c( 0, 0, 10, 4 ^ 2 / 2 ),
+                             t2 = c( 8, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ) ), 
                      gamma = 1, 
                      alpha = list( t1ce = rep( 10, 4 ),
                                    flair = rep( 10, 4 ),
@@ -19,8 +20,10 @@ segment <- function( patient,
                      nu2 = list( t1ce = rep( .25, 3 ),
                                  flair = rep( .25, 3 ),
                                  t2 = c( .25, .01 ) ),
-                     maxit = list( t1ce = 10L, flair = 1L, t2 = 1L ),
-                     factor = list( t1ce = 18L, flair = 18L, t2 = 18L ) ) {
+                     maxit = list( t1ce = 10L, 
+                                   flair = 1L, t2 = 1L ),
+                     factor = list( t1ce = 18L, 
+                                    flair = 18L, t2 = 18L ) ) {
   images <- readImage( patient )
   ## split t1ce images to CSF & necrosis, grey matter and white matter
   t1ce_data <- splitT1ce3( images$t1ce, images$flair )
@@ -103,9 +106,33 @@ segment <- function( patient,
   t2_model <- initEst( t2_data$label, t2_data$intst )
   # sink( '/home/hzhang/Documents/t2_output.txt' )
   # system.time( t2_seg <- 
-  #                pred( t2_model, delta$t2, gamma, alpha$t2, beta$t2,
-  #                              lambda2$t2, a, b, m, nu2$t2, maxit$t2 ) )
+  #             pred( t2_model, delta$t2, gamma, alpha$t2, beta$t2,
+  #                   lambda2$t2, a, b, m, nu2$t2, maxit$t2 ) )
   # sink()
   t2_seg <- pred( t2_model, delta$t2, gamma, alpha$t2, beta$t2,
           lambda2$t2, a, b, m, nu2$t2, maxit$t2 )
+  ## Get the initial results
+  ## t1ce
+  t1ce_image <- t1ce_seg$image
+  t1ce_image[ is.na( t1ce_image ) ] <- 0L
+  t1ce_image[ t1ce_image >= 1 ] <- 4L
+  t1ce_image[ t1ce_image <= -4 ] <- 4L
+  t1ce_image[ t1ce_image == -1 ] <- 1L
+  t1ce_image[ t1ce_image == -2 ] <- 2L
+  t1ce_image[ t1ce_image == -3 ] <- 3L
+  ## flair
+  flair_image <- flair_seg$image
+  flair_image[ is.na( flair_image ) ] <- 0L
+  flair_image[ flair_image >= 1 ] <- 4L
+  flair_image[ flair_image <= -4 ] <- 4L
+  flair_image[ flair_image == -1 ] <- 1L
+  flair_image[ flair_image == -2 ] <- 2L
+  flair_image[ flair_image == -3 ] <- 3L
+  ## t2
+  t2_image <- t2_seg$image
+  t2_image[ is.na( t2_image ) ] <- 0L
+  t2_image[ t2_image >= 1 ] <- 4L
+  t2_image[ t2_image <= -4 ] <- 4L
+  t2_image[ t2_image == -1 ] <- 1L
+  t2_image[ t2_image == -2 ] <- 2L
 }
