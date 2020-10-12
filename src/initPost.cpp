@@ -32,9 +32,9 @@ SEXP initPost( SEXP t1ce_image, SEXP flair_image,
   
   // Get indices and labels of valid voxels
   SEXP vidx = PROTECT( allocVector( INTSXP, n_valid ) );
-  SEXP t1ce_seg = PROTECT( allocVector( INTSXP, n_valid * 2 ) );
-  SEXP flair_seg = PROTECT( allocVector( INTSXP, n_valid * 2 ) );
-  SEXP t2_seg = PROTECT( allocVector( INTSXP, n_valid * 2 ) );
+  SEXP t1ce_seg = PROTECT( allocMatrix( INTSXP, 2, n_valid ) );
+  SEXP flair_seg = PROTECT( allocMatrix( INTSXP, 2, n_valid ) );
+  SEXP t2_seg = PROTECT( allocMatrix( INTSXP, 2, n_valid ) );
   int *ptr_vidx = INTEGER( vidx );
   int *ptr_t1ce_seg = INTEGER( t1ce_seg );
   int *ptr_flair_seg = INTEGER( flair_seg );

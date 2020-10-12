@@ -5,7 +5,7 @@
 void assignIdx( const int &i, const int &j, const int &k,
                 const int &nr, const int &nc, const int &ns,
                 const int &n_nbr, const int &n_valid,
-                int *fidx, int *ptr_nidx ) {
+                const int *fidx, int *ptr_nidx ) {
   int offset[ 18 ] = { 0, 0, -1, 
                        0, -1, 0,
                        -1, 0, 0,
