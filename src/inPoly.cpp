@@ -71,18 +71,19 @@ wn_PnPoly( const Point &P, const vector<Point> &V )
   
   // loop through all edges of the polygon
   if( V[ n ].x == P.x && V[ n ].y == P.y ) {
-    return 0;
+    return 3;
   } 
   for (int i=0; i<n; i++) {   // edge from V[i] to  V[i+1]
-    if( V[ i ].x == P.x && V[ i ].y == P.y ) {
-      return 0;
+    if( ( V[ i ].x == P.x && V[ i ].y == P.y ) ||
+        ( V[ i + 1 ].x == P.x && V[ i + 1 ].y == P.y )) {
+      return 3;
     } else if( ( V[ i ].x - P.x ) * ( V[ i + 1 ].y - P.y  ) ==
       ( V[ i + 1 ].x - P.x ) * ( V[ i ].y - P.y  ) &&
       min( V[ i ].x, V[ i + 1 ].x ) <= P.x && 
       P.x <= max( V[ i ].x, V[ i + 1 ].x ) &&
       min( V[ i ].y, V[ i + 1 ].y ) <= P.y &&
       P.y <= max( V[ i ].y, V[ i + 1 ].y ) ) {
-      return 0;
+      return 2;
     }else {
       if (V[i].y <= P.y) {          // start y <= P.y
         if (V[i+1].y  > P.y)      // an upward crossing
@@ -100,6 +101,7 @@ wn_PnPoly( const Point &P, const vector<Point> &V )
 }
 //===================================================================
 vector<int> inPoly( const vector<int> &p, const vector<int> &poly ) {
+  int a = 0;
   int len = poly.size() / 2;
   int n_point = p.size() / 2;
   vector<Point> polygon( len );
@@ -112,7 +114,11 @@ vector<int> inPoly( const vector<int> &p, const vector<int> &poly ) {
   for( int i = 0; i < n_point; ++ i ) {
     point.x = p[ 2 * i ];
     point.y = p[ 2 * i + 1 ];
-    inside[ i ] = ( wn_PnPoly( point, polygon ) == 0 ) ? 0 : 1;
+    a = wn_PnPoly( point, polygon );
+    if( a != 2 && a != 3 && a != 0 ) {
+      a = 1;
+    }
+    inside[ i ] = a;
   }
   return inside;
 }
