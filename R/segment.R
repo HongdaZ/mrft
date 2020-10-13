@@ -137,5 +137,5 @@ segment <- function( patient,
   t2_image[ t2_image == -2 ] <- 2L
   ## Initialize data for postprocessing
   post_data <- initPost( t1ce_image, flair_image, t2_image )
-  
+  post_seg <- postProcess( post_data )
 }

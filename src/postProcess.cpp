@@ -5,6 +5,10 @@
 #include <list>
 
 #include "helper.h"
+#include "cnctRegion.h"
+#include "excldVoxel.h"
+#include "extRegion.h"
+#include "pad2zero.h"
 
 using std::vector;
 using std::list;
@@ -28,11 +32,17 @@ SEXP postProcess( SEXP post_data ) {
   
   const int len = length( idx );
   SEXP res = PROTECT( allocMatrix( INTSXP, 2, len ) );
+  // Store the results for each tissue type
+  int *ptr_res = INTEGER( res );
   int *ptr_hemorrhage = new int[ 2 * len ]();
   int *ptr_necrosis = new int[ 2 * len ]();
   int *ptr_nonenh = new int[ 2 * len ]();
   int *ptr_enh = new int[ 2 * len ]();
   int *ptr_edema = new int[ 2 * len ]();
+  
+  // Store the result of findRegion
+  vector<int> region;
+  region.reserve( len );
   
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
@@ -42,8 +52,16 @@ SEXP postProcess( SEXP post_data ) {
       ptr_hemorrhage[ 2 * i ] = 5;
     }
   }
-  
-  
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_hemorrhage, ptr_flair, 
+                    1, region ) ) {
+      excldVoxel( region, ptr_t2, 4 );
+      excldVoxel( region, ptr_t1ce, 4 );
+      extRegion( region, ptr_hemorrhage, 5 );
+    } 
+  }
+  // Recover the padding to zero
+  pad2zero( ptr_hemorrhage, len );
   
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;
