@@ -3,6 +3,8 @@
 #include "inPoly.h"
 
 using std::vector;
+using std::min;
+using std::max;
 
 // Copyright 2000 softSurfer, 2012 Dan Sunday
 // This code may be freely used and modified for any purpose
@@ -75,7 +77,11 @@ wn_PnPoly( const Point &P, const vector<Point> &V )
     if( V[ i ].x == P.x && V[ i ].y == P.y ) {
       return 0;
     } else if( ( V[ i ].x - P.x ) * ( V[ i + 1 ].y - P.y  ) ==
-      ( V[ i + 1 ].x - P.x ) * ( V[ i ].y - P.y  ) ) {
+      ( V[ i + 1 ].x - P.x ) * ( V[ i ].y - P.y  ) &&
+      min( V[ i ].x, V[ i + 1 ].x ) <= P.x && 
+      P.x <= max( V[ i ].x, V[ i + 1 ].x ) &&
+      min( V[ i ].y, V[ i + 1 ].y ) <= P.y &&
+      P.y <= max( V[ i ].y, V[ i + 1 ].y ) ) {
       return 0;
     }else {
       if (V[i].y <= P.y) {          // start y <= P.y
