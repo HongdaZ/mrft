@@ -57,11 +57,31 @@ SEXP postProcess( SEXP post_data ) {
                     1, region ) ) {
       excldVoxel( region, ptr_t2, 4 );
       excldVoxel( region, ptr_t1ce, 4 );
-      extRegion( region, ptr_hemorrhage, 5 );
+      extRegion( region, ptr_hemorrhage, 5, .5 );
     } 
   }
   // Recover the padding to zero
   pad2zero( ptr_hemorrhage, len );
+  
+  // 10-2: Find necrosis
+  for( int i = 0; i < len; ++ i ) {
+    if( ( ptr_t1ce[ 2 * i ] == 1 || ptr_flair[ 2 * i ] == 1 ) &&
+        ptr_flair[ 2 * i ] != 4 ) {
+      ptr_necrosis[ 2 * i ] = 6;
+    }
+  }
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_necrosis, ptr_t2, 
+                    4, region ) ) {
+      excldVoxel( region, ptr_t1ce, 4 );
+      excldVoxel( region, ptr_flair, 4 );
+      excldVoxel( region, ptr_hemorrhage, 5 );
+      extRegion( region, ptr_necrosis, 6, 0 );
+    }
+  }
+  // Recover the padding to zero
+  pad2zero( ptr_necrosis, len );
+  
   
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;

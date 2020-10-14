@@ -2,7 +2,7 @@
 
 // Extend the region
 void extRegion( const vector<int> &region, int *ptr_seg,
-                const int &label ) {
+                const int &label, const double &ratio ) {
   int n1 = 0;
   int n2 = 0;
   
@@ -15,7 +15,7 @@ void extRegion( const vector<int> &region, int *ptr_seg,
       }
     }
   }
-  if( n2 > n1 * .5 ) {
+  if( n2 > n1 * ratio ) {
     for( vector<int>::const_iterator it = region.begin();
          it != region.end(); ++ it ) {
       if( *it != 0 ) {
