@@ -82,6 +82,23 @@ SEXP postProcess( SEXP post_data ) {
   // Recover the padding to zero
   pad2zero( ptr_necrosis, len );
   
+  // 10-3: Find enhancing tumor core
+  for( int i = 0; i < len; ++ i ) {
+    if( ( ptr_t1ce[ 2 * i ] == 4 && ptr_necrosis[ 2 * i ] != 6 ) &&
+        ( ptr_t2[ 2 * i ] == 4 || ptr_flair[ 2 * i ] == 4 ) ) {
+      ptr_enh[ 2 * i ] = 4;
+    }
+  }
+  
+  // 10-4: Find edema
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_flair[ 2 * i ] == 4 || ptr_t2[ 2 * i ] == 4 ||
+        ptr_enh[ 2 * i ] == 4 && ptr_necrosis[ 2 * i ] != 6 &&
+        ptr_hemorrhage[ 2 * i ] != 5 ) {
+      ptr_edema[ 2 * i ] = 2;
+    }
+  }
+  
   
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;
