@@ -9,6 +9,7 @@
 #include "excldVoxel.h"
 #include "extRegion.h"
 #include "pad2zero.h"
+#include "regions.h"
 
 using std::vector;
 using std::list;
@@ -98,7 +99,11 @@ SEXP postProcess( SEXP post_data ) {
       ptr_edema[ 2 * i ] = 2;
     }
   }
-  
+  // Find connected regions in edema
+  list<vector<int>> edema_regions = regions( ptr_edema, len,
+                                             region, 2, 
+                                             ptr_nidx,
+                                             ptr_aidx );
   
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;

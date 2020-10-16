@@ -7,7 +7,9 @@
 using std::vector;
 using std::list;
 
-list<vector<int>> regions( int *ptr_seg, const int &label,
+list<vector<int>> regions( int *ptr_seg, const int &len, 
+                           vector<int> &region,
+                           const int &label,
                            const int *ptr_nidx,
                            const int *ptr_aidx );
 
