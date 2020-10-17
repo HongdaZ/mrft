@@ -10,6 +10,7 @@
 #include "extRegion.h"
 #include "pad2zero.h"
 #include "regions.h"
+#include "region2slice.h"
 
 using std::vector;
 using std::list;
@@ -23,6 +24,13 @@ SEXP postProcess( SEXP post_data ) {
   SEXP idx = getListElement( post_data, "idx" );
   SEXP nidx = getListElement( post_data, "nidx" );
   SEXP aidx = getListElement( post_data, "aidx" );
+  SEXP r_nr = getListElement( post_data, "nr" );
+  SEXP r_nc = getListElement( post_data, "nc" );
+  SEXP r_ns = getListElement( post_data, "ns" );
+  
+  const int nr = INTEGER( r_nr )[ 0 ];
+  const int nc = INTEGER( r_nc )[ 0 ];
+  const int ns = INTEGER( r_ns )[ 0 ];
   
   int *ptr_t1ce = INTEGER( t1ce );
   int *ptr_flair = INTEGER( flair );
@@ -99,12 +107,14 @@ SEXP postProcess( SEXP post_data ) {
       ptr_edema[ 2 * i ] = 2;
     }
   }
+  // 10-5: Find necrosis
   // Find connected regions in edema
   list<vector<int>> edema_regions = regions( ptr_edema, len,
                                              region, 2, 
                                              ptr_nidx,
                                              ptr_aidx );
-  
+  vector<list<vector<int>>> edema_slices =
+    region2slice( edema_regions, nr, nc, ns );
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;
   delete [] ptr_nonenh;

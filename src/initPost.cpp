@@ -87,7 +87,10 @@ SEXP initPost( SEXP t1ce_image, SEXP flair_image,
     }
   }
   
-  SEXP names = PROTECT( allocVector( STRSXP, 6 ) );
+  SEXP names = PROTECT( allocVector( STRSXP, 9 ) );
+  SEXP r_nr = PROTECT( ScalarInteger( nr ) );
+  SEXP r_nc = PROTECT( ScalarInteger( nc ) );
+  SEXP r_ns = PROTECT( ScalarInteger( ns ) );
   
   SET_STRING_ELT( names, 0, mkChar( "t1ce_seg" ) );
   SET_STRING_ELT( names, 1, mkChar( "flair_seg" ) );
@@ -95,16 +98,22 @@ SEXP initPost( SEXP t1ce_image, SEXP flair_image,
   SET_STRING_ELT( names, 3, mkChar( "idx" ) );
   SET_STRING_ELT( names, 4, mkChar( "nidx" ) );
   SET_STRING_ELT( names, 5, mkChar( "aidx" ) );
+  SET_STRING_ELT( names, 6, mkChar( "nr" ) );
+  SET_STRING_ELT( names, 7, mkChar( "nc" ) );
+  SET_STRING_ELT( names, 8, mkChar( "ns" ) );
   
-  SEXP res = PROTECT( allocVector( VECSXP, 6 ) );
+  SEXP res = PROTECT( allocVector( VECSXP, 9 ) );
   SET_VECTOR_ELT( res, 0, t1ce_seg );
   SET_VECTOR_ELT( res, 1, flair_seg );
   SET_VECTOR_ELT( res, 2, t2_seg );
   SET_VECTOR_ELT( res, 3, vidx );
   SET_VECTOR_ELT( res, 4, nbr_idx );
   SET_VECTOR_ELT( res, 5, a_idx );
+  SET_VECTOR_ELT( res, 6, r_nr );
+  SET_VECTOR_ELT( res, 7, r_nc );
+  SET_VECTOR_ELT( res, 8, r_ns );
   setAttrib( res, R_NamesSymbol, names );
   delete [] fidx;
-  UNPROTECT( 8 ); 
+  UNPROTECT( 11 ); 
   return res;
 }
