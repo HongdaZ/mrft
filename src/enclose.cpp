@@ -42,7 +42,7 @@ void enclose( int *ptr_seg, const int &len,
           hull.push_back( v2 );
           vector<int> inside = inPoly( inpoly_points, hull );
           for( int j = 0; j < len_slice2; ++ j ) {
-            if( inside[ j ] > 0 ) {
+            if( inside[ j ] == 1 ) {
               idx = ( *it_s2 )[ 4 * j ];
               enclosed[ 3 * ( idx - 1 ) + i ] = 1;
             }

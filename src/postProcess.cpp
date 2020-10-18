@@ -11,6 +11,7 @@
 #include "pad2zero.h"
 #include "regions.h"
 #include "region2slice.h"
+#include "enclose.h"
 
 using std::vector;
 using std::list;
@@ -103,9 +104,10 @@ SEXP postProcess( SEXP post_data ) {
   
   // 10-4: Find edema
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_flair[ 2 * i ] == 4 || ptr_t2[ 2 * i ] == 4 ||
-        ptr_enh[ 2 * i ] == 4 && ptr_necrosis[ 2 * i ] != 6 &&
-        ptr_hemorrhage[ 2 * i ] != 5 ) {
+    if( ( ptr_flair[ 2 * i ] == 4 || ptr_t2[ 2 * i ] == 4 ||
+        ptr_enh[ 2 * i ] == 4 ) && 
+        ( ptr_necrosis[ 2 * i ] != 6 &&
+        ptr_hemorrhage[ 2 * i ] != 5 ) ) {
       ptr_edema[ 2 * i ] = 2;
     }
   }
@@ -121,6 +123,11 @@ SEXP postProcess( SEXP post_data ) {
                                                6, ptr_aidx );
   vector<list<vector<int>>> necrosis_slices = 
     region2slice( necrosis_region, nr, nc, ns );
+  enclose( ptr_enclose_nec, len, edema_slices, necrosis_slices );
+  
+  
+  
+  
   
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;
