@@ -48,6 +48,8 @@ SEXP postProcess( SEXP post_data ) {
   int *ptr_nonenh = new int[ 2 * len ]();
   int *ptr_enh = new int[ 2 * len ]();
   int *ptr_edema = new int[ 2 * len ]();
+  int *ptr_enclose_nec = new int[ 2 * len ]();
+  int *ptr_enclose_hem = new int[ 2 * len ]();
   
   // Store the result of findRegion
   vector<int> region;
@@ -125,6 +127,9 @@ SEXP postProcess( SEXP post_data ) {
   delete [] ptr_nonenh;
   delete [] ptr_enh;
   delete [] ptr_edema;
+  delete [] ptr_enclose_nec;
+  delete [] ptr_enclose_hem;
+  
   UNPROTECT( 1 );
   return res;
 }

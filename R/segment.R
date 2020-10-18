@@ -55,7 +55,8 @@ segment <- function( patient,
   ## Both tumor and outliers are regarded as tumor
   t1ce_seg$image[ t1ce_seg$image < -3 | t1ce_seg$image > 0 ] <- -4L
   
-  ## split flair images to CSF & necrosis, white matter and grey matter
+  ## split flair images to CSF & necrosis, white matter 
+  ## and grey matter
   flair_data <- splitFlair3( images$flair, t1ce_seg )
   m <- flair_data$m
   flair_model <- initEst( flair_data$label, flair_data$flair )
@@ -83,13 +84,15 @@ segment <- function( patient,
                       lambda2$flair, a, b, m, nu2$flair, 
                       maxit$flair )
   ## Both tumor and outliers are regarded as tumor
-  flair_seg$image[ flair_seg$image < -3 | flair_seg$image > 0 ] <- -4L
+  flair_seg$image[ flair_seg$image < -3 |
+                     flair_seg$image > 0 ] <- -4L
   
   ## split t2 to grey matter and white matter
   t2_data <- splitT22( images$t2, t1ce_seg, flair_seg )
   m <- t2_data$m
   t2_model <- initEst( t2_data$label, t2_data$t2 )
-  ## estimate parameters of t2 images without tumor and CSF & necrosis
+  ## estimate parameters of t2 images without tumor 
+  ## and CSF & necrosis
   # sink( '/home/hzhang/Documents/t2_output.txt' )
   t2_seg <- est( t2_model, delta$t2, gamma, 
                  alpha$t2[ 1 : 2 ], beta$t2[ 1 : 2 ], 
