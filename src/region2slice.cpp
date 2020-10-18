@@ -1,6 +1,6 @@
 #include "region2slice.h"
 
-// Convert region to slices
+// Convert regions to slices
 vector<list<vector<int>>>
   region2slice( const list<vector<int>> &regions,
                 const int &nr, const int &nc, const int &ns ) {

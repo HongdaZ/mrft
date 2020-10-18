@@ -115,6 +115,11 @@ SEXP postProcess( SEXP post_data ) {
                                              ptr_aidx );
   vector<list<vector<int>>> edema_slices =
     region2slice( edema_regions, nr, nc, ns );
+  list<vector<int>> necrosis_region = regions( ptr_necrosis, len,
+                                               6, ptr_aidx );
+  vector<list<vector<int>>> necrosis_slices = 
+    region2slice( necrosis_region, nr, nc, ns );
+  
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;
   delete [] ptr_nonenh;
