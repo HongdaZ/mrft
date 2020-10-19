@@ -149,6 +149,7 @@ SEXP postProcess( SEXP post_data ) {
       ptr_edema[ 2 * i ] = 0;
     }
   }
+  
   // 10-6: Find hemorrhage
   // hemorrhage enclosed by edema
   inRegion( ptr_enclose_hem, len, ptr_edema, 2, ptr_hemorrhage, 5,
@@ -180,9 +181,10 @@ SEXP postProcess( SEXP post_data ) {
     }
   }
   pad2zero( ptr_hemorrhage, len );
-  for( int i = 0; i < len; ++ i ) {
-    ptr_res[ 2 * i ] = ptr_hemorrhage[ 2 * i ];
-  }
+  
+  // for( int i = 0; i < len; ++ i ) {
+  //   ptr_res[ 2 * i ] = ptr_enclose_hem[ 2 * i ];
+  // }
   
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;
