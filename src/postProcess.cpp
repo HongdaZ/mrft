@@ -13,6 +13,7 @@
 #include "region2slice.h"
 #include "enclose.h"
 #include "inRegion.h"
+#include "excldRegion.h"
 
 using std::vector;
 using std::list;
@@ -113,15 +114,45 @@ SEXP postProcess( SEXP post_data ) {
     }
   }
   // 10-5: Find necrosis
+  // necrosis enclosed by edema
   inRegion( ptr_enclose_nec, len, ptr_edema, 2, ptr_necrosis, 6, 
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
-  // for( int i = 0; i < len; ++ i ) {
-  //   ptr_res[ 2 * i ] = ptr_enclose_nec[ 2 * i ];
-  // }
+  // Remove necrosis regions separate from edema
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_enclose_nec, 
+                    1, region ) ) {
+      excldRegion( region, ptr_nidx, ptr_enclose_nec, 
+                   ptr_edema, 2 );
+    }
+  }
+  // Recover the padding to zero
+  pad2zero( ptr_enclose_nec, len );
+  // Extend in ptr_necrosis
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_necrosis, 
+                    6, region ) ) {
+      extRegion( region, ptr_enclose_nec, 1, .5 );
+    }
+  }
+  // Recover the padding to zero
+  pad2zero( ptr_enclose_nec, len );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enclose_nec[ 2 * i ] == 1 ) {
+      ptr_necrosis[ 2 * i ] = 6;
+    } else {
+      ptr_necrosis[ 2 * i ] = 0;
+    }
+  } 
+  pad2zero( ptr_necrosis, len );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_necrosis[ 2 * i ] == 6 ) {
+      ptr_edema[ 2 * i ] = 0;
+    }
+  }
   
-  
-  
-  
+  for( int i = 0; i < len; ++ i ) {
+    ptr_res[ 2 * i ] = ptr_necrosis[ 2 * i ];
+  }
   
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;
