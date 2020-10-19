@@ -149,9 +149,39 @@ SEXP postProcess( SEXP post_data ) {
       ptr_edema[ 2 * i ] = 0;
     }
   }
-  
+  // 10-6: Find hemorrhage
+  // hemorrhage enclosed by edema
+  inRegion( ptr_enclose_hem, len, ptr_edema, 2, ptr_hemorrhage, 5,
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  // Remove hemorrhage regions separate from edema
   for( int i = 0; i < len; ++ i ) {
-    ptr_res[ 2 * i ] = ptr_necrosis[ 2 * i ];
+    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_hem, ptr_enclose_hem,
+                    1, region ) ) {
+      excldRegion( region, ptr_nidx, ptr_enclose_hem,
+                   ptr_edema, 2 );
+    }
+  }
+  // Recover the padding to zero
+  pad2zero( ptr_enclose_hem, len );
+  // Extend in ptr_hemorrhage
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_hem, ptr_hemorrhage,
+                    5, region ) ) {
+      extRegion( region, ptr_enclose_hem, 1, .5 );
+    }
+  }
+  // Recover the padding to zero
+  pad2zero( ptr_enclose_hem, len );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enclose_hem[ 2 * i ] == 1 ) {
+      ptr_hemorrhage[ 2 * i ] = 5;
+    } else {
+      ptr_hemorrhage[ 2 * i ] = 0;
+    }
+  }
+  pad2zero( ptr_hemorrhage, len );
+  for( int i = 0; i < len; ++ i ) {
+    ptr_res[ 2 * i ] = ptr_hemorrhage[ 2 * i ];
   }
   
   delete [] ptr_hemorrhage;
