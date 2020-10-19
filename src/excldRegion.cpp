@@ -12,7 +12,8 @@ void excldRegion( const vector<int> &region, const int *ptr_nidx,
     for( int i = 0; i < 6; ++ i ) {
       n_idx = ptr_nidx[ 6 * ( index - 1 ) + i ];
       if( n_idx != NA_INTEGER ) {
-        if( ptr_seg2[ 2 * ( n_idx - 1 ) ] == label ) {
+        if( ptr_seg1[ 2 * ( n_idx - 1 ) ] == 0 &&
+            ptr_seg2[ 2 * ( n_idx - 1 ) ] == label ) {
           return;
         }
       }
