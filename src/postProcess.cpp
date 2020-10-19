@@ -12,6 +12,7 @@
 #include "regions.h"
 #include "region2slice.h"
 #include "enclose.h"
+#include "inRegion.h"
 
 using std::vector;
 using std::list;
@@ -112,18 +113,11 @@ SEXP postProcess( SEXP post_data ) {
     }
   }
   // 10-5: Find necrosis
-  // Find connected regions in edema
-  list<vector<int>> edema_regions = regions( ptr_edema, len,
-                                             region, 2, 
-                                             ptr_nidx,
-                                             ptr_aidx );
-  vector<list<vector<int>>> edema_slices =
-    region2slice( edema_regions, nr, nc, ns );
-  list<vector<int>> necrosis_region = regions( ptr_necrosis, len,
-                                               6, ptr_aidx );
-  vector<list<vector<int>>> necrosis_slices = 
-    region2slice( necrosis_region, nr, nc, ns );
-  enclose( ptr_enclose_nec, len, edema_slices, necrosis_slices );
+  inRegion( ptr_enclose_nec, len, ptr_edema, 2, ptr_necrosis, 6, 
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  // for( int i = 0; i < len; ++ i ) {
+  //   ptr_res[ 2 * i ] = ptr_enclose_nec[ 2 * i ];
+  // }
   
   
   
