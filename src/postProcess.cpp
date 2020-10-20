@@ -15,15 +15,12 @@
 #include "inRegion.h"
 #include "excldRegion.h"
 #include "restoreImg.h"
+#include "tissueType.h"
+#include "wrapUp.h"
 
 using std::vector;
 using std::list;
 
-enum Tumor { HMG = 5, NCR = 6, NET = 7, ET = 4, ED = 2 };
-enum T1ce { T1CSF = 1, T1GM = 2, T1WM = 3, T1TM = 4 };
-enum Flair { FCSF = 1, FWM = 2, FGM = 3, FTM = 4 };
-enum T2 { T2WM = 1, T2GM = 2, T2CSF = 4 };
-enum Seg { SNET = 1, SET = 4, SED = 2 };
 // Postprocess the results
 extern "C" SEXP postProcess( SEXP post_data );
 SEXP postProcess( SEXP post_data ) {
@@ -208,6 +205,7 @@ SEXP postProcess( SEXP post_data ) {
     ptr_hgg[ 0 ] = 0; 
   }
   if( ptr_hgg[ 0 ] == 1 ) {
+    // HGG
     int *ptr_tumor = new int[ 2 * len ]();
     // 10-8.1: Find necrosis
     // necrosis enclosed by enh
@@ -228,21 +226,8 @@ SEXP postProcess( SEXP post_data ) {
       }
     }
     // Wrap up the segmentation result
-    for( int i = 0; i < len; ++ i ) {
-      if( ptr_hemorrhage[ 2 * i ] == Tumor::HMG ) {
-        ptr_seg[ 2 * i ] = Seg::SNET;
-        ptr_tumor[ 2 * i ] = 1;
-      } else if( ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
-        ptr_seg[ 2 * i ] = Seg::SNET;
-        ptr_tumor[ 2 * i ] = 1;
-      } else if( ptr_enh[ 2 * i ] == Tumor::ET ) {
-        ptr_seg[ 2 * i ] = Seg::SET;
-        ptr_tumor[ 2 * i ] = 1;
-      } else if( ptr_edema[ 2 * i ] == Tumor::ED ) {
-        ptr_seg[ 2 * i ] = Seg::SED;
-        ptr_tumor[ 2 * i ] = 1;
-      }
-    }
+    wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
+            ptr_seg, ptr_tumor );
     // 10-8.3: Remove 3D connected regions with enh.size < 100
     for( int i = 0; i < len; ++ i ) {
       if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
@@ -258,8 +243,14 @@ SEXP postProcess( SEXP post_data ) {
       }
     }
     delete [] ptr_tumor;
+  } else {
+    // LGG
+    // Wrap up results for LGG
+    wrapUp( len, ptr_hgg, ptr_hemorrhage, ptr_necrosis, ptr_enh,
+            ptr_edema, ptr_flair, ptr_seg );
   }
-
+  
+  
   // Restore the segmentation result to a image with the original 
   // dimension
   restoreImg( ptr_idx, ptr_seg, ptr_res_image, len );
