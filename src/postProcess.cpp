@@ -18,6 +18,11 @@
 using std::vector;
 using std::list;
 
+enum Tumor { HMG = 5, NCR = 6, NET = 7, ET = 4, ED = 2 };
+enum T1ce { T1CSF = 1, T1GM = 2, T1WM = 3, T1TM = 4 };
+enum Flair { FCSF = 1, FWM = 2, FGM = 3, FTM = 4 };
+enum T2 { T2WM = 1, T2GM = 2, T2CSF = 4 };
+
 // Postprocess the results
 extern "C" SEXP postProcess( SEXP post_data );
 SEXP postProcess( SEXP post_data ) {
@@ -60,18 +65,18 @@ SEXP postProcess( SEXP post_data ) {
   
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_flair[ 2 * i ] == 1 && 
-        ptr_t2[ 2 * i ] == 1 &&
-        ptr_t1ce[ 2 * i ] != 4 ) {
-      ptr_hemorrhage[ 2 * i ] = 5;
+    if( ptr_flair[ 2 * i ] == Flair::FCSF && 
+        ptr_t2[ 2 * i ] == T2::T2WM &&
+        ptr_t1ce[ 2 * i ] != T1ce::T1TM ) {
+      ptr_hemorrhage[ 2 * i ] = Tumor::HMG;
     }
   }
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_hemorrhage, ptr_flair, 
-                    1, region ) ) {
-      excldVoxel( region, ptr_t2, 4 );
-      excldVoxel( region, ptr_t1ce, 4 );
-      extRegion( region, ptr_hemorrhage, 5, .5 );
+                    Flair::FCSF, region ) ) {
+      excldVoxel( region, ptr_t2, T2::T2CSF );
+      excldVoxel( region, ptr_t1ce, T1ce::T1TM );
+      extRegion( region, ptr_hemorrhage, Tumor::HMG, .5 );
     } 
   }
   // Recover the padding to zero
@@ -79,18 +84,19 @@ SEXP postProcess( SEXP post_data ) {
   
   // 10-2: Find necrosis
   for( int i = 0; i < len; ++ i ) {
-    if( ( ptr_t1ce[ 2 * i ] == 1 || ptr_flair[ 2 * i ] == 1 ) &&
-        ptr_flair[ 2 * i ] != 4 ) {
-      ptr_necrosis[ 2 * i ] = 6;
+    if( ( ptr_t1ce[ 2 * i ] == T1ce::T1CSF || 
+        ptr_flair[ 2 * i ] == Flair::FCSF ) &&
+        ptr_flair[ 2 * i ] != Flair::FTM ) {
+      ptr_necrosis[ 2 * i ] = Tumor::NCR;
     }
   }
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_necrosis, ptr_t2, 
-                    4, region ) ) {
-      excldVoxel( region, ptr_t1ce, 4 );
-      excldVoxel( region, ptr_flair, 4 );
-      excldVoxel( region, ptr_hemorrhage, 5 );
-      extRegion( region, ptr_necrosis, 6, 0 );
+                    T2::T2CSF, region ) ) {
+      excldVoxel( region, ptr_t1ce, T1ce::T1TM );
+      excldVoxel( region, ptr_flair, Flair::FTM );
+      excldVoxel( region, ptr_hemorrhage, Tumor::HMG );
+      extRegion( region, ptr_necrosis, Tumor::NCR, 0 );
     }
   }
   // Recover the padding to zero
@@ -98,31 +104,35 @@ SEXP postProcess( SEXP post_data ) {
   
   // 10-3: Find enhancing tumor core
   for( int i = 0; i < len; ++ i ) {
-    if( ( ptr_t1ce[ 2 * i ] == 4 && ptr_necrosis[ 2 * i ] != 6 ) &&
-        ( ptr_t2[ 2 * i ] == 4 || ptr_flair[ 2 * i ] == 4 ) ) {
-      ptr_enh[ 2 * i ] = 4;
+    if( ( ptr_t1ce[ 2 * i ] == T1ce::T1TM && 
+        ptr_necrosis[ 2 * i ] != Tumor::NCR ) &&
+        ( ptr_t2[ 2 * i ] == T2::T2CSF || 
+        ptr_flair[ 2 * i ] == Flair::FTM ) ) {
+      ptr_enh[ 2 * i ] = Tumor::ET;
     }
   }
   
   // 10-4: Find edema
   for( int i = 0; i < len; ++ i ) {
-    if( ( ptr_flair[ 2 * i ] == 4 || ptr_t2[ 2 * i ] == 4 ||
-        ptr_enh[ 2 * i ] == 4 ) && 
-        ( ptr_necrosis[ 2 * i ] != 6 &&
-        ptr_hemorrhage[ 2 * i ] != 5 ) ) {
-      ptr_edema[ 2 * i ] = 2;
+    if( ( ptr_flair[ 2 * i ] == Flair::FTM || 
+        ptr_t2[ 2 * i ] == T2::T2CSF ||
+        ptr_enh[ 2 * i ] == Tumor::ET ) && 
+        ( ptr_necrosis[ 2 * i ] != Tumor::NCR &&
+        ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) ) {
+      ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
   // 10-5: Find necrosis
   // necrosis enclosed by edema
-  inRegion( ptr_enclose_nec, len, ptr_edema, 2, ptr_necrosis, 6, 
+  inRegion( ptr_enclose_nec, len, ptr_edema, Tumor::ED, 
+            ptr_necrosis, Tumor::NCR, 
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
   // Remove necrosis regions separate from edema
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_enclose_nec, 
                     1, region ) ) {
       excldRegion( region, ptr_nidx, ptr_enclose_nec, 
-                   ptr_edema, 2 );
+                   ptr_edema, Tumor::ED );
     }
   }
   // Recover the padding to zero
@@ -130,7 +140,7 @@ SEXP postProcess( SEXP post_data ) {
   // Extend in ptr_necrosis
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_necrosis, 
-                    6, region ) ) {
+                    Tumor::NCR, region ) ) {
       extRegion( region, ptr_enclose_nec, 1, .5 );
     }
   }
@@ -138,28 +148,29 @@ SEXP postProcess( SEXP post_data ) {
   pad2zero( ptr_enclose_nec, len );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_enclose_nec[ 2 * i ] == 1 ) {
-      ptr_necrosis[ 2 * i ] = 6;
+      ptr_necrosis[ 2 * i ] = Tumor::NCR;
     } else {
       ptr_necrosis[ 2 * i ] = 0;
     }
   } 
   pad2zero( ptr_necrosis, len );
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_necrosis[ 2 * i ] == 6 ) {
+    if( ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
       ptr_edema[ 2 * i ] = 0;
     }
   }
   
   // 10-6: Find hemorrhage
   // hemorrhage enclosed by edema
-  inRegion( ptr_enclose_hem, len, ptr_edema, 2, ptr_hemorrhage, 5,
+  inRegion( ptr_enclose_hem, len, ptr_edema, Tumor::ED, 
+            ptr_hemorrhage, Tumor::HMG,
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
   // Remove hemorrhage regions separate from edema
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_hem, ptr_enclose_hem,
                     1, region ) ) {
       excldRegion( region, ptr_nidx, ptr_enclose_hem,
-                   ptr_edema, 2 );
+                   ptr_edema, Tumor::ED );
     }
   }
   // Recover the padding to zero
@@ -167,7 +178,7 @@ SEXP postProcess( SEXP post_data ) {
   // Extend in ptr_hemorrhage
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_hem, ptr_hemorrhage,
-                    5, region ) ) {
+                    Tumor::HMG, region ) ) {
       extRegion( region, ptr_enclose_hem, 1, .5 );
     }
   }
@@ -175,13 +186,14 @@ SEXP postProcess( SEXP post_data ) {
   pad2zero( ptr_enclose_hem, len );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_enclose_hem[ 2 * i ] == 1 ) {
-      ptr_hemorrhage[ 2 * i ] = 5;
+      ptr_hemorrhage[ 2 * i ] = Tumor::HMG;
     } else {
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
   pad2zero( ptr_hemorrhage, len );
   
+  // 
   // for( int i = 0; i < len; ++ i ) {
   //   ptr_res[ 2 * i ] = ptr_enclose_hem[ 2 * i ];
   // }
