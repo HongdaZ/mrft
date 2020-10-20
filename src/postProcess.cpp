@@ -206,6 +206,7 @@ SEXP postProcess( SEXP post_data ) {
     ptr_hgg[ 0 ] = 0; 
   }
   if( ptr_hgg[ 0 ] == 1 ) {
+    int *ptr_tumor = new int[ 2 * len ]();
     // 10-8.1: Find necrosis
     // necrosis enclosed by enh
     inRegion( ptr_enclose_ncr, len, ptr_enh, Tumor::ET, 
@@ -218,22 +219,43 @@ SEXP postProcess( SEXP post_data ) {
         ptr_edema[ 2 * i ] = 0;
       }
     }
+    // 10-8.2: Remove enh from edema
     for( int i = 0; i < len; ++ i ) {
       if( ptr_enh[ 2 * i ] == Tumor::ET ) {
         ptr_edema[ 2 * i ] = 0;
       }
     }
+    // Wrap up the segmentation result
     for( int i = 0; i < len; ++ i ) {
       if( ptr_hemorrhage[ 2 * i ] == Tumor::HMG ) {
         ptr_seg[ 2 * i ] = Seg::SNET;
+        ptr_tumor[ 2 * i ] = 1;
       } else if( ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
         ptr_seg[ 2 * i ] = Seg::SNET;
+        ptr_tumor[ 2 * i ] = 1;
       } else if( ptr_enh[ 2 * i ] == Tumor::ET ) {
         ptr_seg[ 2 * i ] = Seg::SET;
+        ptr_tumor[ 2 * i ] = 1;
       } else if( ptr_edema[ 2 * i ] == Tumor::ED ) {
         ptr_seg[ 2 * i ] = Seg::SED;
+        ptr_tumor[ 2 * i ] = 1;
       }
     }
+    // 10-8.3: Remove 3D connected regions with enh.size < 100
+    for( int i = 0; i < len; ++ i ) {
+      if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
+                      1, region ) ) {
+        excldRegion( region, ptr_tumor,
+                     ptr_seg, Seg::SET, 100 );
+      }
+    }
+    pad2zero( ptr_tumor, len );
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_tumor[ 2 * i ] == 0 ) {
+        ptr_seg[ 2 * i ] = 0;
+      }
+    }
+    delete [] ptr_tumor;
   }
 
   SEXP res = PROTECT( allocVector( VECSXP, 2 ) );
