@@ -14,6 +14,7 @@
 #include "enclose.h"
 #include "inRegion.h"
 #include "excldRegion.h"
+#include "restoreImg.h"
 
 using std::vector;
 using std::list;
@@ -48,12 +49,13 @@ SEXP postProcess( SEXP post_data ) {
   const int *ptr_aidx = INTEGER( aidx );
   
   const int len = length( idx );
-  SEXP seg = PROTECT( allocMatrix( INTSXP, 2, len ) );
+  SEXP res_image = PROTECT( alloc3DArray( INTSXP, nr, nc, ns ) );
   SEXP hgg = PROTECT( ScalarInteger( 0 ) );
   
   // Store the results for each tissue type
-  int *ptr_seg = INTEGER( seg );
+  int *ptr_seg = new int[ 2 * len ]();
   int *ptr_hgg = INTEGER( hgg );
+  int *ptr_res_image = INTEGER( res_image );
   int *ptr_hemorrhage = new int[ 2 * len ]();
   int *ptr_necrosis = new int[ 2 * len ]();
   int *ptr_enh = new int[ 2 * len ]();
@@ -258,8 +260,12 @@ SEXP postProcess( SEXP post_data ) {
     delete [] ptr_tumor;
   }
 
+  // Restore the segmentation result to a image with the original 
+  // dimension
+  restoreImg( ptr_idx, ptr_seg, ptr_res_image, len );
+  
   SEXP res = PROTECT( allocVector( VECSXP, 2 ) );
-  SET_VECTOR_ELT( res, 0, seg );
+  SET_VECTOR_ELT( res, 0, res_image );
   SET_VECTOR_ELT( res, 1, hgg );
   
   SEXP names = PROTECT( allocVector( STRSXP, 2 ) );
@@ -275,6 +281,7 @@ SEXP postProcess( SEXP post_data ) {
   delete [] ptr_enclose_nec;
   delete [] ptr_enclose_hem;
   delete [] ptr_enclose_ncr;
+  delete [] ptr_seg;
   
   UNPROTECT( 4 );
   return res;
