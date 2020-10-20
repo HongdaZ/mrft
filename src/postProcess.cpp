@@ -22,7 +22,7 @@ enum Tumor { HMG = 5, NCR = 6, NET = 7, ET = 4, ED = 2 };
 enum T1ce { T1CSF = 1, T1GM = 2, T1WM = 3, T1TM = 4 };
 enum Flair { FCSF = 1, FWM = 2, FGM = 3, FTM = 4 };
 enum T2 { T2WM = 1, T2GM = 2, T2CSF = 4 };
-
+enum Seg { SNET = 1, SET = 4, SED = 2 };
 // Postprocess the results
 extern "C" SEXP postProcess( SEXP post_data );
 SEXP postProcess( SEXP post_data ) {
@@ -48,17 +48,22 @@ SEXP postProcess( SEXP post_data ) {
   const int *ptr_aidx = INTEGER( aidx );
   
   const int len = length( idx );
-  SEXP res = PROTECT( allocMatrix( INTSXP, 2, len ) );
+  SEXP seg = PROTECT( allocMatrix( INTSXP, 2, len ) );
+  SEXP hgg = PROTECT( ScalarInteger( 0 ) );
+  
   // Store the results for each tissue type
-  int *ptr_res = INTEGER( res );
+  int *ptr_seg = INTEGER( seg );
+  int *ptr_hgg = INTEGER( hgg );
   int *ptr_hemorrhage = new int[ 2 * len ]();
   int *ptr_necrosis = new int[ 2 * len ]();
-  int *ptr_nonenh = new int[ 2 * len ]();
   int *ptr_enh = new int[ 2 * len ]();
   int *ptr_edema = new int[ 2 * len ]();
+  // Necrosis inside edema
   int *ptr_enclose_nec = new int[ 2 * len ]();
+  // Hemorrhage inside edema
   int *ptr_enclose_hem = new int[ 2 * len ]();
-  
+  // Necrosis inside enh
+  int *ptr_enclose_ncr = new int[ 2 * len ]();
   // Store the result of findRegion
   vector<int> region;
   region.reserve( len );
@@ -149,14 +154,9 @@ SEXP postProcess( SEXP post_data ) {
   for( int i = 0; i < len; ++ i ) {
     if( ptr_enclose_nec[ 2 * i ] == 1 ) {
       ptr_necrosis[ 2 * i ] = Tumor::NCR;
+      ptr_edema[ 2 * i ] = 0;
     } else {
       ptr_necrosis[ 2 * i ] = 0;
-    }
-  } 
-  pad2zero( ptr_necrosis, len );
-  for( int i = 0; i < len; ++ i ) {
-    if( ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
-      ptr_edema[ 2 * i ] = 0;
     }
   }
   
@@ -187,25 +187,73 @@ SEXP postProcess( SEXP post_data ) {
   for( int i = 0; i < len; ++ i ) {
     if( ptr_enclose_hem[ 2 * i ] == 1 ) {
       ptr_hemorrhage[ 2 * i ] = Tumor::HMG;
+      ptr_edema[ 2 * i ] = 0;
     } else {
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
   pad2zero( ptr_hemorrhage, len );
+  // 10-7: HGG or LGG
+  int n_enh = 0;
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enh[ 2 * i ] == Tumor::ET ) {
+      ++ n_enh;
+    }
+  }
+  if( n_enh > 100 ) {
+    ptr_hgg[ 0 ] = 1;
+  } else {
+    ptr_hgg[ 0 ] = 0; 
+  }
+  if( ptr_hgg[ 0 ] == 1 ) {
+    // 10-8.1: Find necrosis
+    // necrosis enclosed by enh
+    inRegion( ptr_enclose_ncr, len, ptr_enh, Tumor::ET, 
+              ptr_edema, Tumor::ED, 
+              region, ptr_nidx, ptr_aidx, nr, nc, ns );
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_enclose_ncr[ 2 * i ] == 1 && 
+          ptr_enh[ 2 * i ] != Tumor::ET ) {
+        ptr_necrosis[ 2 * i ] = Tumor::NCR;
+        ptr_edema[ 2 * i ] = 0;
+      }
+    }
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_enh[ 2 * i ] == Tumor::ET ) {
+        ptr_edema[ 2 * i ] = 0;
+      }
+    }
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_hemorrhage[ 2 * i ] == Tumor::HMG ) {
+        ptr_seg[ 2 * i ] = Seg::SNET;
+      } else if( ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
+        ptr_seg[ 2 * i ] = Seg::SNET;
+      } else if( ptr_enh[ 2 * i ] == Tumor::ET ) {
+        ptr_seg[ 2 * i ] = Seg::SET;
+      } else if( ptr_edema[ 2 * i ] == Tumor::ED ) {
+        ptr_seg[ 2 * i ] = Seg::SED;
+      }
+    }
+  }
+
+  SEXP res = PROTECT( allocVector( VECSXP, 2 ) );
+  SET_VECTOR_ELT( res, 0, seg );
+  SET_VECTOR_ELT( res, 1, hgg );
   
-  // 
-  // for( int i = 0; i < len; ++ i ) {
-  //   ptr_res[ 2 * i ] = ptr_enclose_hem[ 2 * i ];
-  // }
+  SEXP names = PROTECT( allocVector( STRSXP, 2 ) );
+  SET_STRING_ELT( names, 0, mkChar( "seg" ) );
+  SET_STRING_ELT( names, 1, mkChar( "hgg" ) );
+  
+  setAttrib( res, R_NamesSymbol, names );
   
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;
-  delete [] ptr_nonenh;
   delete [] ptr_enh;
   delete [] ptr_edema;
   delete [] ptr_enclose_nec;
   delete [] ptr_enclose_hem;
+  delete [] ptr_enclose_ncr;
   
-  UNPROTECT( 1 );
+  UNPROTECT( 4 );
   return res;
 }
