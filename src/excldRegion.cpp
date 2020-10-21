@@ -46,3 +46,16 @@ void excldRegion( const vector<int> &region,
     ptr_seg1[ 2 * ( index - 1 ) ] = 0;
   }
 }
+
+void excldRegion( const vector<int> &region,
+                  int *ptr_seg, const int &size ) {
+  if( region.size() > size ) {
+    return;
+  } 
+  int index;
+  for( vector<int>::const_iterator it = region.begin(); 
+       it != region.end(); ++ it ) {
+    index = *it;
+    ptr_seg[ 2 * ( index - 1 ) ] = 0;
+  }
+}

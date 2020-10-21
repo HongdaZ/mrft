@@ -17,6 +17,7 @@
 #include "restoreImg.h"
 #include "tissueType.h"
 #include "wrapUp.h"
+#include "furtherSeg.h"
 
 using std::vector;
 using std::list;
@@ -63,6 +64,7 @@ SEXP postProcess( SEXP post_data ) {
   int *ptr_enclose_hem = new int[ 2 * len ]();
   // Necrosis inside enh
   int *ptr_enclose_ncr = new int[ 2 * len ]();
+  int *ptr_tumor = new int[ 2 * len ]();
   // Store the result of findRegion
   vector<int> region;
   region.reserve( len );
@@ -206,7 +208,6 @@ SEXP postProcess( SEXP post_data ) {
   }
   if( ptr_hgg[ 0 ] == 1 ) {
     // HGG
-    int *ptr_tumor = new int[ 2 * len ]();
     // 10-8.1: Find necrosis
     // necrosis enclosed by enh
     inRegion( ptr_enclose_ncr, len, ptr_enh, Tumor::ET, 
@@ -242,12 +243,22 @@ SEXP postProcess( SEXP post_data ) {
         ptr_seg[ 2 * i ] = 0;
       }
     }
-    delete [] ptr_tumor;
+    
   } else {
     // LGG
+    // 10-9.1
     // Wrap up results for LGG
-    wrapUp( len, ptr_hgg, ptr_hemorrhage, ptr_necrosis, ptr_enh,
-            ptr_edema, ptr_flair, ptr_seg );
+    wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh,
+            ptr_edema, ptr_flair, ptr_seg, ptr_tumor );
+    // Remove 3D connected regions with size < 100
+    for( int i = 0; i < len; ++ i ) {
+      if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
+                      1, region ) ) {
+        excldRegion( region, ptr_seg, 100 );
+      }
+    }
+    furtherSeg( ptr_hgg, len, ptr_seg, 0.25 );
+    
   }
   
   
@@ -273,6 +284,7 @@ SEXP postProcess( SEXP post_data ) {
   delete [] ptr_enclose_hem;
   delete [] ptr_enclose_ncr;
   delete [] ptr_seg;
+  delete [] ptr_tumor;
   
   UNPROTECT( 4 );
   return res;
