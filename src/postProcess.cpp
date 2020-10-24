@@ -69,7 +69,7 @@ SEXP postProcess( SEXP post_data ) {
   vector<int> region;
   region.reserve( len );
   const int min_enh = 2000;
-  const int min_tumor = 1000;
+  const int min_tumor = 10000;
   
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
