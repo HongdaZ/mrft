@@ -145,5 +145,6 @@ segment <- function( patient,
     return( post_seg$seg )
   } else {
     ## Furtherly segment edema
+    
   }
 }

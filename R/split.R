@@ -154,3 +154,20 @@ split3 <- function( x, x_seg, x_factor ) {
                m = c( m_1, m_2, m_3 ) )
   return( res )
 }
+## Split edema into to parts in Flair
+splitFlair2 <- function( post_seg, flair_data ) {
+  post_edema_idx <- which( post_seg$seg == 2 )
+  flair_edema <- flair_data$intst[ post_edema_idx ]
+  start <- c( min( flair_edema ), max( flair_edema ) )
+  clst <- kmeans( x = flair_edema, centers = start )$cluster
+  label <- array( NA_integer_, dim = dim( flair_data$intst ) )
+  if( mean( flair_edema[ clst == 1 ] ) >
+      mean( flair_edema[ clst == 2 ] ) ) {
+    clst[ clst == 1 ] <- -2
+    clst[ clst == 2 ] <- -1
+  } else {
+    clst[ clst == 1 ] <- -1
+    clst[ clst == 2 ] <- -2
+  }
+  label[ post_edema_idx ] <- clst
+}

@@ -42,9 +42,8 @@ void wrapUp( const int &len,
       ptr_seg[ 2 * i ] = Seg::SNET;
       ptr_tumor[ 2 * i ] = 1;
     } else if( ptr_enh[ 2 * i ] == Tumor::ET ) {
-      // remove enh from LGG
-      ptr_seg[ 2 * i ] = 0;
-      ptr_tumor[ 2 * i ] = 0;
+      ptr_seg[ 2 * i ] = Seg::SET;
+      ptr_tumor[ 2 * i ] = 1;
     } else if( ptr_edema[ 2 * i ] == Tumor::ED ) {
       ptr_tumor[ 2 * i ] = 1;
       if( ptr_flair[ 2 * i ] == Flair::FWM || 

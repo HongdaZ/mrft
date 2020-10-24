@@ -69,7 +69,7 @@ SEXP postProcess( SEXP post_data ) {
   vector<int> region;
   region.reserve( len );
   const int min_enh = 2000;
-  const int min_tumor = 10000;
+  const int min_tumor = 20000;
   
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
@@ -280,10 +280,8 @@ SEXP postProcess( SEXP post_data ) {
         }
       }
     }
-    
     furtherSeg( ptr_hgg, len, ptr_seg, 0.50 );
   }
-  
   
   // Restore the segmentation result to a image with the original 
   // dimension
