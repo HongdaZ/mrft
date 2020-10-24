@@ -141,4 +141,9 @@ segment <- function( patient,
   ## Initialize data for postprocessing
   post_data <- initPost( t1ce_image, flair_image, t2_image )
   post_seg <- postProcess( post_data )
+  if( post_seg$hgg == 1 ) {
+    return( post_seg$seg )
+  } else {
+    ## Furtherly segment edema
+  }
 }

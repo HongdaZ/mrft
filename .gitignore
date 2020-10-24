@@ -1,7 +1,6 @@
 .Rproj.user
 .Rhistory
-.RData
+*.RData
 .Ruserdata
 *.so
 *.o
-.RDataTmp

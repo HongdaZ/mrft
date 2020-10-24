@@ -68,6 +68,8 @@ SEXP postProcess( SEXP post_data ) {
   // Store the result of findRegion
   vector<int> region;
   region.reserve( len );
+  const int min_enh = 2000;
+  const int min_tumor = 1000;
   
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
@@ -201,7 +203,7 @@ SEXP postProcess( SEXP post_data ) {
       ++ n_enh;
     }
   }
-  if( n_enh > 100 ) {
+  if( n_enh > min_enh ) {
     ptr_hgg[ 0 ] = 1;
   } else {
     ptr_hgg[ 0 ] = 0; 
@@ -229,12 +231,12 @@ SEXP postProcess( SEXP post_data ) {
     // Wrap up the segmentation result
     wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
             ptr_seg, ptr_tumor );
-    // 10-8.3: Remove 3D connected regions with enh.size < 100
+    // 10-8.3: Remove 3D connected regions with enh.size < min_enh
     for( int i = 0; i < len; ++ i ) {
       if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                       1, region ) ) {
         excldRegion( region, ptr_tumor,
-                     ptr_seg, Seg::SET, 100 );
+                     ptr_seg, Seg::SET, min_enh );
       }
     }
     pad2zero( ptr_tumor, len );
@@ -250,15 +252,36 @@ SEXP postProcess( SEXP post_data ) {
     // Wrap up results for LGG
     wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh,
             ptr_edema, ptr_flair, ptr_seg, ptr_tumor );
-    // Remove 3D connected regions with size < 100
+    // Remove 3D connected regions with size < min_tumor or 
+    // Keep the largest tumor region
+    int max_size = 0;
     for( int i = 0; i < len; ++ i ) {
       if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                       1, region ) ) {
-        excldRegion( region, ptr_seg, 100 );
+        if( region.size() > max_size ) {
+          max_size = region.size();
+        }
       }
     }
-    furtherSeg( ptr_hgg, len, ptr_seg, 0.25 );
+    pad2zero( ptr_tumor, len );
+    if( max_size > min_tumor ) {
+      for( int i = 0; i < len; ++ i ) {
+        if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
+                        1, region ) ) {
+          excldRegion( region, ptr_seg, min_tumor );
+        }
+      }
+    } else {
+      int size = max_size - 1;
+      for( int i = 0; i < len; ++ i ) {
+        if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
+                        1, region ) ) {
+          excldRegion( region, ptr_seg, size );
+        }
+      }
+    }
     
+    furtherSeg( ptr_hgg, len, ptr_seg, 0.50 );
   }
   
   
