@@ -26,8 +26,8 @@ segment <- function( patient, out = "SEG",
                                  t2 = c( .25, .25 ),
                                  fthr = rep( .25, 2 ) ),
                      maxit = 
-                       list( t1ce = 20L, flair = 10L,
-                             t2 = 10L, fthr = 40L ),
+                       list( t1ce = 10L, flair = 1L,
+                             t2 = 1L, fthr = 40L ),
                      factor = 
                        list( t1ce = 18, flair = 18, t2 =  4,
                              fthr = 8 ),
