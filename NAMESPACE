@@ -3,4 +3,6 @@ exportPattern("^[[:alpha:]]+")
 
 #importFrom(): import selected functions (including S4 generics).
 importFrom( "oro.nifti", "readNIfTI" )
+importFrom( "oro.nifti", "writeNIfTI" )
+importFrom( "oro.nifti", "nifti" )
 importFrom( "stats", "kmeans")
