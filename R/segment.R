@@ -1,30 +1,39 @@
 # segment the MR images 
 # beta and nu2 influenced by normalization
 
-segment <- function( patient, 
+segment <- function( patient, out = "SEG",
                      delta = 
                        list( t1ce = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                             flair = c( 0, 0, 10, 4 ^ 2 / 2 ),
-                             t2 = c( 8, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                             fthr = c( 0, 0, 0, 0 ) ), 
-                     gamma = 1, 
+                             flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                             t2 = c( 8, 0, 8 ),
+                             fthr = c( 0, 0 ) ),
+                     gamma = 1,
                      alpha = list( t1ce = rep( 10, 4 ),
                                    flair = rep( 10, 4 ),
-                                   t2 = rep( 10, 3 ) ),
+                                   t2 = rep( 10, 3 ),
+                                   fthr = rep( 10, 2 ) ),
                      beta = list( t1ce = rep( 1, 4 ),
                                   flair = rep( 1, 4 ),
-                                  t2 = rep( 1, 3 ) ),
+                                  t2 = rep( 1, 3 ),
+                                  fthr = rep( 1, 2 ) ),
                      lambda2 = list( t1ce = rep( 1 , 4 ),
                                      flair = rep( 1 , 4 ),
-                                     t2 = rep( 1 , 3 ) ),
+                                     t2 = rep( 1 , 3 ),
+                                     fthr = rep( 1, 2 ) ),
                      a = 5,
                      nu2 = list( t1ce = rep( .25, 3 ),
                                  flair = rep( .25, 3 ),
-                                 t2 = c( .25, .01 ) ),
-                     maxit = list( t1ce = 10L, 
-                                   flair = 1L, t2 = 1L ),
-                     factor = list( t1ce = 18L, 
-                                    flair = 18L, t2 = 18L ) ) {
+                                 t2 = c( .25, .25 ),
+                                 fthr = rep( .25, 2 ) ),
+                     maxit = 
+                       list( t1ce = 10L, flair = 3L,
+                             t2 = 3L, fthr = 40L ),
+                     factor = 
+                       list( t1ce = 18, flair = 18, t2 =  4,
+                             fthr = 8 ),
+                     min_enh = 2000L,
+                     min_tumor = 20000L,
+                     min_prop_net = .80 ) {
   images <- readImage( patient )
   ## split t1ce images to CSF & necrosis, grey matter and white matter
   t1ce_data <- splitT1ce3( images$t1ce, images$flair )
@@ -141,10 +150,8 @@ segment <- function( patient,
   t2_image[ t2_image == -2 ] <- 2L
   ## Initialize data for postprocessing
   post_data <- initPost( t1ce_image, flair_image, t2_image )
-  post_seg <- postProcess( post_data )
-  if( post_seg$hgg == 1 ) {
-    return( post_seg )
-  } else {
+  post_seg <- postProcess( post_data, min_enh, min_tumor, min_prop_net )
+  if( post_seg$hgg != 1 ) {
     ## Furtherly segment edema
     further_data <- splitFthr( post_seg, t2_data )
     m <- further_data$m
@@ -152,10 +159,27 @@ segment <- function( patient,
     further_seg <- estF( further_model, delta$fthr, gamma,
                          alpha$fthr, beta$fthr, lambda2$fthr,
                          m, nu2$fthr, maxit$fthr )
-    if( ( further_seg$parm[ 2, 2 ] - further_seg$parm[ 2, 1 ] ) / 8 >
-        further_seg$parm[ 3, 2 ] ) {
+    m <- further_seg$parm[ 2, ]
+    sigma <- further_seg$parm[ 3, ]
+    if( ( m[ 2 ] - m[ 1 ] ) /  factor$fthr > sigma[ 2 ] ) {
       post_seg$seg[ further_model$info$idx ] <- further_seg$seg[ 1, ]
     }
-    return( post_seg )
   }
+  # return( post_seg )
+  ## Export the results to .nii images
+  infile <- patient[ 1 ]
+  outfile <- gsub( "N4ITK443Z", out, infile )
+  out_t1ce <- gsub( "_flair.nii.gz", "_t1ce_seg", outfile )
+  writeNIfTI( nifti( t1ce_image, datatype = 2 ),
+              filename = out_t1ce, gzipped = TRUE )
+  out_flair <- gsub( "_flair.nii.gz", "_flair_seg", outfile )
+  writeNIfTI( nifti( flair_image, datatype = 2 ),
+              filename = out_flair, gzipped = TRUE )
+  out_t2 <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
+  writeNIfTI( nifti( t2_image, datatype = 2 ),
+              filename = out_t2, gzipped = TRUE )
+  out_post <- gsub( "_flair.nii.gz", "_post_seg", outfile )
+  writeNIfTI( nifti( post_seg$seg, datatype = 2 ),
+              filename = out_post, gzipped = TRUE )
+  
 }

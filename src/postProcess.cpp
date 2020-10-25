@@ -23,8 +23,10 @@ using std::vector;
 using std::list;
 
 // Postprocess the results
-extern "C" SEXP postProcess( SEXP post_data );
-SEXP postProcess( SEXP post_data ) {
+extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh, 
+                             SEXP min_tumor, SEXP min_prop_net );
+SEXP postProcess( SEXP post_data, SEXP min_enh, 
+                  SEXP min_tumor, SEXP min_prop_net ) {
   SEXP t1ce = getListElement( post_data, "t1ce_seg" );
   SEXP flair = getListElement( post_data, "flair_seg" );
   SEXP t2 = getListElement( post_data, "t2_seg" );
@@ -68,9 +70,9 @@ SEXP postProcess( SEXP post_data ) {
   // Store the result of findRegion
   vector<int> region;
   region.reserve( len );
-  const int min_enh = 2000;
-  const int min_tumor = 20000;
-  
+  const int m_enh = INTEGER( min_enh )[ 0 ];
+  const int m_tumor = INTEGER( min_tumor )[ 0 ];
+  const double m_prop_net = REAL( min_prop_net )[ 0 ];
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
     if( ptr_flair[ 2 * i ] == Flair::FCSF && 
@@ -203,7 +205,7 @@ SEXP postProcess( SEXP post_data ) {
       ++ n_enh;
     }
   }
-  if( n_enh > min_enh ) {
+  if( n_enh > m_enh ) {
     ptr_hgg[ 0 ] = 1;
   } else {
     ptr_hgg[ 0 ] = 0; 
@@ -236,7 +238,7 @@ SEXP postProcess( SEXP post_data ) {
       if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                       1, region ) ) {
         excldRegion( region, ptr_tumor,
-                     ptr_seg, Seg::SET, min_enh );
+                     ptr_seg, Seg::SET, m_enh );
       }
     }
     pad2zero( ptr_tumor, len );
@@ -264,11 +266,11 @@ SEXP postProcess( SEXP post_data ) {
       }
     }
     pad2zero( ptr_tumor, len );
-    if( max_size > min_tumor ) {
+    if( max_size > m_tumor ) {
       for( int i = 0; i < len; ++ i ) {
         if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                         1, region ) ) {
-          excldRegion( region, ptr_seg, min_tumor );
+          excldRegion( region, ptr_seg, m_tumor );
         }
       }
     } else {
@@ -280,7 +282,7 @@ SEXP postProcess( SEXP post_data ) {
         }
       }
     }
-    furtherSeg( ptr_hgg, len, ptr_seg, 0.50 );
+    furtherSeg( ptr_hgg, len, ptr_seg, m_prop_net );
   }
   
   // Restore the segmentation result to a image with the original 
