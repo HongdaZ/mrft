@@ -12,6 +12,20 @@
 #include "copyParm.h"
 #include "restoreImg.h"
 
+#include "cnctRegion.h"
+#include "excldVoxel.h"
+#include "extRegion.h"
+#include "pad2zero.h"
+#include "regions.h"
+#include "region2slice.h"
+#include "enclose.h"
+#include "inRegion.h"
+#include "excldRegion.h"
+#include "restoreImg.h"
+#include "tissueType.h"
+#include "wrapUp.h"
+#include "furtherSeg.h"
+
 using std::vector;
 using std::set;
 
@@ -31,9 +45,19 @@ SEXP estF( SEXP model, SEXP delta, SEXP gamma,
   SEXP nidx = getListElement( info, "nidx" );
   SEXP intst = getListElement( info, "intst" );
   SEXP nintst = getListElement( info, "nintst" );
+  SEXP aidx = getListElement( info, "aidx" );
+  SEXP r_nr = getListElement( info, "nr" );
+  SEXP r_nc = getListElement( info, "nc" );
+  SEXP r_ns = getListElement( info, "ns" );
+  
+  const int nr = INTEGER( r_nr )[ 0 ];
+  const int nc = INTEGER( r_nc )[ 0 ];
+  const int ns = INTEGER( r_ns )[ 0 ];
+  
   
   const int *ptr_idx = INTEGER( idx );
   const int *ptr_nidx = INTEGER( nidx );
+  const int *ptr_aidx = INTEGER( aidx );
   const double *ptr_intst = REAL( intst );
   const double *ptr_nintst = REAL( nintst );
   
@@ -104,10 +128,67 @@ SEXP estF( SEXP model, SEXP delta, SEXP gamma,
   int ncol = health_parm.size() / 8;
   
   SEXP res_parm = PROTECT( allocMatrix( REALSXP, nrow, ncol ) );
-  SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );
+  SEXP res_image = PROTECT( alloc3DArray( INTSXP, nr, nc, ns ) );
   double *ptr_res_parm = REAL( res_parm );
   int *ptr_res_image = INTEGER( res_image );
   copyParmHealth( n_health, health_parm, ptr_res_parm, nrow );
+  
+  // Identify edema and non-enhancing tumor core
+  int *ptr_tissue1 = new int[ 2 * len ]();
+  int *ptr_tissue2 = new int[ 2 * len ]();
+  int *ptr_enclose_ts1 = new int[ 2 * len ]();
+  int *ptr_enclose_ts2 = new int[ 2 * len ]();
+  int n_ts1 = 0, n_ts2 = 0, n_en_ts1 = 0, n_en_ts2 = 0;
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_res_seg[ 2 * i ] == -1 ) {
+      ptr_tissue1[ 2 * i ] = 2;
+      ++ n_ts1;
+    } else if( ptr_res_seg[ 2 * i ] == -2 ){
+      ptr_tissue2[ 2 * i ] = 1;
+      ++ n_ts2;
+    }
+  }
+  inRegion( ptr_enclose_ts1, len, ptr_tissue2, 1, 
+            ptr_tissue1, 2, 
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enclose_ts1[ 2 * i ] == 1 ) {
+      ++ n_en_ts1;
+    }
+  }
+  inRegion( ptr_enclose_ts2, len, ptr_tissue1, 2,
+            ptr_tissue2, 1,
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enclose_ts2[ 2 * i ] == 1 ) {
+      ++ n_en_ts2;
+    }
+  }
+  if( ( n_en_ts1 / ( double )n_ts1 ) > 
+      ( n_en_ts2 / ( double )n_ts2 ) ) {
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_enclose_ts2[ 2 * i ] == 1 ||
+          ptr_tissue1[ 2 * i ] == 2 ) {
+        ptr_res_seg[ 2 * i ] = 1;
+      } else {
+        ptr_res_seg[ 2 * i ] = 2;
+      }
+      ptr_res_parm[ 0 ] = 1;
+      ptr_res_parm[ 9 ] = 2;
+    }
+  } else {
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_enclose_ts1[ 2 * i ] == 1 ||
+          ptr_tissue2[ 2 * i ] == 1 ) {
+        ptr_res_seg[ 2 * i ] = 1;
+      } else {
+        ptr_res_seg[ 2 * i ] = 2;
+      }
+      ptr_res_parm[ 0 ] = 2;
+      ptr_res_parm[ 9 ] = 1;
+    }
+  }           
+  
   restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len );
   
   // results to list
@@ -124,7 +205,10 @@ SEXP estF( SEXP model, SEXP delta, SEXP gamma,
   SET_VECTOR_ELT( res, 2, res_parm );
   SET_VECTOR_ELT( res, 3, res_image );
   setAttrib( res, R_NamesSymbol, names );
-  
+  delete [] ptr_tissue1;
+  delete [] ptr_tissue2;
+  delete [] ptr_enclose_ts1;
+  delete [] ptr_enclose_ts2;
   UNPROTECT( 6 );
   return res;
 }

@@ -143,7 +143,7 @@ segment <- function( patient,
   post_data <- initPost( t1ce_image, flair_image, t2_image )
   post_seg <- postProcess( post_data )
   if( post_seg$hgg == 1 ) {
-    return( post_seg$seg )
+    return( post_seg )
   } else {
     ## Furtherly segment edema
     further_data <- splitFthr( post_seg, t2_data )
@@ -152,5 +152,10 @@ segment <- function( patient,
     further_seg <- estF( further_model, delta$fthr, gamma,
                          alpha$fthr, beta$fthr, lambda2$fthr,
                          m, nu2$fthr, maxit$fthr )
+    if( ( further_seg$parm[ 2, 2 ] - further_seg$parm[ 2, 1 ] ) / 8 >
+        further_seg$parm[ 3, 2 ] ) {
+      post_seg$seg[ further_model$info$idx ] <- further_seg$seg[ 1, ]
+    }
+    return( post_seg )
   }
 }
