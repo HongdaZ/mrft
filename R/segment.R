@@ -5,7 +5,8 @@ segment <- function( patient,
                      delta = 
                        list( t1ce = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              flair = c( 0, 0, 10, 4 ^ 2 / 2 ),
-                             t2 = c( 8, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ) ), 
+                             t2 = c( 8, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                             fthr = c( 0, 0, 0, 0 ) ), 
                      gamma = 1, 
                      alpha = list( t1ce = rep( 10, 4 ),
                                    flair = rep( 10, 4 ),
@@ -145,6 +146,11 @@ segment <- function( patient,
     return( post_seg$seg )
   } else {
     ## Furtherly segment edema
-    
+    further_data <- splitFthr( post_seg, t2_data )
+    m <- further_data$m
+    further_model <-initFther( further_data$label, further_data$intst )
+    further_seg <- estF( further_model, delta$fthr, gamma,
+                         alpha$fthr, beta$fthr, lambda2$fthr,
+                         m, nu2$fthr, maxit$fthr )
   }
 }
