@@ -60,6 +60,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_necrosis = new int[ 2 * len ]();
   int *ptr_enh = new int[ 2 * len ]();
   int *ptr_edema = new int[ 2 * len ]();
+  // Enh inside FLAIR( 4 )
+  int *ptr_enclose_enh = new int[ 2 * len ]();
   // Necrosis inside edema
   int *ptr_enclose_nec = new int[ 2 * len ]();
   // Hemorrhage inside edema
@@ -113,15 +115,24 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   pad2zero( ptr_necrosis, len );
   
   // 10-3: Find enhancing tumor core
+  // enh enclosed by FLAIR(4)
+  inRegion( ptr_enclose_enh, len, ptr_flair, Flair::FTM,
+            ptr_t1ce, T1ce::T1TM,
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  // Extend enh to 3D connected regions
   for( int i = 0; i < len; ++ i ) {
-    if( ( ptr_t1ce[ 2 * i ] == T1ce::T1TM && 
-        ptr_necrosis[ 2 * i ] != Tumor::NCR ) &&
-        ( ptr_t2[ 2 * i ] == T2::T2CSF || 
-        ptr_flair[ 2 * i ] == Flair::FTM ) ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_enh, ptr_t1ce,
+                    T1ce::T1TM, region ) ) {
+      extRegion( region, ptr_enclose_enh, 1, 0.5 );
+    }
+  }
+  pad2zero( ptr_enclose_enh, len );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enclose_enh[ 2 * i ] == 1 && 
+        ( ptr_necrosis[ 2 * i ] != Tumor::NCR ) ) {
       ptr_enh[ 2 * i ] = Tumor::ET;
     }
   }
-  
   // 10-4: Find edema
   for( int i = 0; i < len; ++ i ) {
     if( ( ptr_flair[ 2 * i ] == Flair::FTM || 
@@ -303,6 +314,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   delete [] ptr_necrosis;
   delete [] ptr_enh;
   delete [] ptr_edema;
+  delete [] ptr_enclose_enh;
   delete [] ptr_enclose_nec;
   delete [] ptr_enclose_hem;
   delete [] ptr_enclose_ncr;
