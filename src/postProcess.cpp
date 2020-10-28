@@ -123,13 +123,13 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_enh, ptr_t1ce,
                     T1ce::T1TM, region ) ) {
-      extRegion( region, ptr_enclose_enh, 1, 0.5 );
+      excldVoxel( region, ptr_necrosis, Tumor::NCR );
+      extRegion( region, ptr_enclose_enh, 1, 0.5, true );
     }
   }
   pad2zero( ptr_enclose_enh, len );
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_enclose_enh[ 2 * i ] == 1 && 
-        ( ptr_necrosis[ 2 * i ] != Tumor::NCR ) ) {
+    if( ptr_enclose_enh[ 2 * i ] == 1 ) {
       ptr_enh[ 2 * i ] = Tumor::ET;
     }
   }
@@ -162,7 +162,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_necrosis, 
                     Tumor::NCR, region ) ) {
-      extRegion( region, ptr_enclose_nec, 1, .5 );
+      extRegion( region, ptr_enclose_nec, 1, .5, true );
     }
   }
   // Recover the padding to zero

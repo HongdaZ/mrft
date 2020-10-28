@@ -5,7 +5,7 @@ segment <- function( patient, out = "SEG",
                      delta = 
                        list( t1ce = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                             t2 = c( 8, 0, 8 ),
+                             t2 = c( 8, 0, 4 ),
                              fthr = c( 0, 0 ) ),
                      gamma = 1,
                      alpha = list( t1ce = rep( 10, 4 ),
@@ -166,6 +166,7 @@ segment <- function( patient, out = "SEG",
     }
   }
   # return( post_seg )
+  post_seg$seg[ is.na( post_seg$seg ) ] <- 0;
   ## Export the results to .nii images
   infile <- patient[ 1 ]
   outfile <- gsub( "N4ITK443Z", out, infile )

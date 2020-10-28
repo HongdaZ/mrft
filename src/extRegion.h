@@ -6,6 +6,7 @@
 using std::vector;
 
 void extRegion( const vector<int> &region, int *ptr_seg,
-                const int &label, const double &ratio );
+                const int &label, const double &ratio,
+                bool remove = false );
 
 #endif
