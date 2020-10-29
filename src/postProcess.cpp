@@ -61,6 +61,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_enh = new int[ 2 * len ]();
   int *ptr_edema = new int[ 2 * len ]();
   int *ptr_tmp = new int[ 2 * len ]();
+  // FLAIR(4) & T2(4) \ edema \ necrosis \ enh
+  // enclosed by edema
+  int *ptr_extra_edema = new int[ 2 * len ]();
   // FLAIR(4) & T2(4) \ enh
   int *ptr_whole = new int[ 2 * len ]();
   // Enh inside FLAIR( 4 )
@@ -233,8 +236,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   if( ptr_hgg[ 0 ] == 1 ) {
     // HGG
-    // 10-8.1: Find necrosis
-    // necrosis enclosed by enh
+    // 10-8.1: Find whole = FLAIR(4) & T2(4) \ enh
     for( int i = 0; i < len; ++ i ) {
       if( ptr_flair[ 2 * i ] == Flair::FTM || 
           ptr_t2[ 2 * i ] == T2::T2CSF && 
@@ -242,6 +244,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         ptr_whole[ 2 * i ] = 1;
       }
     }
+    // 10-8.2: Find necrosis
+    // necrosis enclosed by enh
     inRegion( ptr_enclose_ncr, len, ptr_enh, Tumor::ET, 
               ptr_whole, 1, 
               region, ptr_nidx, ptr_aidx, nr, nc, ns );
@@ -252,7 +256,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         ptr_edema[ 2 * i ] = 0;
       }
     }
-    // 10-8.2: Remove enh from edema
+    // 10-8.3: Remove enh from edema
     for( int i = 0; i < len; ++ i ) {
       if( ptr_enh[ 2 * i ] == Tumor::ET ) {
         ptr_edema[ 2 * i ] = 0;
@@ -261,7 +265,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     // Wrap up the segmentation result
     wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
             ptr_seg, ptr_tumor );
-    // 10-8.3: Remove 3D connected regions with enh.size < min_enh
+    // 10-8.4: Remove 3D connected regions with enh.size < min_enh
     for( int i = 0; i < len; ++ i ) {
       if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                       1, region ) ) {
@@ -275,7 +279,21 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         ptr_seg[ 2 * i ] = 0;
       }
     }
-    
+    // 10-8.5: Find extra edema
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_seg[ 2 * i ] > 0 ) {
+        ptr_whole[ 2 * i ] = 0;
+      }
+    }
+    inRegion( ptr_extra_edema, len, ptr_tumor, 1, 
+              ptr_whole, 1, 
+              region, ptr_nidx, ptr_aidx, nr, nc, ns );
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_extra_edema[ 2 * i ] == 1 &&
+          ptr_seg[ 2 * i ] == 0 ) {
+        ptr_seg[ 2 * i ] = Seg::SED;
+      }
+    }
   } else {
     // LGG
     // 10-9.1
@@ -332,6 +350,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   delete [] ptr_enh;
   delete [] ptr_edema;
   delete [] ptr_tmp;
+  delete [] ptr_extra_edema;
   delete [] ptr_whole;
   delete [] ptr_enclose_enh;
   delete [] ptr_enclose_nec;
