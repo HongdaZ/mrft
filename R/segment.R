@@ -166,7 +166,6 @@ segment <- function( patient, out = "SEG",
     }
   }
   # return( post_seg )
-  post_seg$seg[ is.na( post_seg$seg ) ] <- 0;
   ## Export the results to .nii images
   infile <- patient[ 1 ]
   outfile <- gsub( "N4ITK443Z", out, infile )
@@ -179,6 +178,7 @@ segment <- function( patient, out = "SEG",
   out_t2 <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
   writeNIfTI( nifti( t2_image, datatype = 2 ),
               filename = out_t2, gzipped = TRUE )
+  post_seg$seg[ is.na( post_seg$seg ) ] <- 0
   out_post <- gsub( "_flair.nii.gz", "_post_seg", outfile )
   writeNIfTI( nifti( post_seg$seg, datatype = 2 ),
               filename = out_post, gzipped = TRUE )

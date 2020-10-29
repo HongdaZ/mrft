@@ -60,6 +60,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_necrosis = new int[ 2 * len ]();
   int *ptr_enh = new int[ 2 * len ]();
   int *ptr_edema = new int[ 2 * len ]();
+  int *ptr_tmp = new int[ 2 * len ]();
+  // FLAIR(4) & T2(4) \ enh
+  int *ptr_whole = new int[ 2 * len ]();
   // Enh inside FLAIR( 4 )
   int *ptr_enclose_enh = new int[ 2 * len ]();
   // Necrosis inside edema
@@ -103,11 +106,16 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
   }
   for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_necrosis, ptr_t2, 
-                    T2::T2CSF, region ) ) {
-      excldVoxel( region, ptr_t1ce, T1ce::T1TM );
-      excldVoxel( region, ptr_flair, Flair::FTM );
-      excldVoxel( region, ptr_hemorrhage, Tumor::HMG );
+    if( ptr_t2[ 2 * i ] == T2::T2CSF &&
+        ptr_t1ce[ 2 * i ] != T1ce::T1TM &&
+        ptr_flair[ 2 * i ] != Flair::FTM &&
+        ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) {
+      ptr_tmp[ 2 * i ] = 1;
+    }
+  }
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_necrosis, ptr_tmp,
+                    1, region ) ) {
       extRegion( region, ptr_necrosis, Tumor::NCR, 0 );
     }
   }
@@ -225,8 +233,15 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     // HGG
     // 10-8.1: Find necrosis
     // necrosis enclosed by enh
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_flair[ 2 * i ] == Flair::FTM || 
+          ptr_t2[ 2 * i ] == T2::T2CSF && 
+          ptr_enh[ 2 * i ] != Tumor::ET ) {
+        ptr_whole[ 2 * i ] = 1;
+      }
+    }
     inRegion( ptr_enclose_ncr, len, ptr_enh, Tumor::ET, 
-              ptr_edema, Tumor::ED, 
+              ptr_whole, 1, 
               region, ptr_nidx, ptr_aidx, nr, nc, ns );
     for( int i = 0; i < len; ++ i ) {
       if( ptr_enclose_ncr[ 2 * i ] == 1 && 
@@ -314,6 +329,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   delete [] ptr_necrosis;
   delete [] ptr_enh;
   delete [] ptr_edema;
+  delete [] ptr_tmp;
+  delete [] ptr_whole;
   delete [] ptr_enclose_enh;
   delete [] ptr_enclose_nec;
   delete [] ptr_enclose_hem;
