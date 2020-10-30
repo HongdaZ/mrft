@@ -1,5 +1,6 @@
 #include "regions.h"
 #include "cnctRegion.h"
+#include "pad2zero.h"
 
 // Find all the connected regions in ptr_seg with label == label
 list<vector<int>> regions( int *ptr_seg, const int &len, 
@@ -25,6 +26,7 @@ list<vector<int>> regions( int *ptr_seg, const int &len,
       res.push_back( r );
     }
   }
+  pad2zero( ptr_seg, len );
   return res;
 }
 // All voxels with label == label is a whole region
