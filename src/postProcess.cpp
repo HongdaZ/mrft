@@ -147,7 +147,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // 10-4: Find edema
   for( int i = 0; i < len; ++ i ) {
     if( ( ( 
-        // ptr_flair[ 2 * i ] == Flair::FTM || 
+        ptr_flair[ 2 * i ] == Flair::FTM &&
         ptr_t2[ 2 * i ] == T2::T2CSF &&
         ptr_t1ce[ 2 * i ] == T1ce::T1GM ) ||
         ptr_enh[ 2 * i ] == Tumor::ET ) && 
@@ -279,21 +279,21 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         ptr_seg[ 2 * i ] = 0;
       }
     }
-    // 10-8.5: Find extra edema
-    for( int i = 0; i < len; ++ i ) {
-      if( ptr_seg[ 2 * i ] > 0 ) {
-        ptr_whole[ 2 * i ] = 0;
-      }
-    }
-    inRegion( ptr_extra_edema, len, ptr_tumor, 1, 
-              ptr_whole, 1, 
-              region, ptr_nidx, ptr_aidx, nr, nc, ns );
-    for( int i = 0; i < len; ++ i ) {
-      if( ptr_extra_edema[ 2 * i ] == 1 &&
-          ptr_seg[ 2 * i ] == 0 ) {
-        ptr_seg[ 2 * i ] = Seg::SED;
-      }
-    }
+    // // 10-8.5: Find extra edema
+    // for( int i = 0; i < len; ++ i ) {
+    //   if( ptr_seg[ 2 * i ] > 0 ) {
+    //     ptr_whole[ 2 * i ] = 0;
+    //   }
+    // }
+    // inRegion( ptr_extra_edema, len, ptr_tumor, 1, 
+    //           ptr_whole, 1, 
+    //           region, ptr_nidx, ptr_aidx, nr, nc, ns );
+    // for( int i = 0; i < len; ++ i ) {
+    //   if( ptr_extra_edema[ 2 * i ] == 1 &&
+    //       ptr_seg[ 2 * i ] == 0 ) {
+    //     ptr_seg[ 2 * i ] = Seg::SED;
+    //   }
+    // }
   } else {
     // LGG
     // 10-9.1
