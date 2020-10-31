@@ -32,6 +32,7 @@ segment <- function( patient, out = "SEG",
                        list( t1ce = 18, flair = 18, t2 =  4,
                              fthr = 8 ),
                      min_enh = 2000L,
+                     max_prop_enh = .8,
                      min_tumor = 20000L,
                      min_prop_net = .80 ) {
   images <- readImage( patient )
@@ -150,7 +151,8 @@ segment <- function( patient, out = "SEG",
   t2_image[ t2_image == -2 ] <- 2L
   ## Initialize data for postprocessing
   post_data <- initPost( t1ce_image, flair_image, t2_image )
-  post_seg <- postProcess( post_data, min_enh, min_tumor, min_prop_net )
+  post_seg <- postProcess( post_data, min_enh, max_prop_enh,
+                           min_tumor, min_prop_net )
   if( post_seg$hgg != 1 ) {
     ## Furtherly segment edema
     further_data <- splitFthr( post_seg, t2_data )

@@ -28,7 +28,7 @@ void excldRegion( const vector<int> &region, const int *ptr_nidx,
 void excldRegion( const vector<int> &region,
                   int *ptr_seg1,
                   int *ptr_seg2, 
-                  const int &label, const int &size,
+                  const int &label, const int &size, const double &prop,
                   int *ptr_hemorrhage,
                   int *ptr_necrosis,
                   int *ptr_enh,
@@ -39,10 +39,10 @@ void excldRegion( const vector<int> &region,
     index = *it;
     if( ptr_seg2[ 2 * ( index - 1 ) ] == label ) {
       ++ n;
-      if( n > size ) {
-        return;
-      }
     }
+  }
+  if( n > size && n / ( double )region.size() < prop ) {
+    return;
   }
   for( vector<int>::const_iterator it = region.begin(); 
        it != region.end(); ++ it ) {
