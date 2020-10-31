@@ -14,8 +14,12 @@ void excldRegion( const vector<int> &region, const int *ptr_nidx,
 // ptr_seg2 == label is less than size
 void excldRegion( const vector<int> &region,
                   int *ptr_seg1,
-                  const int *ptr_seg2, 
-                  const int &label, const int &size );
+                  int *ptr_seg2, 
+                  const int &label, const int &size,
+                  int *ptr_hemorrhage,
+                  int *ptr_necrosis,
+                  int *ptr_enh,
+                  int *ptr_edema ) ;
 // Remove tumor regions with size < size.
 void excldRegion( const vector<int> &region,
                   int *ptr_seg, const int &size );

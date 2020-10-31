@@ -27,8 +27,12 @@ void excldRegion( const vector<int> &region, const int *ptr_nidx,
 }
 void excldRegion( const vector<int> &region,
                   int *ptr_seg1,
-                  const int *ptr_seg2, 
-                  const int &label, const int &size ) {
+                  int *ptr_seg2, 
+                  const int &label, const int &size,
+                  int *ptr_hemorrhage,
+                  int *ptr_necrosis,
+                  int *ptr_enh,
+                  int *ptr_edema ) {
   int index, n = 0;
   for( vector<int>::const_iterator it = region.begin(); 
        it != region.end(); ++ it ) {
@@ -44,6 +48,11 @@ void excldRegion( const vector<int> &region,
        it != region.end(); ++ it ) {
     index = *it;
     ptr_seg1[ 2 * ( index - 1 ) ] = 0;
+    ptr_seg2[ 2 * ( index - 1 ) ] = 0;
+    ptr_hemorrhage[ 2 * ( index - 1 ) ] = 0;
+    ptr_necrosis[ 2 * ( index - 1 ) ] = 0;
+    ptr_enh[ 2 * ( index - 1 ) ] = 0;
+    ptr_edema[ 2 * ( index - 1 ) ] = 0;
   }
 }
 

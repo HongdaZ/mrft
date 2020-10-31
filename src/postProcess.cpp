@@ -127,21 +127,30 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   
   // 10-3: Find enhancing tumor core
   // enh enclosed by FLAIR(4)
-  inRegion( ptr_enclose_enh, len, ptr_flair, Flair::FTM,
-            ptr_t1ce, T1ce::T1TM,
-            region, ptr_nidx, ptr_aidx, nr, nc, ns );
-  // Extend enh to 3D connected regions
+  // inRegion( ptr_enclose_enh, len, ptr_flair, Flair::FTM,
+  //           ptr_t1ce, T1ce::T1TM,
+  //           region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  // // Extend enh to 3D connected regions
+  // for( int i = 0; i < len; ++ i ) {
+  //   if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_enh, ptr_t1ce,
+  //                   T1ce::T1TM, region ) ) {
+  //     excldVoxel( region, ptr_necrosis, Tumor::NCR );
+  //     extRegion( region, ptr_enclose_enh, 1, 0.5, true );
+  //   }
+  // }
+  // pad2zero( ptr_enclose_enh, len );
+  // for( int i = 0; i < len; ++ i ) {
+  //   if( ptr_enclose_enh[ 2 * i ] == 1 ) {
+  //     ptr_enh[ 2 * i ] = Tumor::ET;
+  //   }
+  // }
   for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_enh, ptr_t1ce,
-                    T1ce::T1TM, region ) ) {
-      excldVoxel( region, ptr_necrosis, Tumor::NCR );
-      extRegion( region, ptr_enclose_enh, 1, 0.5, true );
-    }
-  }
-  pad2zero( ptr_enclose_enh, len );
-  for( int i = 0; i < len; ++ i ) {
-    if( ptr_enclose_enh[ 2 * i ] == 1 ) {
+    if( ptr_t1ce[ 2 * i ] == T1ce::T1TM &&
+        ptr_t2[ 2 * i ] == T2::T2CSF &&
+        ptr_necrosis[ 2 * i ] != Tumor::NCR &&
+        ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) {
       ptr_enh[ 2 * i ] = Tumor::ET;
+      
     }
   }
   // 10-4: Find edema
@@ -222,6 +231,15 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
   }
   pad2zero( ptr_hemorrhage, len );
+  // 10-6.2: Add T1ce(4) inside Edema
+  inRegion( ptr_enclose_enh, len, ptr_edema, Tumor::ED, 
+            ptr_t1ce, T1ce::T1TM,
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enclose_enh[ 2 * i ] == 1 ) {
+      ptr_enh[ 2 * i ] = Tumor::ET;
+    }
+  }
   // 10-7: HGG or LGG
   int n_enh = 0;
   for( int i = 0; i < len; ++ i ) {
@@ -236,10 +254,11 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   if( ptr_hgg[ 0 ] == 1 ) {
     // HGG
-    // 10-8.1: Find whole = FLAIR(4) & T2(4) \ enh
+    // 10-8.1: Find whole = enh complement
     for( int i = 0; i < len; ++ i ) {
-      if( ptr_flair[ 2 * i ] == Flair::FTM || 
-          ptr_t2[ 2 * i ] == T2::T2CSF && 
+      if( ptr_t1ce[ 2 * i ] != 0 &&
+          ptr_flair[ 2 * i ] != 0 && 
+          ptr_t2[ 2 * i ] != 0 && 
           ptr_enh[ 2 * i ] != Tumor::ET ) {
         ptr_whole[ 2 * i ] = 1;
       }
@@ -270,30 +289,32 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                       1, region ) ) {
         excldRegion( region, ptr_tumor,
-                     ptr_seg, Seg::SET, m_enh );
+                     ptr_seg, Seg::SET, m_enh,
+                     ptr_hemorrhage, ptr_necrosis,
+                     ptr_enh, ptr_edema );
       }
     }
     pad2zero( ptr_tumor, len );
+    // 10-8.5: Find extra edema
     for( int i = 0; i < len; ++ i ) {
-      if( ptr_tumor[ 2 * i ] == 0 ) {
-        ptr_seg[ 2 * i ] = 0;
+      if( ptr_flair[ 2 * i ] == Flair::FTM ||
+          ptr_t2[ 2 * i ] == T2::T2CSF ) {
+        ptr_whole[ 2 * i ] = 1;
+      } else {
+        ptr_whole[ 2 * i ] = 0;
       }
     }
-    // // 10-8.5: Find extra edema
-    // for( int i = 0; i < len; ++ i ) {
-    //   if( ptr_seg[ 2 * i ] > 0 ) {
-    //     ptr_whole[ 2 * i ] = 0;
-    //   }
-    // }
-    // inRegion( ptr_extra_edema, len, ptr_tumor, 1, 
-    //           ptr_whole, 1, 
-    //           region, ptr_nidx, ptr_aidx, nr, nc, ns );
-    // for( int i = 0; i < len; ++ i ) {
-    //   if( ptr_extra_edema[ 2 * i ] == 1 &&
-    //       ptr_seg[ 2 * i ] == 0 ) {
-    //     ptr_seg[ 2 * i ] = Seg::SED;
-    //   }
-    // }
+    inRegion( ptr_extra_edema, len, ptr_tumor, 1,
+              ptr_whole, 1,
+              region, ptr_nidx, ptr_aidx, nr, nc, ns );
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_extra_edema[ 2 * i ] == 1 &&
+          ptr_seg[ 2 * i ] == 0 ) {
+        ptr_seg[ 2 * i ] = Seg::SED;
+        ptr_tumor[ 2 * i ] = 1;
+        ptr_edema[ 2 * i ] = Tumor::ED;
+      }
+    }
   } else {
     // LGG
     // 10-9.1
