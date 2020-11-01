@@ -416,37 +416,36 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
         }
       }
     }
-    // // 10-9.2: Extend edema in T1CE(2), FLAIR(4), and T2(2)
-    // for( int i = 0; i < len; ++ i ) {
-    //   if( ptr_t1ce[ 2 * i ] == T1ce::T1GM &&
-    //       ptr_flair[ 2 * i ] == Flair::FTM &&
-    //       ptr_t2[ 2 * i ] == T2::T2GM ) {
-    //     ptr_whole[ 2 * i ] = 1;
-    //   } else {
-    //     ptr_whole[ 2 * i ] = 0;
-    //   }
-    // }
-    // for( int i = 0; i < len; ++ i ) {
-    //   if( cnctRegion( i + 1, ptr_nidx, ptr_whole, ptr_whole, 
-    //                   1, region ) ) {
-    //     excldRegion( region, ptr_nidx, ptr_whole, 
-    //                  ptr_edema, Tumor::ED );
-    //   }
-    // }
-    // pad2zero( ptr_whole, len );
-    // for( int i = 0; i < len; ++ i ) {
-    //   if( ptr_whole[ 2 * i ] == 1 &&
-    //       ptr_seg[ 2 * i ] == 0 ) {
-    //     ptr_tumor[ 2 * i ] = 1;
-    //     if( ptr_flair[ 2 * i ] == Flair::FTM ) {
-    //       ptr_seg[ 2 * i ] = Seg::SED;
-    //       ptr_edema[ 2 * i ] = Tumor::ED;
-    //     } else {
-    //       ptr_seg[ 2 * i ] = Seg::SNET;
-    //       ptr_necrosis[ 2 * i ] = Tumor::NCR;
-    //     }
-    //   }
-    // }
+    // 10-9.2: Extend edema in T1CE(2), FLAIR(4), and T2(2)
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_flair[ 2 * i ] == Flair::FTM &&
+          ptr_t2[ 2 * i ] == T2::T2CSF ) {
+        ptr_whole[ 2 * i ] = 1;
+      } else {
+        ptr_whole[ 2 * i ] = 0;
+      }
+    }
+    for( int i = 0; i < len; ++ i ) {
+      if( cnctRegion( i + 1, ptr_nidx, ptr_whole, ptr_whole,
+                      1, region ) ) {
+        excldRegion( region, ptr_nidx, ptr_whole,
+                     ptr_edema, Tumor::ED );
+      }
+    }
+    pad2zero( ptr_whole, len );
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_whole[ 2 * i ] == 1 &&
+          ptr_seg[ 2 * i ] == 0 ) {
+        ptr_tumor[ 2 * i ] = 1;
+        if( ptr_flair[ 2 * i ] == Flair::FTM ) {
+          ptr_seg[ 2 * i ] = Seg::SED;
+          ptr_edema[ 2 * i ] = Tumor::ED;
+        } else {
+          ptr_seg[ 2 * i ] = Seg::SNET;
+          ptr_necrosis[ 2 * i ] = Tumor::NCR;
+        }
+      }
+    }
     // Remove 3D connected regions with size < min_tumor or 
     // Keep the largest tumor region
     int max_size = 0;
