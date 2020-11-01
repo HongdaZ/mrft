@@ -3,9 +3,9 @@
 
 segment <- function( patient, out = "SEG",
                      delta = 
-                       list( t1ce = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                       list( t1ce = c( -2, -2, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                             t2 = c( 8, 0, 4 ),
+                             t2 = c( 8, 0, 6 ),
                              fthr = c( 0, 0 ) ),
                      gamma = 1,
                      alpha = list( t1ce = rep( 10, 4 ),
