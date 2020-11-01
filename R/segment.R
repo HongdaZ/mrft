@@ -6,7 +6,7 @@ segment <- function( patient, out = "SEG",
                      delta = 
                        list( t1ce = c( -2, -2, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                             t2 = c( 8, 0, 6, 0 ),
+                             t2 = c( 8, 0, NA_real_, NA_real_ ),
                              fthr = c( 0, 0, 0, 0 ) ),
                      gamma = 1,
                      ## #of healthy tissue types controlled by alpha
@@ -112,6 +112,10 @@ segment <- function( patient, out = "SEG",
                  lambda2$t2[ 1 : 2 ],
                  m, nu2$t2, 40L )
   # sink()
+  ## update delta
+  if( is.na( delta$t2[ 3 ] ) ) {
+    delta$t2[ c( 3, 4 ) ] <- updateDelta3( flair_seg, t2_seg ) 
+  }
   ## update beta
   sigma2 <- t2_seg$parm[ 3, ]
   beta$t2[ 1 : 2 ] <- ( alpha$t2[ 1 : 2 ] + 1 ) * sigma2
