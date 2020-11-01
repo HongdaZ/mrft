@@ -266,7 +266,6 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       ++ n_enh;
     }
   }
-  Rprintf( "n_enh = %d\n", n_enh );
   if( n_enh > m_enh ) {
     ptr_hgg[ 0 ] = 1;
   } else {
