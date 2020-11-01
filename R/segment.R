@@ -2,12 +2,14 @@
 # beta and nu2 influenced by normalization
 
 segment <- function( patient, out = "SEG",
+                     ## Always four numbers for delta
                      delta = 
                        list( t1ce = c( -2, -2, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                             t2 = c( 8, 0, 6 ),
-                             fthr = c( 0, 0 ) ),
+                             t2 = c( 8, 0, 6, 0 ),
+                             fthr = c( 0, 0, 0, 0 ) ),
                      gamma = 1,
+                     ## #of healthy tissue types controlled by alpha
                      alpha = list( t1ce = rep( 10, 4 ),
                                    flair = rep( 10, 4 ),
                                    t2 = rep( 10, 3 ),

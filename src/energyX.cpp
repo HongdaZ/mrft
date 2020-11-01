@@ -15,7 +15,7 @@ double pairwise( const int &left, const int &right ) {
   }
   return ans;
 }
-// ptr_delta[ 0 ] for tumor and ptr_delta[ 0 ] + ptr_delta[ 1 ] 
+// ptr_delta[ 2 ] for tumor and ptr_delta[ 3 ] + ptr_delta[ 3 ] 
 // for outliers
 double unary( const int &label, const double *ptr_delta ) {
   double ans;
