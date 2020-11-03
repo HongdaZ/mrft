@@ -6,13 +6,13 @@ updateDelta3 <- function( flair_seg, t2_seg ) {
   sigma2_2 <- t2_seg$parm[ 3, 2 ]  
   m_2 <- t2_seg$parm[ 2, 2 ]
   flair_tumor <- flair_tumor[ flair_tumor > 
-                                ( m_2 + sqrt( sigma2_2 ) * 2 ) ]
+                                ( m_2 + sqrt( sigma2_2 ) * 4 ) ]
   clst <- kmeans( x = flair_tumor, 
-                  centers = c( min( flair_tumor ),
-                               max( flair_tumor ) ) )$cluster
-  m <- median( flair_tumor[ clst == 1 ] )
+                  centers = summary( flair_tumor )[ - 4 ] )$cluster
+
+  m <- tapply( flair_tumor, clst, median )
   
-  delta_3 <- ( m - m_2 ) / sqrt( sigma2_2 ) 
-  delta_3
+  delta_3 <- ( m - m_2 ) / sqrt( sigma2_2 )
+  delta_3[ 3 ]
 }
 

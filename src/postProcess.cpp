@@ -215,7 +215,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
-  // 10-7.1: FLAIR(4) inside tumor >> edema 
+  // 10-7.1: FLAIR( 4 ) || T2( 4 ) || T1ce( 2 ) 
+  // inside tumor >> edema 
   // Wrap up the segmentation result
   // Now edema only includes edema
   wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
@@ -239,33 +240,33 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
-  // 10-7.2: Extend edema in T1CE(2) && FLAIR(4) && T2(2)
-  for( int i = 0; i < len; ++ i ) {
-    if( ptr_t1ce[ 2 * i ] == T1ce::T1GM &&
-        ptr_flair[ 2 * i ] == Flair::FTM &&
-        ptr_t2[ 2 * i ] == T2::T2GM ) {
-      ptr_whole[ 2 * i ] = 1;
-    } else {
-      ptr_whole[ 2 * i ] = 0;
-    }
-  }
-  // remove regions disjoint from edema
-  for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_whole, ptr_whole,
-                    1, region ) ) {
-      excldRegion( region, ptr_nidx, ptr_whole,
-                   ptr_edema, Tumor::ED );
-    }
-  }
-  pad2zero( ptr_whole, len );
-  for( int i = 0; i < len; ++ i ) {
-    if( ptr_whole[ 2 * i ] == 1 &&
-        ptr_seg[ 2 * i ] == 0 ) {
-      ptr_tumor[ 2 * i ] = 1;
-      ptr_seg[ 2 * i ] = Seg::SED;
-      ptr_edema[ 2 * i ] = Tumor::ED;
-    }
-  }
+  // // 10-7.2: Extend edema in T1CE(2) && FLAIR(4) && T2(2)
+  // for( int i = 0; i < len; ++ i ) {
+  //   if( ptr_t1ce[ 2 * i ] == T1ce::T1GM &&
+  //       ptr_flair[ 2 * i ] == Flair::FTM &&
+  //       ptr_t2[ 2 * i ] == T2::T2GM ) {
+  //     ptr_whole[ 2 * i ] = 1;
+  //   } else {
+  //     ptr_whole[ 2 * i ] = 0;
+  //   }
+  // }
+  // // remove regions disjoint from edema
+  // for( int i = 0; i < len; ++ i ) {
+  //   if( cnctRegion( i + 1, ptr_nidx, ptr_whole, ptr_whole,
+  //                   1, region ) ) {
+  //     excldRegion( region, ptr_nidx, ptr_whole,
+  //                  ptr_edema, Tumor::ED );
+  //   }
+  // }
+  // pad2zero( ptr_whole, len );
+  // for( int i = 0; i < len; ++ i ) {
+  //   if( ptr_whole[ 2 * i ] == 1 &&
+  //       ptr_seg[ 2 * i ] == 0 ) {
+  //     ptr_tumor[ 2 * i ] = 1;
+  //     ptr_seg[ 2 * i ] = Seg::SED;
+  //     ptr_edema[ 2 * i ] = Tumor::ED;
+  //   }
+  // }
   // 10-7.3: Add T1ce(4) inside edema
   inRegion( ptr_enclose_enh, len, ptr_edema, Tumor::ED, 
             ptr_t1ce, T1ce::T1TM,
@@ -347,6 +348,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
           ptr_t2[ 2 * i ] != 0 &&
           ptr_enh[ 2 * i ] != Tumor::ET ) {
         ptr_whole[ 2 * i ] = 1;
+      } else {
+        ptr_whole[ 2 * i ] = 0;
       }
     }
     // necrosis enclosed by enh
@@ -363,10 +366,11 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
         ptr_hemorrhage[ 2 * i ] = 0;
         ptr_enh[ 2 * i ] = 0;
         ++ n_other;
-      } else if( ptr_enh[ 2 * i ] == 1 ) {
+      } else if( ptr_enh[ 2 * i ] == Tumor::ET ) {
         ++ n_enh;
       }
     }
+    Rprintf( "n_other = %d, n_enh = %d\n", n_other, n_enh );
     if( n_enh > 0.5 * ( n_enh + n_other ) ) {
       ptr_code[ 0 ] = 2; // HGG (further seg)
     } else {
@@ -382,7 +386,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
   SET_VECTOR_ELT( res, 1, code );
   
   SEXP names = PROTECT( allocVector( STRSXP, 2 ) );
-  SET_STRING_ELT( names, 0, mkChar( "seg" ) );
+  SET_STRING_ELT( names, 0, mkChar( "image" ) );
   SET_STRING_ELT( names, 1, mkChar( "code" ) );
   
   setAttrib( res, R_NamesSymbol, names );

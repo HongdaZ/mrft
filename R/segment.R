@@ -169,9 +169,10 @@ segment <- function( patient, out = "SEG",
                          m, nu2$fthr, maxit$fthr )
     m <- further_seg$parm[ 2, ]
     sigma2 <- further_seg$parm[ 3, ]
-    if( ( m[ 2 ] - m[ 1 ] ) /  factor$fthr > sqrt( sigma[ 2 ] ) ) {
-      edema_idx <- post_seg$seg == 2
-      post_seg$seg[ edema_idx ] <- further_seg$seg[ edema_idx ]
+    if( ( m[ 2 ] - m[ 1 ] ) /  factor$fthr > sqrt( sigma2[ 2 ] ) ) {
+      edema_idx <- post_seg$image == 2
+      edema_idx[ is.na( edema_idx ) ] <- FALSE
+      post_seg$image[ edema_idx ] <- further_seg$image[ edema_idx ]
     }
   }
   # return( post_seg )
@@ -187,9 +188,9 @@ segment <- function( patient, out = "SEG",
   out_t2 <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
   writeNIfTI( nifti( t2_image, datatype = 2 ),
               filename = out_t2, gzipped = TRUE )
-  post_seg$seg[ is.na( post_seg$seg ) ] <- 0
+  post_seg$image[ is.na( post_seg$image ) ] <- 0
   out_post <- gsub( "_flair.nii.gz", "_post_seg", outfile )
-  writeNIfTI( nifti( post_seg$seg, datatype = 2 ),
+  writeNIfTI( nifti( post_seg$image, datatype = 2 ),
               filename = out_post, gzipped = TRUE )
   
 }

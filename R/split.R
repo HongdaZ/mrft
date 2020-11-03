@@ -156,7 +156,7 @@ split3 <- function( x, x_seg, x_factor ) {
 }
 ## Split edema || enh into to parts
 splitFthr <- function( post_seg, flair_data ) {
-  post_mix_idx <- which( post_seg$seg == 2 | post_seg$seg == 4 )
+  post_mix_idx <- which( post_seg$image == 2 | post_seg$image == 4 )
   flair_mix <- flair_data$intst[ post_mix_idx ]
   valid_idx <- which( ! is.na( flair_mix ) )
   flair_mix <- flair_mix[ valid_idx ]
