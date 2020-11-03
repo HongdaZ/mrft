@@ -41,7 +41,7 @@ void excldRegion( const vector<int> &region,
       ++ n;
     }
   }
-  if( n > size && n / ( double )region.size() < prop ) {
+  if( n > size && ( n / ( double )region.size() ) < prop ) {
     return;
   }
   for( vector<int>::const_iterator it = region.begin(); 
@@ -57,7 +57,9 @@ void excldRegion( const vector<int> &region,
 }
 
 void excldRegion( const vector<int> &region,
-                  int *ptr_seg, const int &size ) {
+                  int *ptr_seg, int *ptr_tumor,
+                  int *ptr_hemorrhage, int *ptr_necrosis,
+                  int *ptr_enh, int *ptr_edema, const int &size ) {
   if( region.size() > size ) {
     return;
   } 
@@ -66,5 +68,10 @@ void excldRegion( const vector<int> &region,
        it != region.end(); ++ it ) {
     index = *it;
     ptr_seg[ 2 * ( index - 1 ) ] = 0;
+    ptr_tumor[ 2 * ( index - 1 ) ] = 0;
+    ptr_hemorrhage[ 2 * ( index - 1 ) ] = 0;
+    ptr_necrosis[ 2 * ( index - 1 ) ] = 0;
+    ptr_enh[ 2 * ( index - 1 ) ] = 0;
+    ptr_edema[ 2 * ( index - 1 ) ] = 0;
   }
 }

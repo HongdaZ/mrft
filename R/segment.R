@@ -159,7 +159,7 @@ segment <- function( patient, out = "SEG",
   post_data <- initPost( t1ce_image, flair_image, t2_image )
   post_seg <- postProcess( post_data, min_enh, max_prop_enh,
                            min_tumor, min_prop_net )
-  if( post_seg$hgg != 1 ) {
+  if( post_seg$code != 0 ) {
     ## Furtherly segment edema
     further_data <- splitFthr( post_seg, t2_data )
     m <- further_data$m
@@ -168,9 +168,10 @@ segment <- function( patient, out = "SEG",
                          alpha$fthr, beta$fthr, lambda2$fthr,
                          m, nu2$fthr, maxit$fthr )
     m <- further_seg$parm[ 2, ]
-    sigma <- further_seg$parm[ 3, ]
-    if( ( m[ 2 ] - m[ 1 ] ) /  factor$fthr > sigma[ 2 ] ) {
-      post_seg$seg[ further_model$info$idx ] <- further_seg$seg[ 1, ]
+    sigma2 <- further_seg$parm[ 3, ]
+    if( ( m[ 2 ] - m[ 1 ] ) /  factor$fthr > sqrt( sigma[ 2 ] ) ) {
+      edema_idx <- post_seg$seg == 2
+      post_seg$seg[ edema_idx ] <- further_seg$seg[ edema_idx ]
     }
   }
   # return( post_seg )

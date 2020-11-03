@@ -22,6 +22,8 @@ void excldRegion( const vector<int> &region,
                   int *ptr_edema ) ;
 // Remove tumor regions with size < size.
 void excldRegion( const vector<int> &region,
-                  int *ptr_seg, const int &size );
+                  int *ptr_seg, int *ptr_tumor,
+                  int *ptr_hemorrhage, int *ptr_necrosis,
+                  int *ptr_enh, int *ptr_edema, const int &size );
 
 #endif
