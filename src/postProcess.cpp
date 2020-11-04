@@ -19,6 +19,7 @@
 #include "wrapUp.h"
 #include "furtherSeg.h"
 #include "zeroVector.h"
+#include "onRegion.h"
 
 using std::vector;
 using std::list;
@@ -77,6 +78,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
   // Necrosis inside enh
   int *ptr_enclose_ncr = new int[ 2 * len ]();
   int *ptr_tumor = new int[ 2 * len ]();
+  int *ptr_on = new int[ 2 * len ]();
   // Store the result of findRegion
   vector<int> region;
   region.reserve( len );
@@ -239,31 +241,24 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
-  // 10-7.2: Extend edema in T1CE(2) && FLAIR(4) && T2(2)
+  // 10-7.2: Extend edema in FLAIR(4) || T2(4)
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_t1ce[ 2 * i ] == T1ce::T1GM &&
-        ptr_flair[ 2 * i ] == Flair::FTM &&
-        ptr_t2[ 2 * i ] == T2::T2GM ) {
+    if( ( ptr_flair[ 2 * i ] == Flair::FTM ||
+        ptr_t2[ 2 * i ] == T2::T2CSF ) &&
+        ptr_tumor[ 2 * i ] == 0 &&
+        ptr_t1ce[ 2 * i ] != T1ce::T1CSF &&
+        ptr_flair[ 2 * i ] != Flair::FCSF ) {
       ptr_whole[ 2 * i ] = 1;
     } else {
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  // remove regions disjoint from edema
+  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_whole, ptr_whole,
-                    1, region ) ) {
-      excldRegion( region, ptr_nidx, ptr_whole,
-                   ptr_edema, Tumor::ED );
-    }
-  }
-  pad2zero( ptr_whole, len );
-  for( int i = 0; i < len; ++ i ) {
-    if( ptr_whole[ 2 * i ] == 1 &&
-        ptr_seg[ 2 * i ] == 0 ) {
+    if( ptr_on[ 2 * i ] == 1 ) {
       ptr_tumor[ 2 * i ] = 1;
       ptr_seg[ 2 * i ] = Seg::SED;
-      ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
   // 10-7.3: Add T1ce(4) inside edema
@@ -402,6 +397,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
   delete [] ptr_enclose_ncr;
   delete [] ptr_seg;
   delete [] ptr_tumor;
+  delete [] ptr_on;
   
   UNPROTECT( 4 );
   return res;

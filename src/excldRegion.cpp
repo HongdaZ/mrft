@@ -2,7 +2,7 @@
 
 #include "Rinternals.h"
 
-void excldRegion( const vector<int> &region, const int *ptr_nidx,
+bool excldRegion( const vector<int> &region, const int *ptr_nidx,
                   int *ptr_seg1,
                   const int *ptr_seg2, const int &label ) {
   int n_idx, index;
@@ -14,7 +14,7 @@ void excldRegion( const vector<int> &region, const int *ptr_nidx,
       if( n_idx != NA_INTEGER ) {
         if( ptr_seg1[ 2 * ( n_idx - 1 ) ] == 0 &&
             ptr_seg2[ 2 * ( n_idx - 1 ) ] == label ) {
-          return;
+          return false;
         }
       }
     }
@@ -24,6 +24,7 @@ void excldRegion( const vector<int> &region, const int *ptr_nidx,
     index = *it;
     ptr_seg1[ 2 * ( index - 1 ) ] = 0;
   }
+  return true;
 }
 void excldRegion( const vector<int> &region,
                   int *ptr_seg1,
