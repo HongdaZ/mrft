@@ -63,7 +63,6 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
   int *ptr_necrosis = new int[ 2 * len ]();
   int *ptr_enh = new int[ 2 * len ]();
   int *ptr_edema = new int[ 2 * len ]();
-  int *ptr_tmp = new int[ 2 * len ]();
   // FLAIR(4) & T2(4) \ edema \ necrosis \ enh
   // enclosed by edema
   int *ptr_extra_edema = new int[ 2 * len ]();
@@ -117,18 +116,18 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
         ptr_t1ce[ 2 * i ] != T1ce::T1TM &&
         ptr_flair[ 2 * i ] != Flair::FTM &&
         ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) {
-      ptr_tmp[ 2 * i ] = 1;
+      ptr_whole[ 2 * i ] = 1;
     }
   }
   for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_necrosis, ptr_tmp,
+    if( cnctRegion( i + 1, ptr_nidx, ptr_necrosis, ptr_whole,
                     1, region ) ) {
       extRegion( region, ptr_necrosis, Tumor::NCR, 0 );
     }
   }
   // Recover the padding to zero
   pad2zero( ptr_necrosis, len );
-  zeroVector( ptr_tmp, len );
+  zeroVector( ptr_whole, len );
   // 10-3: Find rough regions of enhancing tumor core
   for( int i = 0; i < len; ++ i ) {
     if( ptr_t1ce[ 2 * i ] == T1ce::T1TM &&
@@ -240,33 +239,33 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
-  // // 10-7.2: Extend edema in T1CE(2) && FLAIR(4) && T2(2)
-  // for( int i = 0; i < len; ++ i ) {
-  //   if( ptr_t1ce[ 2 * i ] == T1ce::T1GM &&
-  //       ptr_flair[ 2 * i ] == Flair::FTM &&
-  //       ptr_t2[ 2 * i ] == T2::T2GM ) {
-  //     ptr_whole[ 2 * i ] = 1;
-  //   } else {
-  //     ptr_whole[ 2 * i ] = 0;
-  //   }
-  // }
-  // // remove regions disjoint from edema
-  // for( int i = 0; i < len; ++ i ) {
-  //   if( cnctRegion( i + 1, ptr_nidx, ptr_whole, ptr_whole,
-  //                   1, region ) ) {
-  //     excldRegion( region, ptr_nidx, ptr_whole,
-  //                  ptr_edema, Tumor::ED );
-  //   }
-  // }
-  // pad2zero( ptr_whole, len );
-  // for( int i = 0; i < len; ++ i ) {
-  //   if( ptr_whole[ 2 * i ] == 1 &&
-  //       ptr_seg[ 2 * i ] == 0 ) {
-  //     ptr_tumor[ 2 * i ] = 1;
-  //     ptr_seg[ 2 * i ] = Seg::SED;
-  //     ptr_edema[ 2 * i ] = Tumor::ED;
-  //   }
-  // }
+  // 10-7.2: Extend edema in T1CE(2) && FLAIR(4) && T2(2)
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_t1ce[ 2 * i ] == T1ce::T1GM &&
+        ptr_flair[ 2 * i ] == Flair::FTM &&
+        ptr_t2[ 2 * i ] == T2::T2GM ) {
+      ptr_whole[ 2 * i ] = 1;
+    } else {
+      ptr_whole[ 2 * i ] = 0;
+    }
+  }
+  // remove regions disjoint from edema
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_whole, ptr_whole,
+                    1, region ) ) {
+      excldRegion( region, ptr_nidx, ptr_whole,
+                   ptr_edema, Tumor::ED );
+    }
+  }
+  pad2zero( ptr_whole, len );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_whole[ 2 * i ] == 1 &&
+        ptr_seg[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      ptr_seg[ 2 * i ] = Seg::SED;
+      ptr_edema[ 2 * i ] = Tumor::ED;
+    }
+  }
   // 10-7.3: Add T1ce(4) inside edema
   inRegion( ptr_enclose_enh, len, ptr_edema, Tumor::ED, 
             ptr_t1ce, T1ce::T1TM,
@@ -395,7 +394,6 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
   delete [] ptr_necrosis;
   delete [] ptr_enh;
   delete [] ptr_edema;
-  delete [] ptr_tmp;
   delete [] ptr_extra_edema;
   delete [] ptr_whole;
   delete [] ptr_enclose_enh;
