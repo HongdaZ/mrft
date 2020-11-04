@@ -243,17 +243,14 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
   }
   // 10-7.2: Extend edema in FLAIR(4) || T2(4)
   for( int i = 0; i < len; ++ i ) {
-    if( ( ptr_flair[ 2 * i ] == Flair::FTM ||
-        ptr_t2[ 2 * i ] == T2::T2CSF ) &&
-        ptr_tumor[ 2 * i ] == 0 &&
-        ptr_t1ce[ 2 * i ] != T1ce::T1CSF &&
-        ptr_flair[ 2 * i ] != Flair::FCSF ) {
+    if( ptr_flair[ 2 * i ] == Flair::FTM &&
+        ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
     } else {
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 ) {
@@ -364,7 +361,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
         ++ n_enh;
       }
     }
-    Rprintf( "n_other = %d, n_enh = %d\n", n_other, n_enh );
+    // Rprintf( "n_other = %d, n_enh = %d\n", n_other, n_enh );
     if( n_enh > 0.5 * ( n_enh + n_other ) ) {
       ptr_code[ 0 ] = 2; // HGG (further seg)
     } else {

@@ -1,3 +1,5 @@
+#include <R.h>
+#include <Rinternals.h>
 #include "onRegion.h"
 #include "cnctRegion.h"
 #include "excldRegion.h"
@@ -36,6 +38,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           }
         }
         if( n_vio < 2 ) {
+          // Rprintf( "region added \n" );
           for( vector<int>::const_iterator it = region.begin();
                it != region.end(); ++ it ) {
             idx = *it;
