@@ -9,12 +9,14 @@ bool excldRegion( const vector<int> &region, const int *ptr_nidx,
   for( vector<int>::const_iterator it = region.begin(); 
        it != region.end(); ++ it ) {
     index = *it;
-    for( int i = 0; i < 6; ++ i ) {
-      n_idx = ptr_nidx[ 6 * ( index - 1 ) + i ];
-      if( n_idx != NA_INTEGER ) {
-        if( ptr_seg1[ 2 * ( n_idx - 1 ) ] == 0 &&
-            ptr_seg2[ 2 * ( n_idx - 1 ) ] == label ) {
-          return false;
+    if( index != 0 ) {
+      for( int i = 0; i < 6; ++ i ) {
+        n_idx = ptr_nidx[ 6 * ( index - 1 ) + i ];
+        if( n_idx != NA_INTEGER ) {
+          if( ptr_seg1[ 2 * ( n_idx - 1 ) ] == 0 &&
+              ptr_seg2[ 2 * ( n_idx - 1 ) ] == label ) {
+            return false;
+          }
         }
       }
     }
@@ -22,7 +24,9 @@ bool excldRegion( const vector<int> &region, const int *ptr_nidx,
   for( vector<int>::const_iterator it = region.begin(); 
        it != region.end(); ++ it ) {
     index = *it;
-    ptr_seg1[ 2 * ( index - 1 ) ] = 0;
+    if( index != 0 ) {
+      ptr_seg1[ 2 * ( index - 1 ) ] = 0;
+    }
   }
   return true;
 }
@@ -38,7 +42,7 @@ void excldRegion( const vector<int> &region,
   for( vector<int>::const_iterator it = region.begin(); 
        it != region.end(); ++ it ) {
     index = *it;
-    if( ptr_seg2[ 2 * ( index - 1 ) ] == label ) {
+    if( index != 0 && ptr_seg2[ 2 * ( index - 1 ) ] == label ) {
       ++ n;
     }
   }
@@ -48,12 +52,14 @@ void excldRegion( const vector<int> &region,
   for( vector<int>::const_iterator it = region.begin(); 
        it != region.end(); ++ it ) {
     index = *it;
-    ptr_seg1[ 2 * ( index - 1 ) ] = 0;
-    ptr_seg2[ 2 * ( index - 1 ) ] = 0;
-    ptr_hemorrhage[ 2 * ( index - 1 ) ] = 0;
-    ptr_necrosis[ 2 * ( index - 1 ) ] = 0;
-    ptr_enh[ 2 * ( index - 1 ) ] = 0;
-    ptr_edema[ 2 * ( index - 1 ) ] = 0;
+    if( index != 0 ) {
+      ptr_seg1[ 2 * ( index - 1 ) ] = 0;
+      ptr_seg2[ 2 * ( index - 1 ) ] = 0;
+      ptr_hemorrhage[ 2 * ( index - 1 ) ] = 0;
+      ptr_necrosis[ 2 * ( index - 1 ) ] = 0;
+      ptr_enh[ 2 * ( index - 1 ) ] = 0;
+      ptr_edema[ 2 * ( index - 1 ) ] = 0;
+    }
   }
 }
 
@@ -68,11 +74,13 @@ void excldRegion( const vector<int> &region,
   for( vector<int>::const_iterator it = region.begin(); 
        it != region.end(); ++ it ) {
     index = *it;
-    ptr_seg[ 2 * ( index - 1 ) ] = 0;
-    ptr_tumor[ 2 * ( index - 1 ) ] = 0;
-    ptr_hemorrhage[ 2 * ( index - 1 ) ] = 0;
-    ptr_necrosis[ 2 * ( index - 1 ) ] = 0;
-    ptr_enh[ 2 * ( index - 1 ) ] = 0;
-    ptr_edema[ 2 * ( index - 1 ) ] = 0;
+    if( index != 0 ) {
+      ptr_seg[ 2 * ( index - 1 ) ] = 0;
+      ptr_tumor[ 2 * ( index - 1 ) ] = 0;
+      ptr_hemorrhage[ 2 * ( index - 1 ) ] = 0;
+      ptr_necrosis[ 2 * ( index - 1 ) ] = 0;
+      ptr_enh[ 2 * ( index - 1 ) ] = 0;
+      ptr_edema[ 2 * ( index - 1 ) ] = 0;
+    }
   }
 }

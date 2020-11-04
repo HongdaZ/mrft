@@ -216,7 +216,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
-  // 10-7.1: FLAIR( 4 ) || T2( 4 ) || T1ce( 2 ) 
+  // 10-7.1: FLAIR( 4 ) || T2( 4 ) || T1ce( 3 ) 
   // inside tumor >> edema 
   // Wrap up the segmentation result
   // Now edema only includes edema
@@ -224,7 +224,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
           ptr_seg, ptr_tumor );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_flair[ 2 * i ] == Flair::FTM ||
-        ptr_t2[ 2 * i ] == T2::T2CSF ) {
+        ptr_t2[ 2 * i ] == T2::T2CSF ||
+        ptr_t1ce[ 2 * i ] == T1ce::T1WM ) {
       ptr_whole[ 2 * i ] = 1;
     } else {
       ptr_whole[ 2 * i ] = 0;
@@ -241,39 +242,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
-  // 10-7.2: Extend edema in FLAIR(4) || T2(4)
-  for( int i = 0; i < len; ++ i ) {
-    if( ptr_flair[ 2 * i ] == Flair::FTM &&
-        ptr_tumor[ 2 * i ] == 0 ) {
-      ptr_whole[ 2 * i ] = 1;
-    } else {
-      ptr_whole[ 2 * i ] = 0;
-    }
-  }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
-            region, ptr_nidx, ptr_aidx, nr, nc, ns );
-  for( int i = 0; i < len; ++ i ) {
-    if( ptr_on[ 2 * i ] == 1 ) {
-      ptr_tumor[ 2 * i ] = 1;
-      ptr_seg[ 2 * i ] = Seg::SED;
-    }
-  }
-  // 10-7.3: Add T1ce(4) inside edema
-  inRegion( ptr_enclose_enh, len, ptr_edema, Tumor::ED, 
-            ptr_t1ce, T1ce::T1TM,
-            region, ptr_nidx, ptr_aidx, nr, nc, ns );
-  for( int i = 0; i < len; ++ i ) {
-    if( ptr_enclose_enh[ 2 * i ] == 1 &&
-        ptr_seg[ 2 * i ] == 0 ) {
-      ptr_tumor[ 2 * i ] = 1;
-      ptr_seg[ 2 * i ] = Seg::SET;
-      ptr_enh[ 2 * i ] = Tumor::ET;
-    }
-  }
-  // 10-7.4: Remove 3D connected regions with 
-  // size < min_tumor or Keep the largest tumor region
-  // and percentage of enh > 80%
-  
+  zeroVector( ptr_whole, len );
+  // 10-7.2: Remove 3D connected regions with
+  // size < min_tumor or Keep the tumor regions with 
+  // size > max_size * 0.80
   int max_size = 0;
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
@@ -293,7 +265,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       }
     }
   } else {
-    int size = max_size - 1;
+    int size = max_size * 0.80;
     for( int i = 0; i < len; ++ i ) {
       if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                       1, region ) ) {
@@ -303,16 +275,50 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
     }
   }
   pad2zero( ptr_tumor, len );
+  // // remove regions with prop of enh too large
+  // for( int i = 0; i < len; ++ i ) {
+  //   if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
+  //                   1, region ) ) {
+  //     excldRegion( region, ptr_tumor,
+  //                  ptr_seg, Seg::SET, -1, m_prop_enh,
+  //                  ptr_hemorrhage, ptr_necrosis,
+  //                  ptr_enh, ptr_edema );
+  //   }
+  // }
+  // pad2zero( ptr_tumor, len );
+  
+  // 10-7.3: Extend edema in FLAIR(4) && T2(4)
   for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
-                    1, region ) ) {
-      excldRegion( region, ptr_tumor,
-                   ptr_seg, Seg::SET, -1, m_prop_enh,
-                   ptr_hemorrhage, ptr_necrosis,
-                   ptr_enh, ptr_edema );
+    if(
+        ptr_flair[ 2 * i ] == Flair::FTM &&
+        ptr_t1ce[ 2 * i ] ==  T1ce::T1GM &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_whole[ 2 * i ] = 1;
+    } else {
+      ptr_whole[ 2 * i ] = 0;
     }
   }
-  pad2zero( ptr_tumor, len );
+  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_on[ 2 * i ] == 1 &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      ptr_seg[ 2 * i ] = Seg::SED;
+    }
+  }
+  // 10-7.4: Add T1ce(4) inside edema
+  inRegion( ptr_enclose_enh, len, ptr_edema, Tumor::ED,
+            ptr_t1ce, T1ce::T1TM,
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enclose_enh[ 2 * i ] == 1 &&
+        ptr_seg[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      ptr_seg[ 2 * i ] = Seg::SET;
+      ptr_enh[ 2 * i ] = Tumor::ET;
+    }
+  }
   // 10-7.5: code
   // 0: HGG (no further seg)
   // 1: LGG (further seg)
@@ -362,7 +368,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       }
     }
     // Rprintf( "n_other = %d, n_enh = %d\n", n_other, n_enh );
-    if( n_enh > 0.5 * ( n_enh + n_other ) ) {
+    if( n_enh > 0.60 * ( n_enh + n_other ) ) {
       ptr_code[ 0 ] = 2; // HGG (further seg)
     } else {
       ptr_code[ 0 ] = 0; // HGG (no further seg)

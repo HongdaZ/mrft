@@ -157,8 +157,10 @@ segment <- function( patient, out = "SEG",
   t2_image[ t2_image == -2 ] <- 2L
   ## Initialize data for postprocessing
   post_data <- initPost( t1ce_image, flair_image, t2_image )
+  # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
   post_seg <- postProcess( post_data, min_enh, max_prop_enh,
                            min_tumor, min_prop_net )
+  # sink()
   if( post_seg$code != 0 ) {
     ## Furtherly segment edema
     further_data <- splitFthr( post_seg, t2_data )
