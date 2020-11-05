@@ -1,5 +1,5 @@
 ## update delta[ 3 ] for t2
-updateDelta3 <- function( flair_seg, t2_seg ) {
+updateDelta3 <- function( flair_seg, t2_data ) {
   flair_tumor <- t2_data$t2[ flair_seg$image == - 4 ]
   flair_tumor <- flair_tumor[ !is.na( flair_tumor ) ]
   ## t2_seg from est

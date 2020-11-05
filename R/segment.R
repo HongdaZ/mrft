@@ -114,7 +114,7 @@ segment <- function( patient, out = "SEG",
   # sink()
   ## update delta
   if( is.na( delta$t2[ 3 ] ) ) {
-    delta$t2[ c( 3, 4 ) ] <- updateDelta3( flair_seg, t2_seg ) 
+    delta$t2[ c( 3, 4 ) ] <- updateDelta3( flair_seg, t2_data ) 
   }
   ## update beta
   sigma2 <- t2_seg$parm[ 3, ]
