@@ -133,7 +133,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
   // 10-3: Find rough regions of enhancing tumor core
   for( int i = 0; i < len; ++ i ) {
     if( ptr_t1ce[ 2 * i ] == T1ce::T1TM &&
-        ptr_t2[ 2 * i ] == T2::T2CSF &&
+        ( ptr_t2[ 2 * i ] == T2::T2CSF ||
+        ptr_flair[ 2 * i ] == Flair::FTM ) &&
         ptr_necrosis[ 2 * i ] != Tumor::NCR &&
         ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) {
       ptr_enh[ 2 * i ] = Tumor::ET;
