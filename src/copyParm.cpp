@@ -12,6 +12,14 @@ void copyParm( const int &n_health,
   int j = 0;
   int curr_label;
   int cidx;
+  for( int i = 0; i < n_health; ++ i ) {
+    curr_label = - i - 1;
+    ptr_res_parm[ nrow * j ] = curr_label;
+    for( int k = 0; k < 8; ++ k ) {
+      ptr_res_parm[ nrow * j + k + 1 ] = health_parm[ 8 * i + k ];
+    }
+    ++ j;
+  }
   for( list<list<int>>::const_iterator it = tumor_regions.begin();
        it != tumor_regions.end(); ++ it ) {
     curr_label = it->front();
@@ -19,14 +27,6 @@ void copyParm( const int &n_health,
     ptr_res_parm[ nrow * j ] = curr_label;
     for( int k = 0; k < 8; ++ k ) {
       ptr_res_parm[ nrow * j + k + 1 ] = tumor_parm[ 8 * cidx + k ];
-    }
-    ++ j;
-  }
-  for( int i = 0; i < n_health; ++ i ) {
-    curr_label = - i - 1;
-    ptr_res_parm[ nrow * j ] = curr_label;
-    for( int k = 0; k < 8; ++ k ) {
-      ptr_res_parm[ nrow * j + k + 1 ] = health_parm[ 8 * i + k ];
     }
     ++ j;
   }
