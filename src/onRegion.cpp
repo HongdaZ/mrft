@@ -42,7 +42,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
         
         if( n_vio < 2 ) {
           spread_idx = spread( region, ptr_aidx );
-          if( spread_idx < 3 ) {
+          if( spread_idx < 4 ) {
             for( vector<int>::const_iterator it = region.begin();
                  it != region.end(); ++ it ) {
               idx = *it;
