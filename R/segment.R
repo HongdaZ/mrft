@@ -31,7 +31,7 @@ segment <- function( patient, out = "SEG",
                        list( t1ce = 10L, flair = 1L,
                              t2 = 1L, fthr = 40L ),
                      factor = 
-                       list( t1ce = 18, flair = 18, t2 =  4,
+                       list( t1ce = 8, flair = 8, t2 =  4,
                              fthr = 8 ),
                      min_enh = 2000L,
                      max_prop_enh = .8,
