@@ -7,7 +7,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                        list( t1ce = c( -2, -2, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              t2 = c( 8, 0, NA_real_, NA_real_ ),
-                             fthr = c( 0, 0, 0, 0 ) ),
+                             fthr = c( 0, 0, 8, 0 ) ),
                      gamma = 1,
                      ## #of healthy tissue types controlled by alpha
                      alpha = list( t1ce = rep( 10, 4 ),
@@ -30,9 +30,6 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                      maxit = 
                        list( t1ce = 10L, flair = 1L,
                              t2 = 1L, fthr = 40L ),
-                     factor = 
-                       list( t1ce = 8, flair = 8, t2 =  4,
-                             fthr = 8 ),
                      min_enh = 2000L,
                      max_prop_enh_enc = .2,
                      min_tumor = 20000L,
@@ -50,7 +47,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
   ## update beta
   sigma2 <- t1ce_seg$parm[ 3, ]
   beta$t1ce[ 1 : 3 ] <- ( alpha$t1ce[ 1 : 3 ] + 1 ) * ( sigma2 )
-  t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, factor$t1ce )
+  t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, delta$t1ce[ 3 ] )
   ## update m
   m <- t1ce_data$m
   b <- getB( m, a )
@@ -81,7 +78,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
   ## update beta
   sigma2 <- flair_seg$parm[ 3, ]
   beta$flair[ 1 : 3 ] <- ( alpha$flair[ 1 : 3 ] + 1 ) * ( sigma2 )
-  flair_data <- split4( flair_data$flair, flair_seg, factor$flair )
+  flair_data <- split4( flair_data$flair, flair_seg, delta$flair[ 3 ] )
   ## update m
   m <- flair_data$m
   b <- getB( m, a )
@@ -119,7 +116,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
   ## update beta
   sigma2 <- t2_seg$parm[ 3, ]
   beta$t2[ 1 : 2 ] <- ( alpha$t2[ 1 : 2 ] + 1 ) * sigma2
-  t2_data <- split3( t2_data$t2, t2_seg, factor$t2 )
+  t2_data <- split3( t2_data$t2, t2_seg, delta$t2[ 3 ] )
   ## update m
   m <- t2_data$m
   b <- getB( m, a )
@@ -171,7 +168,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                          m, nu2$fthr, maxit$fthr )
     m <- further_seg$parm[ 2, ]
     sigma2 <- further_seg$parm[ 3, ]
-    if( ( m[ 2 ] - m[ 1 ] ) /  factor$fthr > sqrt( sigma2[ 2 ] ) ) {
+    if( ( m[ 2 ] - m[ 1 ] ) /  delta$fthr[ 3 ] > sqrt( sigma2[ 2 ] ) ) {
       edema_idx <- post_seg$image == 2
       edema_idx[ is.na( edema_idx ) ] <- FALSE
       post_seg$image[ edema_idx ] <- further_seg$image[ edema_idx ]
