@@ -18,6 +18,9 @@ updateDelta3 <- function( flair_seg, t2_data, t2_seg ) {
                       median( delta_3 ),
                       max( delta_3 ) ) )
   delta_3 <- delta_3$centers[ 2 ]
-  delta_3
+  if( delta_3 > 5 ^ 2 / 2 ) {
+    delta_3 <- 5 ^ 2 / 2  
+  }
+  return( delta_3 )
 }
 
