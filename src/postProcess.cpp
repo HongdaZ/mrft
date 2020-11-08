@@ -26,10 +26,10 @@ using std::list;
 
 // Postprocess the results
 extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh, 
-                             SEXP max_prop_enh,
-                             SEXP min_tumor, SEXP min_prop_net );
-SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
-                  SEXP min_tumor, SEXP min_prop_net ) {
+                             SEXP max_prop_enh_enc,
+                             SEXP min_tumor, SEXP spread ) ;
+SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
+                  SEXP min_tumor, SEXP spread ) {
   SEXP t1ce = getListElement( post_data, "t1ce_seg" );
   SEXP flair = getListElement( post_data, "flair_seg" );
   SEXP t2 = getListElement( post_data, "t2_seg" );
@@ -83,9 +83,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
   vector<int> region;
   region.reserve( len );
   const int m_enh = INTEGER( min_enh )[ 0 ];
-  const double m_prop_enh = REAL( max_prop_enh )[ 0 ];
+  const double m_prop_enh_enc = REAL( max_prop_enh_enc )[ 0 ];
   const int m_tumor = INTEGER( min_tumor )[ 0 ];
-  const double m_prop_net = REAL( min_prop_net )[ 0 ];
+  const double spread_factor = REAL( spread )[ 0 ];
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
     if( ptr_flair[ 2 * i ] == Flair::FCSF && 
@@ -300,7 +300,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
     }
   }
   onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
-            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+            region, spread_factor, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -340,6 +340,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
     // Find total number of voxels inside convex hull
     // of enh
     // Find whole = enh complement
+    int n_tumor = 0;
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_tumor[ 2 * i ] == 1 ) {
+        ++ n_tumor;
+      }
+    }
     for( int i = 0; i < len; ++ i ) {
       if( ptr_t1ce[ 2 * i ] != 0 &&
           ptr_flair[ 2 * i ] != 0 &&
@@ -369,7 +375,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh,
       }
     }
     // Rprintf( "n_other = %d, n_enh = %d\n", n_other, n_enh );
-    if( n_enh > 0.60 * ( n_enh + n_other ) ) {
+    if( ( n_enh + n_other ) < m_prop_enh_enc *  n_tumor ) {
       ptr_code[ 0 ] = 2; // HGG (further seg)
     } else {
       ptr_code[ 0 ] = 0; // HGG (no further seg)

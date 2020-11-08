@@ -12,7 +12,7 @@
 void onRegion( int *ptr_on, const int &len, const double &prop,
                int *ptr_seg1, const int &label1, 
                int *ptr_seg2, const int &label2,
-               vector<int> &region, 
+               vector<int> &region, const double &spread_factor,
                const int *ptr_nidx, const int *ptr_aidx,
                const int &nr, const int &nc, const int &ns ) {
   vector<int> bound{ 0, nr - 1, nr + nc - 1, nr + nc + ns - 1 };
@@ -42,7 +42,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
         
         if( n_vio < 2 ) {
           spread_idx = spread( region, ptr_aidx );
-          if( spread_idx < 4 ) {
+          if( spread_idx < spread_factor ) {
             for( vector<int>::const_iterator it = region.begin();
                  it != region.end(); ++ it ) {
               idx = *it;

@@ -34,9 +34,9 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                        list( t1ce = 8, flair = 8, t2 =  4,
                              fthr = 8 ),
                      min_enh = 2000L,
-                     max_prop_enh = .8,
+                     max_prop_enh_enc = .2,
                      min_tumor = 20000L,
-                     min_prop_net = .80 ) {
+                     spread = 4 ) {
   images <- readImage( patient )
   ## split t1ce images to CSF & necrosis, grey matter and white matter
   t1ce_data <- splitT1ce3( images$t1ce, images$flair )
@@ -158,8 +158,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
   ## Initialize data for postprocessing
   post_data <- initPost( t1ce_image, flair_image, t2_image )
   # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
-  post_seg <- postProcess( post_data, min_enh, max_prop_enh,
-                           min_tumor, min_prop_net )
+  post_seg <- postProcess( post_data, min_enh, max_prop_enh_enc,
+                           min_tumor, spread )
   # sink()
   if( post_seg$code != 0 ) {
     ## Furtherly segment edema
