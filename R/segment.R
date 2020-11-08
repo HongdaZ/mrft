@@ -1,7 +1,7 @@
 # segment the MR images 
 # beta and nu2 influenced by normalization
 
-segment <- function( patient, out = "SEG",
+segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                      ## Always four numbers for delta
                      delta = 
                        list( t1ce = c( -2, -2, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
@@ -180,7 +180,7 @@ segment <- function( patient, out = "SEG",
   # return( post_seg )
   ## Export the results to .nii images
   infile <- patient[ 1 ]
-  outfile <- gsub( "N4ITK443Z", out, infile )
+  outfile <- gsub( infolder, out, infile )
   out_t1ce <- gsub( "_flair.nii.gz", "_t1ce_seg", outfile )
   writeNIfTI( nifti( t1ce_image, datatype = 2 ),
               filename = out_t1ce, gzipped = TRUE )
