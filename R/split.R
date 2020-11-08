@@ -87,12 +87,19 @@ splitT22 <- function( t2, t1ce_seg, flair_seg ) {
   label[ ! is.nan( t2 ) ] <- 0L
   
   ## Find CSF & necrosis and Tumor
-  q_t2 <- quantile( t2, probs = .6, na.rm = T )
-  bright_t2 <- t2[ t1ce_seg$image == -1 | t1ce_seg$image == -4 |
-                     flair_seg$image == -1 | flair_seg$image == -4 ]
+  q_t2 <- quantile( t2, probs = .5, na.rm = T )
+  bright_t2 <- t2[ t2 > q_t2 & ( t1ce_seg$image == -1 | 
+                                 t1ce_seg$image == -4 |
+                                 flair_seg$image == -1 |
+                                 flair_seg$image == -4 ) ]
   bright_t2 <- bright_t2[ ! is.na( bright_t2 ) ]
-  b_km <- min( kmeans( bright_t2, 2 )$centers )
-  bright <- t2 > b_km
+  b_km <- min( kmeans( bright_t2, 7 )$centers )
+  bright <- t2 > b_km |
+    t1ce_seg$image == -1 | 
+    t1ce_seg$image == -4 |
+    flair_seg$image == -1 |
+    flair_seg$image == -4
+  
   label[ bright ] <- -4L
   tbd <- label == 0
   sub_t2 <- t2[ tbd ]
