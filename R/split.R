@@ -93,7 +93,7 @@ splitT22 <- function( t2, t1ce_seg, flair_seg ) {
                                  flair_seg$image == -1 |
                                  flair_seg$image == -4 ) ]
   bright_t2 <- bright_t2[ ! is.na( bright_t2 ) ]
-  b_km <- min( kmeans( bright_t2, 7 )$centers )
+  b_km <- min( bright_t2 )
   bright <- t2 > b_km |
     t1ce_seg$image == -1 | 
     t1ce_seg$image == -4 |
