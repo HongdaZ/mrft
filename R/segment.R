@@ -34,6 +34,9 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                      max_prop_enh_enc = .2,
                      min_tumor = 20000L,
                      spread = 4 ) {
+  res <- matrix( nrow = 2, ncol = 3 )
+  row.names( res ) <- c( "m", "sigma2" )
+  colnames( res ) <- c( "t1ce", "flair", "t2" )
   images <- readImage( patient )
   ## split t1ce images to CSF & necrosis, grey matter and white matter
   t1ce_data <- splitT1ce3( images$t1ce, images$flair )
@@ -44,6 +47,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                     alpha$t1ce[ 1 : 3 ], beta$t1ce[ 1 : 3 ], 
                     lambda2$t1ce[ 1 : 3 ], 
                     m, nu2$t1ce, 40L )
+  res[ , 1 ] <- t1ce_seg$parm[ c( 2, 3 ), 3 ]
   ## update beta
   sigma2 <- t1ce_seg$parm[ 3, ]
   beta$t1ce[ 1 : 3 ] <- ( alpha$t1ce[ 1 : 3 ] + 1 ) * ( sigma2 )
@@ -75,6 +79,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                      alpha$flair[ 1 : 3 ], beta$flair[ 1 : 3 ], 
                      lambda2$flair[ 1 : 3 ],
                      m, nu2$flair, 40L )
+  res[ , 2 ] <- flair_seg$parm[ c( 2, 3 ), 3 ]
   ## update beta
   sigma2 <- flair_seg$parm[ 3, ]
   beta$flair[ 1 : 3 ] <- ( alpha$flair[ 1 : 3 ] + 1 ) * ( sigma2 )
@@ -108,6 +113,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                  alpha$t2[ 1 : 2 ], beta$t2[ 1 : 2 ], 
                  lambda2$t2[ 1 : 2 ],
                  m, nu2$t2, 40L )
+  res[ , 3 ] <- t2_seg$parm[ c( 2, 3 ), 2 ]
   # sink()
   ## update delta
   if( is.na( delta$t2[ 3 ] ) ) {
@@ -191,5 +197,22 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
   out_post <- gsub( "_flair.nii.gz", "_post_seg", outfile )
   writeNIfTI( nifti( post_seg$image, datatype = 2 ),
               filename = out_post, gzipped = TRUE )
-  
+  ## Export normalized images
+  t1ce_intst <- t1ce_data$intst
+  out_t1ce <- gsub( "_flair.nii.gz", "_t1ce_norm", outfile )
+  writeNIfTI( nifti( t1ce_intst, datatype = 64 ) ,
+              out_t1ce,
+              gzipped = T )
+  flair_intst <- flair_data$intst
+  out_flair <- gsub( "_flair.nii.gz", "_flair_norm", outfile )
+  writeNIfTI( nifti( flair_intst, datatype = 64 ) ,
+              out_flair,
+              gzipped = T )
+  t2_intst <- t2_data$intst
+  out_t2 <- gsub( "_flair.nii.gz", "_t2_norm", outfile )
+  writeNIfTI( nifti( t2_intst, datatype = 64 ) ,
+              out_t2,
+              gzipped = T )
+  data_file <- gsub( "_flair.nii.gz", ".RData", outfile )
+  save( res, file = data_file )
 }
