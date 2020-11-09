@@ -46,8 +46,8 @@ splitFlair3 <- function( flair, t1ce_seg ) {
   label <- array( -4L, dim = dim( flair ) )
   label[ ! is.nan( flair ) ] <- 0L
   
-  ## Find the brightest 25% percent
-  q_flair <- quantile( flair, probs = .75, na.rm = T )
+  ## Find the brightest 30% percent
+  q_flair <- quantile( flair, probs = .30, na.rm = T )
   bright <- flair > q_flair
   label[ bright ] <- -4L
   
