@@ -8,7 +8,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
                              flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              t2 = c( 8, 0, NA_real_, NA_real_ ),
                              fthr = c( 0, 0, 8, 0 ) ),
-                     gamma = 1,
+                     gamma = 0.80,
                      ## #of healthy tissue types controlled by alpha
                      alpha = list( t1ce = rep( 10, 4 ),
                                    flair = rep( 10, 4 ),
