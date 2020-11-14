@@ -309,7 +309,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
     }
   }
   // 10-7.4: Add T1ce(4) inside edema
-  inRegion( ptr_enclose_enh, len, ptr_edema, Tumor::ED,
+  inRegion( ptr_enclose_enh, len, ptr_tumor, 1,
             ptr_t1ce, T1ce::T1TM,
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
@@ -340,12 +340,6 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
     // Find total number of voxels inside convex hull
     // of enh
     // Find whole = enh complement
-    int n_tumor = 0;
-    for( int i = 0; i < len; ++ i ) {
-      if( ptr_tumor[ 2 * i ] == 1 ) {
-        ++ n_tumor;
-      }
-    }
     for( int i = 0; i < len; ++ i ) {
       if( ptr_t1ce[ 2 * i ] != 0 &&
           ptr_flair[ 2 * i ] != 0 &&
@@ -372,6 +366,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
         ++ n_other;
       } else if( ptr_enh[ 2 * i ] == Tumor::ET ) {
         ++ n_enh;
+      }
+    }
+    int n_tumor = 0;
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_tumor[ 2 * i ] == 1 ) {
+        ++ n_tumor;
       }
     }
     // Rprintf( "n_other = %d, n_enh = %d\n", n_other, n_enh );

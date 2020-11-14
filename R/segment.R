@@ -1,10 +1,10 @@
 # segment the MR images 
 # beta and nu2 influenced by normalization
 
-segment <- function( patient, out = "SEG", infolder = "N4ITK443Z",
+segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      ## Always four numbers for delta
                      delta = 
-                       list( t1ce = c( -2, -2, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
+                       list( t1ce = c( -3, -2, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
                              t2 = c( 8, 0, NA_real_, NA_real_ ),
                              fthr = c( 0, 0, 8, 0 ) ),
