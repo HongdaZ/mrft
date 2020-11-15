@@ -27,9 +27,11 @@ using std::list;
 // Postprocess the results
 extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh, 
                              SEXP max_prop_enh_enc,
-                             SEXP min_tumor, SEXP spread ) ;
+                             SEXP min_tumor, SEXP spread,
+                             SEXP min_prop_tumor_nbr ) ;
 SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
-                  SEXP min_tumor, SEXP spread ) {
+                  SEXP min_tumor, SEXP spread,
+                  SEXP min_prop_tumor_nbr ) {
   SEXP t1ce = getListElement( post_data, "t1ce_seg" );
   SEXP flair = getListElement( post_data, "flair_seg" );
   SEXP t2 = getListElement( post_data, "t2_seg" );
@@ -86,6 +88,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
   const double m_prop_enh_enc = REAL( max_prop_enh_enc )[ 0 ];
   const int m_tumor = INTEGER( min_tumor )[ 0 ];
   const double spread_factor = REAL( spread )[ 0 ];
+  const double m_p_t_nbr = REAL( min_prop_tumor_nbr )[ 0 ];
+  
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
     if( ptr_flair[ 2 * i ] == Flair::FCSF && 
@@ -300,7 +304,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
     }
   }
   onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
-            region, spread_factor, ptr_nidx, ptr_aidx, nr, nc, ns );
+            region, spread_factor, m_p_t_nbr,
+            ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {

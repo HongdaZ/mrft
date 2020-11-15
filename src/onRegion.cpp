@@ -7,12 +7,14 @@
 #include "zeroVector.h"
 #include "pad2zero.h"
 #include "spread.h"
+#include "nTNbr.h"
 
 // Extend ptr_seg1 to adjacent regions of ptr_seg2
 void onRegion( int *ptr_on, const int &len, const double &prop,
                int *ptr_seg1, const int &label1, 
                int *ptr_seg2, const int &label2,
                vector<int> &region, const double &spread_factor,
+               const double &m_p_t_nbr,
                const int *ptr_nidx, const int *ptr_aidx,
                const int &nr, const int &nc, const int &ns ) {
   vector<int> bound{ 0, nr - 1, nr + nc - 1, nr + nc + ns - 1 };
@@ -20,7 +22,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
   vector<int> seg2_count( nr + nc + ns, 0 );
   sliceCount( seg1_count, ptr_seg1, len, label1, ptr_nidx, ptr_aidx,
               nr, nc, ns );
-  int n_vio = 0, idx = 1;
+  int n_vio = 0, idx = 1, n_t_nbr = 0;
   double spread_idx = 0;
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_seg2, ptr_seg2,
@@ -33,6 +35,11 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
                     nr, nc, ns );
         for( int j = 0; j < 3; ++ j ) {
           for( int k = bound[ j ]; k < bound[ j + 1 ]; ++ k ) {
+            // Find the number of anatomical planes
+            // that a slice of extended  
+            // region having a number of voxels greater 
+            // than prop * ( the number of voxels on a slice ) 
+            // of the original tumor region
             if( seg2_count[ k ] > prop * seg1_count[ k ] ) {
               ++ n_vio;
               break;
@@ -41,14 +48,18 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
         }
         
         if( n_vio < 2 ) {
-          spread_idx = spread( region, ptr_aidx );
-          if( spread_idx < spread_factor ) {
-            for( vector<int>::const_iterator it = region.begin();
-                 it != region.end(); ++ it ) {
-              idx = *it;
-              if( idx != 0 ) {
-                ptr_on[ 2 * ( idx - 1 ) ] = 1;
-              }
+          n_t_nbr = nTNbr( region, ptr_seg1, label1, ptr_nidx );
+          if( n_t_nbr / region.size() < m_p_t_nbr ) {
+            spread_idx = spread( region, ptr_aidx );
+            if( spread_idx > spread_factor ) {
+              continue;
+            }
+          }
+          for( vector<int>::const_iterator it = region.begin();
+               it != region.end(); ++ it ) {
+            idx = *it;
+            if( idx != 0 ) {
+              ptr_on[ 2 * ( idx - 1 ) ] = 1;
             }
           }
         }

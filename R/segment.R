@@ -33,7 +33,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      min_enh = 2000L,
                      max_prop_enh_enc = .1,
                      min_tumor = 20000L,
-                     spread = 4 ) {
+                     spread = 4, 
+                     min_prop_tumor_nbr = 0.3 ) {
   res <- matrix( nrow = 2, ncol = 3 )
   row.names( res ) <- c( "m", "sigma2" )
   colnames( res ) <- c( "t1ce", "flair", "t2" )
@@ -165,7 +166,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   post_data <- initPost( t1ce_image, flair_image, t2_image )
   # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
   post_seg <- postProcess( post_data, min_enh, max_prop_enh_enc,
-                           min_tumor, spread )
+                           min_tumor, spread, 
+                           min_prop_tumor_nbr )
   # sink()
   if( post_seg$code != 0 ) {
     ## Furtherly segment edema
