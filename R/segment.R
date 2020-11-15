@@ -6,7 +6,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      delta = 
                        list( t1ce = c( -3, -2, 6, 6 ),
                              flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                             t2 = c( 2, 0, NA_real_, NA_real_ ),
+                             t2 = c( 4, 0, NA_real_, NA_real_ ),
                              fthr = c( 0, 0, 8, 0 ) ),
                      gamma = 0.80,
                      ## #of healthy tissue types controlled by alpha
