@@ -103,7 +103,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      flair_seg$image > 0 ] <- -4L
   
   ## split t2 to grey matter and white matter
-  prop_bright <- propBright( t1ce_seg, flair_seg )
+  prop_bright <- propBright( t1ce_seg, flair_seg, images$t2 )
   t2_data <- splitT22( prop_bright, images$t2, t1ce_seg, flair_seg )
   m <- t2_data$m
   t2_model <- initEst( t2_data$label, t2_data$t2 )
