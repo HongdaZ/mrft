@@ -6,7 +6,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      delta = 
                        list( t1ce = c( -3, -2, 6, 6 ),
                              flair = c( 0, 0, 4 ^ 2 / 2, 4 ^ 2 / 2 ),
-                             t2 = c( 8, 0, 8, 8 ),
+                             t2 = c( 2, 0, NA_real_, NA_real_ ),
                              fthr = c( 0, 0, 8, 0 ) ),
                      gamma = 0.80,
                      ## #of healthy tissue types controlled by alpha
@@ -31,7 +31,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                        list( t1ce = 10L, flair = 1L,
                              t2 = 1L, fthr = 40L ),
                      min_enh = 2000L,
-                     max_prop_enh_enc = .2,
+                     max_prop_enh_enc = .1,
                      min_tumor = 20000L,
                      spread = 4 ) {
   res <- matrix( nrow = 2, ncol = 3 )
@@ -103,7 +103,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      flair_seg$image > 0 ] <- -4L
   
   ## split t2 to grey matter and white matter
-  t2_data <- splitT22( images$t2, t1ce_seg, flair_seg )
+  prop_bright <- propBright( t1ce_seg, flair_seg )
+  t2_data <- splitT22( prop_bright, images$t2, t1ce_seg, flair_seg )
   m <- t2_data$m
   t2_model <- initEst( t2_data$label, t2_data$t2 )
   ## estimate parameters of t2 images without tumor 
@@ -117,7 +118,9 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   # sink()
   ## update delta
   if( is.na( delta$t2[ 3 ] ) ) {
-    delta$t2[ c( 3, 4 ) ] <- updateDelta3( flair_seg, t2_data, t2_seg ) 
+    delta$t2[ c( 3, 4 ) ] <- updateDelta3( prop_bright,
+                                           t1ce_seg, flair_seg,
+                                           t2_data, t2_seg ) 
   }
   ## update beta
   sigma2 <- t2_seg$parm[ 3, ]

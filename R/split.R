@@ -82,12 +82,12 @@ splitFlair3 <- function( flair, t1ce_seg ) {
   return( res )
 }
 ## split t2 to grey matter and white matter
-splitT22 <- function( t2, t1ce_seg, flair_seg ) {
+splitT22 <- function( prop_bright, t2, t1ce_seg, flair_seg ) {
   label <- array( -4L, dim = dim( t2 ) )
   label[ ! is.nan( t2 ) ] <- 0L
   
-  ## Find CSF & necrosis and Tumor (brightest 40%)
-  q_t2 <- quantile( t2, probs = .60, na.rm = T )
+  ## Find CSF & necrosis and Tumor (brightest prop_bright)
+  q_t2 <- quantile( t2, probs = 1 - prop_bright, na.rm = T )
   bright_t2 <- t2[ t2 > q_t2 & ( t1ce_seg$image == -1 | 
                                  t1ce_seg$image == -4 |
                                  flair_seg$image == -1 |
