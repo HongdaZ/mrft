@@ -7,7 +7,7 @@
 #include "zeroVector.h"
 #include "pad2zero.h"
 #include "spread.h"
-#include "nTNbr.h"
+#include "pTNbr.h"
 
 // Extend ptr_seg1 to adjacent regions of ptr_seg2
 void onRegion( int *ptr_on, const int &len, const double &prop,
@@ -22,7 +22,8 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
   vector<int> seg2_count( nr + nc + ns, 0 );
   sliceCount( seg1_count, ptr_seg1, len, label1, ptr_nidx, ptr_aidx,
               nr, nc, ns );
-  int n_vio = 0, idx = 1, n_t_nbr = 0;
+  int n_vio = 0, idx = 1;
+  double p_t_nbr = 0;
   double spread_idx = 0;
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_seg2, ptr_seg2,
@@ -46,10 +47,9 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
             }
           }
         }
-        
         if( n_vio < 2 ) {
-          n_t_nbr = nTNbr( region, ptr_seg1, label1, ptr_nidx );
-          if( n_t_nbr / region.size() < m_p_t_nbr ) {
+          p_t_nbr = pTNbr( region, ptr_seg1, label1, ptr_nidx );
+          if( p_t_nbr < m_p_t_nbr ) {
             spread_idx = spread( region, ptr_aidx );
             if( spread_idx > spread_factor ) {
               continue;

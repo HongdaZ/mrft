@@ -5,8 +5,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      ## Always four numbers for delta
                      delta = 
                        list( t1ce = c( -3, -2, 6, 6 ),
-                             flair = c( 0, 0, 6, 6 ),
-                             t2 = c( 4, 0, NA_real_, NA_real_ ),
+                             flair = c( 0, 0, 8, 8 ),
+                             t2 = c( 3, 0, NA_real_, NA_real_ ),
                              fthr = c( 0, 0, 8, 0 ) ),
                      gamma = 0.80,
                      ## #of healthy tissue types controlled by alpha
@@ -34,7 +34,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      max_prop_enh_enc = .1,
                      min_tumor = 20000L,
                      spread = 4, 
-                     min_prop_tumor_nbr = 0.3 ) {
+                     min_prop_tumor_nbr = 0.6 ) {
   res <- matrix( nrow = 2, ncol = 3 )
   row.names( res ) <- c( "m", "sigma2" )
   colnames( res ) <- c( "t1ce", "flair", "t2" )
