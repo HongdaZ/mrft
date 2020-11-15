@@ -221,5 +221,5 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
               out_t2,
               gzipped = T )
   data_file <- gsub( "_flair.nii.gz", ".RData", outfile )
-  save( res, file = data_file )
+  save( res, delta, file = data_file )
 }
