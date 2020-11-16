@@ -221,7 +221,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
-  // 10-7.1: FLAIR( 4 ) || T2( 4 )
+  // 10-7.1: FLAIR( 4 ) && T2( 4 )
   // inside tumor >> edema 
   // Wrap up the segmentation result
   // Now edema only includes edema
@@ -291,11 +291,15 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
   // }
   // pad2zero( ptr_tumor, len );
   
-  // 10-7.3: Extend edema in FLAIR(4) && T1ce( 2 )
+  // 10-7.3: Extend edema in ( FLAIR( 4 ) && T1ce( 2 ) ) || 
+  //                         ( FLAIR( 4 ) && T2( 4 ) && T1ce( 3 ) ) 
   for( int i = 0; i < len; ++ i ) {
     if(
-        ptr_flair[ 2 * i ] == Flair::FTM &&
-        ptr_t1ce[ 2 * i ] ==  T1ce::T1GM &&
+        ( ( ptr_flair[ 2 * i ] == Flair::FTM &&
+          ptr_t1ce[ 2 * i ] ==  T1ce::T1GM ) || 
+        ( ptr_flair[ 2 * i ] == Flair::FTM &&
+          ptr_t2[ 2 * i ] == T2::T2CSF &&
+          ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) ) &&
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
     } else {

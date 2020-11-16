@@ -164,18 +164,18 @@ split3 <- function( x, x_seg, x_factor ) {
   return( res )
 }
 ## Split edema || enh into to parts
-splitFthr <- function( post_seg, flair_data ) {
+splitFthr <- function( post_seg, t2_data ) {
   post_mix_idx <- which( post_seg$image == 2 | post_seg$image == 4 )
-  flair_mix <- flair_data$intst[ post_mix_idx ]
-  valid_idx <- which( ! is.na( flair_mix ) )
-  flair_mix <- flair_mix[ valid_idx ]
+  t2_mix <- t2_data$intst[ post_mix_idx ]
+  valid_idx <- which( ! is.na( t2_mix ) )
+  t2_mix <- t2_mix[ valid_idx ]
   post_mix_idx <- post_mix_idx[ valid_idx ]
-  start <- c( min( flair_mix ), 
-              max( flair_mix ) )
-  clst <- kmeans( x = flair_mix, centers = start )$cluster
-  label <- array( NA_integer_, dim = dim( flair_data$intst ) )
-  mean1 <- mean( flair_mix[ clst == 1 ] )
-  mean2 <- mean( flair_mix[ clst == 2 ] )
+  start <- c( min( t2_mix ), 
+              max( t2_mix ) )
+  clst <- kmeans( x = t2_mix, centers = start )$cluster
+  label <- array( NA_integer_, dim = dim( t2_data$intst ) )
+  mean1 <- mean( t2_mix[ clst == 1 ] )
+  mean2 <- mean( t2_mix[ clst == 2 ] )
   if( mean1 > mean2 ) {
     clst[ clst == 1 ] <- -2L
     clst[ clst == 2 ] <- -1L
@@ -186,7 +186,7 @@ splitFthr <- function( post_seg, flair_data ) {
     m <- c( mean1, mean2 )
   }
   label[ post_mix_idx ] <- clst
-  res <- list( label = label, intst = flair_data$intst, 
+  res <- list( label = label, intst = t2_data$intst, 
                m = m )
   return( res )
 }
