@@ -164,16 +164,16 @@ split3 <- function( x, x_seg, x_factor ) {
   return( res )
 }
 ## Split edema || enh into to parts
-splitFthr <- function( post_seg, t2_data ) {
+splitFthr <- function( post_seg, t2_intst ) {
   post_mix_idx <- which( post_seg$image == 2 | post_seg$image == 4 )
-  t2_mix <- t2_data$intst[ post_mix_idx ]
+  t2_mix <- t2_intst[ post_mix_idx ]
   valid_idx <- which( ! is.na( t2_mix ) )
   t2_mix <- t2_mix[ valid_idx ]
   post_mix_idx <- post_mix_idx[ valid_idx ]
   start <- c( min( t2_mix ), 
               max( t2_mix ) )
   clst <- kmeans( x = t2_mix, centers = start )$cluster
-  label <- array( NA_integer_, dim = dim( t2_data$intst ) )
+  label <- array( NA_integer_, dim = dim( t2_intst ) )
   mean1 <- mean( t2_mix[ clst == 1 ] )
   mean2 <- mean( t2_mix[ clst == 2 ] )
   if( mean1 > mean2 ) {
@@ -186,7 +186,7 @@ splitFthr <- function( post_seg, t2_data ) {
     m <- c( mean1, mean2 )
   }
   label[ post_mix_idx ] <- clst
-  res <- list( label = label, intst = t2_data$intst, 
+  res <- list( label = label, intst = t2_intst, 
                m = m )
   return( res )
 }

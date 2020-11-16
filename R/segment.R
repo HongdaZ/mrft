@@ -10,7 +10,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                              fthr = c( 0, 0, 8, 0 ) ),
                      gamma = list( t1ce = 0.8,
                                    flair = 0.8,
-                                   t2 = 0.8,
+                                   t2 = 1,
                                    fthr = 0.8 ),
                      ## #of healthy tissue types controlled by alpha
                      alpha = list( t1ce = rep( 10, 4 ),
@@ -149,30 +149,6 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   t2_image[ t2_image <= -4 ] <- 4L
   t2_image[ t2_image == -1 ] <- 1L
   t2_image[ t2_image == -2 ] <- 2L
-  ## Initialize data for postprocessing
-  post_data <- initPost( t1ce_image, flair_image, t2_image )
-  # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
-  post_seg <- postProcess( post_data, min_enh, max_prop_enh_enc,
-                           min_tumor, spread, 
-                           min_prop_tumor_nbr )
-  # sink()
-  if( post_seg$code != 0 ) {
-    ## Furtherly segment edema
-    further_data <- splitFthr( post_seg, t2_data )
-    m <- further_data$m
-    further_model <-initFther( further_data$label, further_data$intst )
-    further_seg <- estF( further_model, delta$fthr, gamma$fthr,
-                         alpha$fthr, beta$fthr, lambda2$fthr,
-                         m, nu2$fthr, maxit$fthr )
-    m <- further_seg$parm[ 2, ]
-    sigma2 <- further_seg$parm[ 3, ]
-    if( ( m[ 2 ] - m[ 1 ] ) /  delta$fthr[ 3 ] > sqrt( sigma2[ 2 ] ) ) {
-      edema_idx <- post_seg$image == 2
-      edema_idx[ is.na( edema_idx ) ] <- FALSE
-      post_seg$image[ edema_idx ] <- further_seg$image[ edema_idx ]
-    }
-  }
-  # return( post_seg )
   ## Export the results to .nii images
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
@@ -185,10 +161,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   out_t2 <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
   writeNIfTI( nifti( t2_image, datatype = 2 ),
               filename = out_t2, gzipped = TRUE )
-  post_seg$image[ is.na( post_seg$image ) ] <- 0
-  out_post <- gsub( "_flair.nii.gz", "_post_seg", outfile )
-  writeNIfTI( nifti( post_seg$image, datatype = 2 ),
-              filename = out_post, gzipped = TRUE )
+  
   ## Export normalized images
   t1ce_intst <- t1ce_data$intst
   out_t1ce <- gsub( "_flair.nii.gz", "_t1ce_norm", outfile )
