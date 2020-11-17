@@ -221,7 +221,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh, SEXP max_prop_enh_enc,
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
-  // 10-7.1: FLAIR( 4 ) || T2( 4 ) || T1ce( 2 )
+  // 10-7.1: FLAIR( 4 ) || T2( 4 )
   // inside tumor >> edema 
   // Wrap up the segmentation result
   // Now edema only includes edema

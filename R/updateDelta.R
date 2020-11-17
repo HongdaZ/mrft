@@ -11,14 +11,14 @@ updateDelta3T2 <- function( prop_bright,
   tumor <- tumor[ ! is.na( tumor ) ]
   x <- kmeans( tumor, 9 )$centers
   y <- order( x )
-  m <- x[ y ][ 2 ]
+  m <- x[ y ][ 3 ]
   ## t2_seg from est
   sigma2_2 <- t2_seg$parm[ 3, 2 ]  
   m_2 <- t2_seg$parm[ 2, 2 ]
   
   delta_3 <- ( m - m_2 ) / sqrt( sigma2_2 )
-  if( delta_3 > 8 ) {
-    delta_3 <- 8  
+  if( delta_3 > 12.5 ) {
+    delta_3 <- 12.5  
   }
   return( delta_3 )
 }
