@@ -5,7 +5,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      ## Always four numbers for delta
                      delta = 
                        list( t1ce = c( -3, -1, 7, 7 ),
-                             flair = c( 1, 0, 8, 8 ),
+                             flair = c( 1, 0, NA_real_, NA_real_ ),
                              t2 = c( 6, 0, NA_real_, NA_real_ ),
                              fthr = c( 0, 0, 8, 0 ) ),
                      gamma = list( t1ce = 0.9,
@@ -108,6 +108,12 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                       lambda2$flair[ 1 : 3 ],
                       m, nu2$flair, 40L )
     flair_res <- flair_seg$parm[ c( 2, 3 ), 3 ]
+    ## update delta
+    if( is.na( delta$flair[ 3 ] ) ) {
+      delta$flair[ c( 3, 4 ) ] <- delta$flair[ 2 ] +
+        updateDelta3Flair( t1ce_image, flair_data, flair_seg ) 
+      
+    }
     flair_delta <- delta$flair
     ## update beta
     sigma2 <- flair_seg$parm[ 3, ]
@@ -166,7 +172,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     ## update delta
     if( is.na( delta$t2[ 3 ] ) ) {
       delta$t2[ c( 3, 4 ) ] <- delta$t2[ 1 ] - 5 + 
-        updateDelta3( prop_bright,
+        updateDelta3T2( prop_bright,
                       t1ce_image, flair_image,
                       t2_data, t2_seg ) 
       

@@ -3,7 +3,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   ## Always four numbers for delta
                   delta = 
                     list( t1ce = c( -3, -1, 7, 7 ),
-                          flair = c( 1, 0, 8, 8 ),
+                          flair = c( 1, 0, NA_real_, NA_real_ ),
                           t2 = c( 6, 0, NA_real_, NA_real_ ),
                           fthr = c( 0, 0, 8, 0 ) ),
                   gamma = list( t1ce = 0.9,
