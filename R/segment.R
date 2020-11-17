@@ -4,13 +4,13 @@
 segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      ## Always four numbers for delta
                      delta = 
-                       list( t1ce = c( -3, -2, 6, 6 ),
+                       list( t1ce = c( 0, 1, 9, 9 ),
                              flair = c( 0, 0, 8, 8 ),
                              t2 = c( 6, 0, NA_real_, NA_real_ ),
                              fthr = c( 0, 0, 8, 0 ) ),
                      gamma = list( t1ce = 0.8,
                                    flair = 0.8,
-                                   t2 = 1,
+                                   t2 = 0.6,
                                    fthr = 0.8 ),
                      ## #of healthy tissue types controlled by alpha
                      alpha = list( t1ce = rep( 10, 4 ),
@@ -32,152 +32,167 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                                  fthr = rep( .25, 2 ) ),
                      maxit = 
                        list( t1ce = 10L, flair = 1L,
-                             t2 = 1L, fthr = 40L ),
-                     min_enh = 2000L,
-                     max_prop_enh_enc = .1,
-                     min_tumor = 20000L,
-                     spread = 4, 
-                     min_prop_tumor_nbr = 0.6 ) {
-  res <- matrix( nrow = 2, ncol = 3 )
-  row.names( res ) <- c( "m", "sigma2" )
-  colnames( res ) <- c( "t1ce", "flair", "t2" )
+                             t2 = 1L, fthr = 40L ) ) {
   images <- readImage( patient )
-  ## split t1ce images to CSF & necrosis, grey matter and white matter
-  t1ce_data <- splitT1ce3( images$t1ce, images$flair )
-  m <- t1ce_data$m
-  t1ce_model <- initEst( t1ce_data$label, t1ce_data$t1ce )
-  ## estimate parameters of t2 images without tumor and CSF & necrosis
-  t1ce_seg <- est( t1ce_model, delta$t1ce, gamma$t1ce,
-                    alpha$t1ce[ 1 : 3 ], beta$t1ce[ 1 : 3 ], 
-                    lambda2$t1ce[ 1 : 3 ], 
-                    m, nu2$t1ce, 40L )
-  res[ , 1 ] <- t1ce_seg$parm[ c( 2, 3 ), 3 ]
-  ## update beta
-  sigma2 <- t1ce_seg$parm[ 3, ]
-  beta$t1ce[ 1 : 3 ] <- ( alpha$t1ce[ 1 : 3 ] + 1 ) * ( sigma2 )
-  t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, delta$t1ce[ 3 ] )
-  ## update m
-  m <- t1ce_data$m
-  b <- getB( m, a )
-  t1ce_model <- initEst( t1ce_data$label, t1ce_data$intst )
-  t1ce_seg <- pred( t1ce_model, delta$t1ce, 
-                     gamma$t1ce, alpha$t1ce, beta$t1ce, 
-                     lambda2$t1ce, a, b, m, nu2$t1ce, maxit$t1ce )
-  ## Both tumor and outliers are regarded as tumor
-  t1ce_seg$image[ t1ce_seg$image < -3 | t1ce_seg$image > 0 ] <- -4L
-  
-  ## split flair images to CSF & necrosis, white matter 
-  ## and grey matter
-  flair_data <- splitFlair3( images$flair, t1ce_seg )
-  m <- flair_data$m
-  flair_model <- initEst( flair_data$label, flair_data$flair )
-  ## estimate parameters of t1ce or FLAIR images without tumor
-  flair_seg <- est( flair_model, delta$flair, gamma$flair, 
-                     alpha$flair[ 1 : 3 ], beta$flair[ 1 : 3 ], 
-                     lambda2$flair[ 1 : 3 ],
-                     m, nu2$flair, 40L )
-  res[ , 2 ] <- flair_seg$parm[ c( 2, 3 ), 3 ]
-  ## update beta
-  sigma2 <- flair_seg$parm[ 3, ]
-  beta$flair[ 1 : 3 ] <- ( alpha$flair[ 1 : 3 ] + 1 ) * ( sigma2 )
-  flair_data <- split4( flair_data$flair, flair_seg, delta$flair[ 3 ] )
-  ## update m
-  m <- flair_data$m
-  b <- getB( m, a )
-  flair_model <- initEst( flair_data$label, flair_data$intst )
-  flair_seg <- pred( flair_model, delta$flair,
-                      gamma$flair, alpha$flair, beta$flair,
-                      lambda2$flair, a, b, m, nu2$flair, 
-                      maxit$flair )
-  ## Both tumor and outliers are regarded as tumor
-  flair_seg$image[ flair_seg$image < -3 |
-                     flair_seg$image > 0 ] <- -4L
-  
-  ## split t2 to grey matter and white matter
-  prop_bright <- propBright( t1ce_seg, flair_seg, images$t2 )
-  t2_data <- splitT22( prop_bright, images$t2, t1ce_seg, flair_seg )
-  m <- t2_data$m
-  t2_model <- initEst( t2_data$label, t2_data$t2 )
-  ## estimate parameters of t2 images without tumor 
-  ## and CSF & necrosis
-  # sink( '/home/hzhang/Documents/t2_output.txt' )
-  t2_seg <- est( t2_model, delta$t2, gamma$t2, 
-                 alpha$t2[ 1 : 2 ], beta$t2[ 1 : 2 ], 
-                 lambda2$t2[ 1 : 2 ],
-                 m, nu2$t2, 40L )
-  res[ , 3 ] <- t2_seg$parm[ c( 2, 3 ), 2 ]
-  # sink()
-  ## update delta
-  if( is.na( delta$t2[ 3 ] ) ) {
-    delta$t2[ c( 3, 4 ) ] <- delta$t2[ 1 ] - 5.5 + 
-      updateDelta3( prop_bright,
-                    t1ce_seg, flair_seg,
-                    t2_data, t2_seg ) 
-                                           
-  }
-  ## update beta
-  sigma2 <- t2_seg$parm[ 3, ]
-  beta$t2[ 1 : 2 ] <- ( alpha$t2[ 1 : 2 ] + 1 ) * sigma2
-  t2_data <- split3( t2_data$t2, t2_seg, delta$t2[ 3 ] )
-  ## update m
-  m <- t2_data$m
-  b <- getB( m, a )
-  t2_model <- initEst( t2_data$label, t2_data$intst )
-  t2_seg <- pred( t2_model, delta$t2, gamma$t2, alpha$t2, beta$t2,
-          lambda2$t2, a, b, m, nu2$t2, maxit$t2 )
-  ## Get the initial results
-  ## t1ce
-  t1ce_image <- t1ce_seg$image
-  t1ce_image[ is.na( t1ce_image ) ] <- 0L
-  t1ce_image[ t1ce_image >= 1 ] <- 4L
-  t1ce_image[ t1ce_image <= -4 ] <- 4L
-  t1ce_image[ t1ce_image == -1 ] <- 1L
-  t1ce_image[ t1ce_image == -2 ] <- 2L
-  t1ce_image[ t1ce_image == -3 ] <- 3L
-  ## flair
-  flair_image <- flair_seg$image
-  flair_image[ is.na( flair_image ) ] <- 0L
-  flair_image[ flair_image >= 1 ] <- 4L
-  flair_image[ flair_image <= -4 ] <- 4L
-  flair_image[ flair_image == -1 ] <- 1L
-  flair_image[ flair_image == -2 ] <- 2L
-  flair_image[ flair_image == -3 ] <- 3L
-  ## t2
-  t2_image <- t2_seg$image
-  t2_image[ is.na( t2_image ) ] <- 0L
-  t2_image[ t2_image >= 1 ] <- 4L
-  t2_image[ t2_image <= -4 ] <- 4L
-  t2_image[ t2_image == -1 ] <- 1L
-  t2_image[ t2_image == -2 ] <- 2L
-  ## Export the results to .nii images
+  ## Output files
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
-  out_t1ce <- gsub( "_flair.nii.gz", "_t1ce_seg", outfile )
-  writeNIfTI( nifti( t1ce_image, datatype = 2 ),
-              filename = out_t1ce, gzipped = TRUE )
-  out_flair <- gsub( "_flair.nii.gz", "_flair_seg", outfile )
-  writeNIfTI( nifti( flair_image, datatype = 2 ),
-              filename = out_flair, gzipped = TRUE )
-  out_t2 <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
-  writeNIfTI( nifti( t2_image, datatype = 2 ),
-              filename = out_t2, gzipped = TRUE )
   
-  ## Export normalized images
-  t1ce_intst <- t1ce_data$intst
-  out_t1ce <- gsub( "_flair.nii.gz", "_t1ce_norm", outfile )
-  writeNIfTI( nifti( t1ce_intst, datatype = 64 ) ,
-              out_t1ce,
-              gzipped = T )
-  flair_intst <- flair_data$intst
-  out_flair <- gsub( "_flair.nii.gz", "_flair_norm", outfile )
-  writeNIfTI( nifti( flair_intst, datatype = 64 ) ,
-              out_flair,
-              gzipped = T )
-  t2_intst <- t2_data$intst
-  out_t2 <- gsub( "_flair.nii.gz", "_t2_norm", outfile )
-  writeNIfTI( nifti( t2_intst, datatype = 64 ) ,
-              out_t2,
-              gzipped = T )
-  data_file <- gsub( "_flair.nii.gz", ".RData", outfile )
-  save( res, delta, file = data_file )
+  out_t1ce_seg <- gsub( "_flair.nii.gz", "_t1ce_seg", outfile )
+  out_t1ce_norm <- gsub( "_flair.nii.gz", "_t1ce_norm", outfile )
+  out_t1ce_data <- gsub( "_flair.nii.gz", "_t1ce.RData", outfile )
+  if( file.exists( out_t1ce_seg ) & 
+      file.exists( out_t1ce_norm ) &
+      file.exists( out_t1ce_data ) ) {
+    t1ce_image <-  readNIfTI( out_t1ce, reorient = FALSE )@.Data
+  } else {
+    ## split t1ce images to CSF & necrosis, grey matter and white matter
+    t1ce_data <- splitT1ce3( images$t1ce, images$flair )
+    m <- t1ce_data$m
+    t1ce_model <- initEst( t1ce_data$label, t1ce_data$t1ce )
+    ## estimate parameters of t2 images without tumor and CSF & necrosis
+    t1ce_seg <- est( t1ce_model, delta$t1ce, gamma$t1ce,
+                     alpha$t1ce[ 1 : 3 ], beta$t1ce[ 1 : 3 ], 
+                     lambda2$t1ce[ 1 : 3 ], 
+                     m, nu2$t1ce, 40L )
+    t1ce_res <- t1ce_seg$parm[ c( 2, 3 ), 3 ]
+    t1ce_delta <- delta$t1ce
+    ## update beta
+    sigma2 <- t1ce_seg$parm[ 3, ]
+    beta$t1ce[ 1 : 3 ] <- ( alpha$t1ce[ 1 : 3 ] + 1 ) * ( sigma2 )
+    t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, delta$t1ce[ 3 ] )
+    ## update m
+    m <- t1ce_data$m
+    b <- getB( m, a )
+    t1ce_model <- initEst( t1ce_data$label, t1ce_data$intst )
+    t1ce_seg <- pred( t1ce_model, delta$t1ce, 
+                      gamma$t1ce, alpha$t1ce, beta$t1ce, 
+                      lambda2$t1ce, a, b, m, nu2$t1ce, maxit$t1ce )
+    ## t1ce
+    t1ce_image <- t1ce_seg$image
+    t1ce_image[ is.na( t1ce_image ) ] <- 0L
+    t1ce_image[ t1ce_image >= 1 ] <- 4L
+    t1ce_image[ t1ce_image <= -4 ] <- 4L
+    t1ce_image[ t1ce_image == -1 ] <- 1L
+    t1ce_image[ t1ce_image == -2 ] <- 2L
+    t1ce_image[ t1ce_image == -3 ] <- 3L
+    ## Get the initial results
+    writeNIfTI( nifti( t1ce_image, datatype = 2 ),
+                filename = out_t1ce_seg, gzipped = TRUE )
+    ## Export normalized images
+    t1ce_intst <- t1ce_data$intst
+    writeNIfTI( nifti( t1ce_intst, datatype = 64 ) ,
+                out_t1ce_norm,
+                gzipped = T )
+    save( t1ce_res, t1ce_delta, file = out_t1ce_data )
+  }
+  
+  out_flair_seg <- gsub( "_flair.nii.gz", "_flair_seg", outfile )
+  out_flair_norm <- gsub( "_flair.nii.gz", "_flair_norm", outfile )
+  out_flair_data <- gsub( "_flair.nii.gz", "_flair.RData", outfile )
+  if( file.exists( out_flair_seg ) & 
+      file.exists( out_flair_norm ) &
+      file.exists( out_flair_data ) ) {
+    flair_image <-  readNIfTI( out_flair, reorient = FALSE )@.Data
+  } else {
+    ## split flair images to CSF & necrosis, white matter 
+    ## and grey matter
+    flair_data <- splitFlair3( images$flair, t1ce_image )
+    m <- flair_data$m
+    flair_model <- initEst( flair_data$label, flair_data$flair )
+    ## estimate parameters of t1ce or FLAIR images without tumor
+    flair_seg <- est( flair_model, delta$flair, gamma$flair, 
+                      alpha$flair[ 1 : 3 ], beta$flair[ 1 : 3 ], 
+                      lambda2$flair[ 1 : 3 ],
+                      m, nu2$flair, 40L )
+    flair_res <- flair_seg$parm[ c( 2, 3 ), 3 ]
+    flair_delta <- delta$flair
+    ## update beta
+    sigma2 <- flair_seg$parm[ 3, ]
+    beta$flair[ 1 : 3 ] <- ( alpha$flair[ 1 : 3 ] + 1 ) * ( sigma2 )
+    flair_data <- split4( flair_data$flair, flair_seg, delta$flair[ 3 ] )
+    ## update m
+    m <- flair_data$m
+    b <- getB( m, a )
+    flair_model <- initEst( flair_data$label, flair_data$intst )
+    flair_seg <- pred( flair_model, delta$flair,
+                       gamma$flair, alpha$flair, beta$flair,
+                       lambda2$flair, a, b, m, nu2$flair, 
+                       maxit$flair )
+    ## flair
+    flair_image <- flair_seg$image
+    flair_image[ is.na( flair_image ) ] <- 0L
+    flair_image[ flair_image >= 1 ] <- 4L
+    flair_image[ flair_image <= -4 ] <- 4L
+    flair_image[ flair_image == -1 ] <- 1L
+    flair_image[ flair_image == -2 ] <- 2L
+    flair_image[ flair_image == -3 ] <- 3L
+    ## Get the initial results
+    writeNIfTI( nifti( flair_image, datatype = 2 ),
+                filename = out_flair_seg, gzipped = TRUE )
+    ## Export normalized images
+    flair_intst <- flair_data$intst
+    writeNIfTI( nifti( flair_intst, datatype = 64 ) ,
+                out_flair_norm,
+                gzipped = T )
+    save( flair_res, flair_delta, file = out_flair_data )
+    
+  }
+  
+  out_t2_seg <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
+  out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm", outfile )
+  out_t2_data <- gsub( "_flair.nii.gz", "_t2.RData", outfile )
+  if( ! ( file.exists( out_t2_seg ) & 
+      file.exists( out_t2_norm ) &
+      file.exists( out_t2_data ) ) ) {
+    ## split t2 to grey matter and white matter
+    prop_bright <- propBright( t1ce_image, flair_image, images$t2 )
+    t2_data <- splitT22( prop_bright, images$t2, t1ce_image, flair_image )
+    m <- t2_data$m
+    t2_model <- initEst( t2_data$label, t2_data$t2 )
+    ## estimate parameters of t2 images without tumor 
+    ## and CSF & necrosis
+    # sink( '/home/hzhang/Documents/t2_output.txt' )
+    t2_seg <- est( t2_model, delta$t2, gamma$t2, 
+                   alpha$t2[ 1 : 2 ], beta$t2[ 1 : 2 ], 
+                   lambda2$t2[ 1 : 2 ],
+                   m, nu2$t2, 40L )
+    t2_res <- t2_seg$parm[ c( 2, 3 ), 2 ]
+    # sink()
+    ## update delta
+    if( is.na( delta$t2[ 3 ] ) ) {
+      delta$t2[ c( 3, 4 ) ] <- delta$t2[ 1 ] - 5 + 
+        updateDelta3( prop_bright,
+                      t1ce_seg, flair_seg,
+                      t2_data, t2_seg ) 
+      
+    }
+    t2_delta <- delta$t2
+    ## update beta
+    sigma2 <- t2_seg$parm[ 3, ]
+    beta$t2[ 1 : 2 ] <- ( alpha$t2[ 1 : 2 ] + 1 ) * sigma2
+    t2_data <- split3( t2_data$t2, t2_seg, delta$t2[ 3 ] )
+    ## update m
+    m <- t2_data$m
+    b <- getB( m, a )
+    t2_model <- initEst( t2_data$label, t2_data$intst )
+    t2_seg <- pred( t2_model, delta$t2, gamma$t2, alpha$t2, beta$t2,
+                    lambda2$t2, a, b, m, nu2$t2, maxit$t2 )
+    ## t2
+    t2_image <- t2_seg$image
+    t2_image[ is.na( t2_image ) ] <- 0L
+    t2_image[ t2_image >= 1 ] <- 4L
+    t2_image[ t2_image <= -4 ] <- 4L
+    t2_image[ t2_image == -1 ] <- 1L
+    t2_image[ t2_image == -2 ] <- 2L
+    ## Get the initial results
+    writeNIfTI( nifti( t2_image, datatype = 2 ),
+                filename = out_t2_seg, gzipped = TRUE )
+    ## Export normalized images
+    t2_intst <- t2_data$intst
+    writeNIfTI( nifti( t2_intst, datatype = 64 ) ,
+                out_t2_norm,
+                gzipped = T )
+    save( t2_res, t2_delta, file = out_t2_data )
+  }
 }

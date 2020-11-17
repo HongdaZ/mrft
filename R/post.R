@@ -1,14 +1,14 @@
 # postprocessing after segmentation
-function( patient, out = "SEG", infolder = "N4ITK433Z",
+post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           ## Always four numbers for delta
           delta = 
-            list( t1ce = c( -3, -2, 6, 6 ),
+            list( t1ce = c( 0, 1, 9, 9 ),
                   flair = c( 0, 0, 8, 8 ),
                   t2 = c( 6, 0, NA_real_, NA_real_ ),
                   fthr = c( 0, 0, 8, 0 ) ),
           gamma = list( t1ce = 0.8,
                         flair = 0.8,
-                        t2 = 1,
+                        t2 = 0.6,
                         fthr = 0.8 ),
           ## #of healthy tissue types controlled by alpha
           alpha = list( t1ce = rep( 10, 4 ),
@@ -39,12 +39,12 @@ function( patient, out = "SEG", infolder = "N4ITK433Z",
   ## Read segmentation results
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
-  out_t1ce <- gsub( "_flair.nii.gz", "_t1ce_seg", outfile )
-  t1ce_image <- readNIfTI( out_t1ce, reorient = FALSE )@.Data
-  out_flair <- gsub( "_flair.nii.gz", "_flair_seg", outfile )
-  flair_image <- readNIfTI( out_flair, reorient = FALSE )@.Data
-  out_t2 <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
-  t2_image <- readNIfTI( out_t2, reorient = FALSE )@.Data
+  out_t1ce_seg <- gsub( "_flair.nii.gz", "_t1ce_seg", outfile )
+  t1ce_image <- readNIfTI( out_t1ce_seg, reorient = FALSE )@.Data
+  out_flair_seg <- gsub( "_flair.nii.gz", "_flair_seg", outfile )
+  flair_image <- readNIfTI( out_flair_seg, reorient = FALSE )@.Data
+  out_t2_seg <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
+  t2_image <- readNIfTI( out_t2_seg, reorient = FALSE )@.Data
   ## Initialize data for postprocessing
   post_data <- initPost( t1ce_image, flair_image, t2_image )
   # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
@@ -53,8 +53,8 @@ function( patient, out = "SEG", infolder = "N4ITK433Z",
                            min_prop_tumor_nbr )
   # sink()
   if( post_seg$code != 0 ) {
-    out_t2_intst <- gsub( "_flair.nii.gz", "_t2_norm", outfile )
-    t2_intst <- readNIfTI( out_t2_intst, reorient = FALSE )@.Data
+    out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm", outfile )
+    t2_intst <- readNIfTI( out_t2_norm, reorient = FALSE )@.Data
     ## Furtherly segment edema
     further_data <- splitFthr( post_seg, t2_intst )
     m <- further_data$m
@@ -73,7 +73,7 @@ function( patient, out = "SEG", infolder = "N4ITK433Z",
   # return( post_seg )
   ## Export the results to .nii images
   post_seg$image[ is.na( post_seg$image ) ] <- 0
-  out_post <- gsub( "_flair.nii.gz", "_post_seg", outfile )
+  out_post_seg <- gsub( "_flair.nii.gz", "_post_seg", outfile )
   writeNIfTI( nifti( post_seg$image, datatype = 2 ),
-              filename = out_post, gzipped = TRUE )
+              filename = out_post_seg, gzipped = TRUE )
 }
