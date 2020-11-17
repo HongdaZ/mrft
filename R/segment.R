@@ -4,14 +4,14 @@
 segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      ## Always four numbers for delta
                      delta = 
-                       list( t1ce = c( -2, -1, 7, 7 ),
-                             flair = c( 0, 0, 8, 8 ),
+                       list( t1ce = c( -3, -1, 7, 7 ),
+                             flair = c( 0, 0, 7, 7 ),
                              t2 = c( 6, 0, NA_real_, NA_real_ ),
                              fthr = c( 0, 0, 8, 0 ) ),
-                     gamma = list( t1ce = 0.8,
-                                   flair = 0.8,
+                     gamma = list( t1ce = 0.6,
+                                   flair = 0.6,
                                    t2 = 0.6,
-                                   fthr = 0.8 ),
+                                   fthr = 0.6 ),
                      ## #of healthy tissue types controlled by alpha
                      alpha = list( t1ce = rep( 10, 4 ),
                                    flair = rep( 10, 4 ),
