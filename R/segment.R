@@ -38,13 +38,13 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
   
-  out_t1ce_seg <- gsub( "_flair.nii.gz", "_t1ce_seg", outfile )
-  out_t1ce_norm <- gsub( "_flair.nii.gz", "_t1ce_norm", outfile )
+  out_t1ce_seg <- gsub( "_flair.nii.gz", "_t1ce_seg.nii.gz", outfile )
+  out_t1ce_norm <- gsub( "_flair.nii.gz", "_t1ce_norm.nii.gz", outfile )
   out_t1ce_data <- gsub( "_flair.nii.gz", "_t1ce.RData", outfile )
-  if( file.exists( paste( out_t1ce_seg, ".nii.gz", sep = "" ) ) & 
-      file.exists( paste( out_t1ce_norm, ".nii.gz", sep = "" ) ) &
+  if( file.exists( out_t1ce_seg ) & 
+      file.exists( out_t1ce_norm ) &
       file.exists( out_t1ce_data ) ) {
-    t1ce_image <-  readNIfTI( out_t1ce, reorient = FALSE )@.Data
+    t1ce_image <-  readNIfTI( out_t1ce_seg, reorient = FALSE )@.Data
   } else {
     ## split t1ce images to CSF & necrosis, grey matter and white matter
     t1ce_data <- splitT1ce3( images$t1ce, images$flair )
@@ -77,23 +77,25 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     t1ce_image[ t1ce_image == -2 ] <- 2L
     t1ce_image[ t1ce_image == -3 ] <- 3L
     ## Get the initial results
+    out_t1ce_seg <- gsub( ".nii.gz", "", out_t1ce_seg )
     writeNIfTI( nifti( t1ce_image, datatype = 2 ),
                 filename = out_t1ce_seg, gzipped = TRUE )
     ## Export normalized images
     t1ce_intst <- t1ce_data$intst
+    out_t1ce_norm <- gsub( ".nii.gz", "", out_t1ce_norm )
     writeNIfTI( nifti( t1ce_intst, datatype = 64 ) ,
                 out_t1ce_norm,
                 gzipped = T )
     save( t1ce_res, t1ce_delta, file = out_t1ce_data )
   }
   
-  out_flair_seg <- gsub( "_flair.nii.gz", "_flair_seg", outfile )
-  out_flair_norm <- gsub( "_flair.nii.gz", "_flair_norm", outfile )
+  out_flair_seg <- gsub( "_flair.nii.gz", "_flair_seg.nii.gz", outfile )
+  out_flair_norm <- gsub( "_flair.nii.gz", "_flair_norm.nii.gz", outfile )
   out_flair_data <- gsub( "_flair.nii.gz", "_flair.RData", outfile )
-  if( file.exists( paste( out_flair_seg, ".nii.gz", sep = "" ) ) & 
-      file.exists( paste( out_flair_norm, ".nii.gz", sep = "" ) ) &
+  if( file.exists( out_flair_seg ) & 
+      file.exists( out_flair_norm ) &
       file.exists( out_flair_data ) ) {
-    flair_image <-  readNIfTI( out_flair, reorient = FALSE )@.Data
+    flair_image <-  readNIfTI( out_flair_seg, reorient = FALSE )@.Data
   } else {
     ## split flair images to CSF & necrosis, white matter 
     ## and grey matter
@@ -128,10 +130,12 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     flair_image[ flair_image == -2 ] <- 2L
     flair_image[ flair_image == -3 ] <- 3L
     ## Get the initial results
+    out_flair_seg <- gsub( ".nii.gz", "", out_flair_seg )
     writeNIfTI( nifti( flair_image, datatype = 2 ),
                 filename = out_flair_seg, gzipped = TRUE )
     ## Export normalized images
     flair_intst <- flair_data$intst
+    out_flair_norm <- gsub( ".nii.gz", "", out_flair_norm )
     writeNIfTI( nifti( flair_intst, datatype = 64 ) ,
                 out_flair_norm,
                 gzipped = T )
@@ -139,11 +143,11 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     
   }
   
-  out_t2_seg <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
-  out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm", outfile )
+  out_t2_seg <- gsub( "_flair.nii.gz", "_t2_seg.nii.gz", outfile )
+  out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm.nii.gz", outfile )
   out_t2_data <- gsub( "_flair.nii.gz", "_t2.RData", outfile )
-  if( ! ( file.exists( paste( out_t2_seg, ".nii.gz", sep = "" ) ) & 
-          file.exists( paste( out_t2_norm, ".nii.gz", sep = "" ) ) &
+  if( ! ( file.exists( out_t2_seg ) & 
+          file.exists( out_t2_norm ) &
           file.exists( out_t2_data ) ) ) {
     ## split t2 to grey matter and white matter
     prop_bright <- propBright( t1ce_image, flair_image, images$t2 )
@@ -186,10 +190,12 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     t2_image[ t2_image == -1 ] <- 1L
     t2_image[ t2_image == -2 ] <- 2L
     ## Get the initial results
+    out_t2_seg <- gsub( ".nii.gz", "", out_t2_seg )
     writeNIfTI( nifti( t2_image, datatype = 2 ),
                 filename = out_t2_seg, gzipped = TRUE )
     ## Export normalized images
     t2_intst <- t2_data$intst
+    out_t2_norm <- gsub( ".nii.gz", "", out_t2_norm )
     writeNIfTI( nifti( t2_intst, datatype = 64 ) ,
                 out_t2_norm,
                 gzipped = T )
