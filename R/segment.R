@@ -163,7 +163,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     if( is.na( delta$t2[ 3 ] ) ) {
       delta$t2[ c( 3, 4 ) ] <- delta$t2[ 1 ] - 5 + 
         updateDelta3( prop_bright,
-                      t1ce_seg, flair_seg,
+                      t1ce_image, flair_image,
                       t2_data, t2_seg ) 
       
     }
