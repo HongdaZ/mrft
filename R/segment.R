@@ -41,8 +41,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   out_t1ce_seg <- gsub( "_flair.nii.gz", "_t1ce_seg", outfile )
   out_t1ce_norm <- gsub( "_flair.nii.gz", "_t1ce_norm", outfile )
   out_t1ce_data <- gsub( "_flair.nii.gz", "_t1ce.RData", outfile )
-  if( file.exists( out_t1ce_seg ) & 
-      file.exists( out_t1ce_norm ) &
+  if( file.exists( paste( out_t1ce_seg, ".nii.gz", sep = "" ) ) & 
+      file.exists( paste( out_t1ce_norm, ".nii.gz", sep = "" ) ) &
       file.exists( out_t1ce_data ) ) {
     t1ce_image <-  readNIfTI( out_t1ce, reorient = FALSE )@.Data
   } else {
@@ -90,8 +90,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   out_flair_seg <- gsub( "_flair.nii.gz", "_flair_seg", outfile )
   out_flair_norm <- gsub( "_flair.nii.gz", "_flair_norm", outfile )
   out_flair_data <- gsub( "_flair.nii.gz", "_flair.RData", outfile )
-  if( file.exists( out_flair_seg ) & 
-      file.exists( out_flair_norm ) &
+  if( file.exists( paste( out_flair_seg, ".nii.gz", sep = "" ) ) & 
+      file.exists( paste( out_flair_norm, ".nii.gz", sep = "" ) ) &
       file.exists( out_flair_data ) ) {
     flair_image <-  readNIfTI( out_flair, reorient = FALSE )@.Data
   } else {
@@ -142,9 +142,9 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   out_t2_seg <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
   out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm", outfile )
   out_t2_data <- gsub( "_flair.nii.gz", "_t2.RData", outfile )
-  if( ! ( file.exists( out_t2_seg ) & 
-      file.exists( out_t2_norm ) &
-      file.exists( out_t2_data ) ) ) {
+  if( ! ( file.exists( paste( out_t2_seg, ".nii.gz", sep = "" ) ) & 
+          file.exists( paste( out_t2_norm, ".nii.gz", sep = "" ) ) &
+          file.exists( out_t2_data ) ) ) {
     ## split t2 to grey matter and white matter
     prop_bright <- propBright( t1ce_image, flair_image, images$t2 )
     t2_data <- splitT22( prop_bright, images$t2, t1ce_image, flair_image )
