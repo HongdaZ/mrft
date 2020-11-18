@@ -2,7 +2,7 @@
 post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           ## Always four numbers for delta
           delta = 
-            list( t1ce = c( -3, -1, 7, 7 ),
+            list( t1ce = c( -2, -1, 7, 7 ),
                   flair = c( 1, 0, NA_real_, NA_real_ ),
                   t2 = c( 2, 0, NA_real_, NA_real_ ),
                   fthr = c( 0, 0, 8, 0 ) ),
@@ -32,9 +32,11 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
             list( t1ce = 10L, flair = 1L,
                   t2 = 1L, fthr = 40L ),
           min_enh = 2000L,
+          min_enh_enc = 1000L,
           max_prop_enh_enc = .1,
           min_tumor = 20000L,
-          spread = 4, 
+          spread_add = 2,
+          spread_rm = 3,
           min_prop_tumor_nbr = 0.6 ) {
   ## Read segmentation results
   infile <- patient[ 1 ]
@@ -48,8 +50,9 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   ## Initialize data for postprocessing
   post_data <- initPost( t1ce_image, flair_image, t2_image )
   # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
-  post_seg <- postProcess( post_data, min_enh, max_prop_enh_enc,
-                           min_tumor, spread, 
+  post_seg <- postProcess( post_data, min_enh, min_enh_enc,
+                           max_prop_enh_enc,
+                           min_tumor, spread_add, spread_rm, 
                            min_prop_tumor_nbr )
   # sink()
   if( post_seg$code != 0 ) {

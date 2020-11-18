@@ -2,11 +2,11 @@
 mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   ## Always four numbers for delta
                   delta = 
-                    list( t1ce = c( -3, -1, 7, 7 ),
+                    list( t1ce = c( -2, -1, 7, 7 ),
                           flair = c( 1, 0, NA_real_, NA_real_ ),
                           t2 = c( 2, 0, NA_real_, NA_real_ ),
                           fthr = c( 0, 0, 8, 0 ) ),
-                  gamma = list( t1ce = 0.9,
+                  gamma = list( t1ce = 1,
                                 flair = 0.8,
                                 t2 = 0.2,
                                 fthr = 1 ),
@@ -32,14 +32,16 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                     list( t1ce = 10L, flair = 1L,
                           t2 = 1L, fthr = 40L ),
                   min_enh = 2000L,
+                  min_enh_enc = 1000L,
                   max_prop_enh_enc = .1,
                   min_tumor = 20000L,
-                  spread = 4, 
+                  spread_add = 2,
+                  spread_rm = 3,
                   min_prop_tumor_nbr = 0.6 ) {
   segment( patient, out, infolder, delta, gamma, alpha,
            beta, lambda2, a, nu2, maxit )
   post( patient, out, infolder, delta, gamma, alpha,
         beta, lambda2, a, nu2, maxit, 
-        min_enh, max_prop_enh_enc, 
-        min_tumor, spread, min_prop_tumor_nbr )
+        min_enh, min_enh_enc, max_prop_enh_enc, 
+        min_tumor, spread_add, spread_rm, min_prop_tumor_nbr )
 }
