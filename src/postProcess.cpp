@@ -21,6 +21,7 @@
 #include "zeroVector.h"
 #include "onRegion.h"
 #include "remove.h"
+#include "assignCSF.h"
 
 using std::vector;
 using std::list;
@@ -69,6 +70,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_res_image = INTEGER( res_image );
   int *ptr_hemorrhage = new int[ 2 * len ]();
   int *ptr_necrosis = new int[ 2 * len ]();
+  int *ptr_csf = new int[ 2 * len ]();
   int *ptr_enh = new int[ 2 * len ]();
   int *ptr_edema = new int[ 2 * len ]();
   // FLAIR(4) & T2(4) \ edema \ necrosis \ enh
@@ -384,20 +386,30 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_code[ 0 ] = 0; // HGG (no further seg)
     }
   }
-  // // 10-7.6: Add T1ce(4) inside edema
-  // inRegion( ptr_enclose_enh, len, ptr_tumor, 1,
-  //           ptr_t1ce, T1ce::T1TM,
-  //           region, ptr_nidx, ptr_aidx, nr, nc, ns );
-  // for( int i = 0; i < len; ++ i ) {
-  //   if( ptr_enclose_enh[ 2 * i ] == 1 &&
-  //       ptr_seg[ 2 * i ] == 0 ) {
-  //     ptr_tumor[ 2 * i ] = 1;
-  //     ptr_seg[ 2 * i ] = Seg::SET;
-  //     ptr_enh[ 2 * i ] = Tumor::ET;
-  //   }
-  // }
-  // wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
-  //         ptr_flair, ptr_seg, ptr_tumor ); 
+  // 10-7.6: Add T1ce(4) inside edema
+  assignCSF( ptr_csf, ptr_t1ce, ptr_flair, ptr_tumor, len );
+  zeroVector( ptr_whole, len );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_t1ce[ 2 * i ] == T1ce::T1TM &&
+        ptr_csf[ 2 * i ] == 0 ) {
+      ptr_whole[ 2 * i ] = 1;
+    } else {
+      ptr_whole[ 2 * i ] = 0;
+    }
+  }
+  inRegion( ptr_enclose_enh, len, ptr_tumor, 1,
+            ptr_whole, 1,
+            region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enclose_enh[ 2 * i ] == 1 &&
+        ptr_seg[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      ptr_seg[ 2 * i ] = Seg::SET;
+      ptr_enh[ 2 * i ] = Tumor::ET;
+    }
+  }
+  wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
+          ptr_flair, ptr_seg, ptr_tumor );
   // Restore the segmentation result to a image with the original
   // dimension
   restoreImg( ptr_idx, ptr_seg, ptr_res_image, len );
@@ -414,6 +426,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   
   delete [] ptr_hemorrhage;
   delete [] ptr_necrosis;
+  delete [] ptr_csf;
   delete [] ptr_enh;
   delete [] ptr_edema;
   delete [] ptr_extra_edema;
