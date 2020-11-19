@@ -22,6 +22,7 @@
 #include "onRegion.h"
 #include "remove.h"
 #include "assignCSF.h"
+#include "removeSmall.h"
 
 using std::vector;
 using std::list;
@@ -231,7 +232,6 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
   }
  
-  
   // 10-7.1: Remove 3D connected regions with
   // size < min_tumor or Keep the tumor regions with
   // size = max_size
@@ -272,42 +272,37 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   zeroVector( ptr_whole, len );
   // Remove 3D connected regions with
   // size < 100
+  removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
+               ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
+               100, len );
+  // 10-7.3: Extend edema in ( FLAIR( 4 ) && T1ce( 2 ) ) ||
+  //                         ( T2( 4 ) && T1ce( 2 ) ) ||
+  //                         ( FLAIR( 4 ) && T2( 4 ) && T1ce( 3 ) )
   for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
-                    1, region ) ) {
-      excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
-                   ptr_necrosis, ptr_enh, ptr_edema, 100 );
+    if(
+        ( ( ptr_flair[ 2 * i ] == Flair::FTM &&
+          ptr_t1ce[ 2 * i ] ==  T1ce::T1GM ) ||
+          ( ptr_t2[ 2 * i ] == T2::T2CSF &&
+          ptr_t1ce[ 2 * i ] ==  T1ce::T1GM ) ||
+        ( ptr_flair[ 2 * i ] == Flair::FTM &&
+          ptr_t2[ 2 * i ] == T2::T2CSF &&
+          ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) ) &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_whole[ 2 * i ] = 1;
+    } else {
+      ptr_whole[ 2 * i ] = 0;
     }
   }
-  pad2zero( ptr_tumor, len );
-  // // 10-7.3: Extend edema in ( FLAIR( 4 ) && T1ce( 2 ) ) || 
-  // //                         ( T2( 4 ) && T1ce( 2 ) ) ||
-  // //                         ( FLAIR( 4 ) && T2( 4 ) && T1ce( 3 ) ) 
-  // for( int i = 0; i < len; ++ i ) {
-  //   if(
-  //       ( ( ptr_flair[ 2 * i ] == Flair::FTM &&
-  //         ptr_t1ce[ 2 * i ] ==  T1ce::T1GM ) || 
-  //         ( ptr_t2[ 2 * i ] == T2::T2CSF &&
-  //         ptr_t1ce[ 2 * i ] ==  T1ce::T1GM ) || 
-  //       ( ptr_flair[ 2 * i ] == Flair::FTM &&
-  //         ptr_t2[ 2 * i ] == T2::T2CSF &&
-  //         ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) ) &&
-  //       ptr_tumor[ 2 * i ] == 0 ) {
-  //     ptr_whole[ 2 * i ] = 1;
-  //   } else {
-  //     ptr_whole[ 2 * i ] = 0;
-  //   }
-  // }
-  // onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
-  //           region, s_add, m_p_t_nbr,
-  //           ptr_nidx, ptr_aidx, nr, nc, ns );
-  // for( int i = 0; i < len; ++ i ) {
-  //   if( ptr_on[ 2 * i ] == 1 &&
-  //       ptr_tumor[ 2 * i ] == 0 ) {
-  //     ptr_tumor[ 2 * i ] = 1;
-  //     ptr_seg[ 2 * i ] = Seg::SED;
-  //   }
-  // }
+  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
+            region, s_add, m_p_t_nbr,
+            ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_on[ 2 * i ] == 1 &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      ptr_seg[ 2 * i ] = Seg::SED;
+    }
+  }
   // 10-7.4: code
   // 0: HGG (no further seg)
   // 1: LGG (further seg)
@@ -408,6 +403,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_enh[ 2 * i ] = Tumor::ET;
     }
   }
+  removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
+               ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
+               100, len );
   wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
           ptr_flair, ptr_seg, ptr_tumor );
   // Restore the segmentation result to a image with the original
