@@ -84,3 +84,17 @@ void excldRegion( const vector<int> &region,
     }
   }
 }
+void excldRegion( const vector<int> &region,
+                  int *ptr_enclose_ncr, const int &size ) {
+  if( region.size() < size ) {
+    return;
+  }
+  int index;
+  for( vector<int>::const_iterator it = region.begin();
+       it != region.end(); ++ it ) {
+    index = *it;
+    if( index != 0 ) {
+      ptr_enclose_ncr[ 2 * ( index - 1 ) ] = 0;
+    }
+  }
+}

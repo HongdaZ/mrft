@@ -341,6 +341,22 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     inRegion( ptr_enclose_ncr, len, ptr_enh, Tumor::ET,
               ptr_whole, 1,
               region, ptr_nidx, ptr_aidx, nr, nc, ns );
+    // Remove new regions with size > 100
+    zeroVector( ptr_on, len );
+    for( int i = 0; i < len; ++ i ) {
+      if( ptr_tumor[ 2 * i ] == 0 && 
+          ptr_enclose_ncr[ 2 * i ] == 1 ) {
+        ptr_on[ 2 * i ] = 1;
+      } else {
+        ptr_on[ 2 * i ] = 0;
+      }
+    }
+    for( int i = 0; i < len; ++ i ) {
+      if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_ncr, ptr_on,
+                      1, region ) ) {
+        excldRegion( region, ptr_enclose_ncr, 200 );
+      }
+    }
     int n_other = 0, n_enh = 0;
     for( int i = 0; i < len; ++ i ) {
       if( ptr_enclose_ncr[ 2 * i ] == 1 ) {

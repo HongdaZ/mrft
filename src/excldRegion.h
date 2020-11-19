@@ -25,5 +25,8 @@ void excldRegion( const vector<int> &region,
                   int *ptr_seg, int *ptr_tumor,
                   int *ptr_hemorrhage, int *ptr_necrosis,
                   int *ptr_enh, int *ptr_edema, const int &size );
+// Remove newly added necrosis if the region size > size
+void excldRegion( const vector<int> &region,
+                  int *ptr_enclose_ncr, const int &size );
 
 #endif
