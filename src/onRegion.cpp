@@ -126,7 +126,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           }
         }
         if( add ) {
-          if( n_new < 0.2 * n_cnct_old ) {
+          if( n_new < prop * n_cnct_old ) {
             for( vector<int>::const_iterator it = region.begin();
                  it != region.end(); ++ it ) {
               idx = *it;
