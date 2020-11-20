@@ -1,70 +1,150 @@
 #include <R.h>
 #include <Rinternals.h>
+
+#include <cmath>
+
 #include "onRegion.h"
 #include "cnctRegion.h"
 #include "excldRegion.h"
-#include "sliceCount.h"
 #include "zeroVector.h"
 #include "pad2zero.h"
 #include "spread.h"
 #include "pTNbr.h"
+#include "inRegion.h"
+#include "clearVector.h"
+#include "radius.h"
+
+using std::cbrt;
 
 // Extend ptr_seg1 to adjacent regions of ptr_seg2
 void onRegion( int *ptr_on, const int &len, const double &prop,
                int *ptr_seg1, const int &label1, 
                int *ptr_seg2, const int &label2,
                vector<int> &region, const double &spread_factor,
-               const double &m_p_t_nbr,
                const int *ptr_nidx, const int *ptr_aidx,
                const int &nr, const int &nc, const int &ns ) {
-  vector<int> bound{ 0, nr - 1, nr + nc - 1, nr + nc + ns - 1 };
-  vector<int> seg1_count( nr + nc + ns, 0 );
-  vector<int> seg2_count( nr + nc + ns, 0 );
-  sliceCount( seg1_count, ptr_seg1, len, label1, ptr_nidx, ptr_aidx,
-              nr, nc, ns );
-  int n_vio = 0, idx = 1;
+  int idx = 0;
   double p_t_nbr = 0;
+  int n_enclose_t;
   double spread_idx = 0;
+  bool add = false;
+  double r = 0;
+  int n_cnct_old;
+  int n_new = 0;
+  
+  int *ptr_enclose_tumor = new int[ 2 * len ]();
+  int *ptr_new_region = new int[ 2 * len ]();
+  int *ptr_tmp_seg1 = new int[ 2 * len ]();
+  int *ptr_old_new = new int[ 2 * len ]();
+  int *ptr_cnct_old = new int[ 2 * len ]();
+  
+  for( int i = 0; i < len; ++ i ) {
+    ptr_tmp_seg1[ 2 * i ] = ptr_seg1[ 2 * i ]; 
+  }
+  
+  vector<int> tmp_region;
+  tmp_region.reserve( len );
+  
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_seg2, ptr_seg2,
                     label2, region ) ) {
       if( ! excldRegion( region, ptr_nidx, ptr_seg2,
                          ptr_seg1, label1 ) ) {
-        n_vio = 0;
-        zeroVector( seg2_count );
-        sliceCount( seg2_count, region, ptr_nidx, ptr_aidx, 
-                    nr, nc, ns );
-        for( int j = 0; j < 3; ++ j ) {
-          for( int k = bound[ j ]; k < bound[ j + 1 ]; ++ k ) {
-            // Find the number of anatomical planes
-            // that a slice of extended  
-            // region having a number of voxels greater 
-            // than prop * ( the number of voxels on a slice ) 
-            // of the original tumor region
-            if( seg2_count[ k ] > prop * seg1_count[ k ] ) {
-              ++ n_vio;
-              break;
+        zeroVector( ptr_new_region, len );
+        zeroVector( ptr_enclose_tumor, len );
+        zeroVector( ptr_old_new, len );
+        zeroVector( ptr_cnct_old, len );
+        n_new = region.size();
+        
+        for( vector<int>::const_iterator it = region.begin();
+             it != region.end(); ++ it ) {
+          idx = *it;
+          if( idx != 0 ) {
+            ptr_new_region[ 2 * ( idx - 1 ) ] = 1;
+          }
+        }
+        for( int j = 0; j < len; ++ j ) {
+          if( ptr_new_region[ 2 * i ] == 1 ||
+              ptr_tmp_seg1[ 2 * i ] == label1 ) {
+            ptr_old_new[ 2 * i ] = 1;
+          }
+        }
+        cnctRegion( i + 1, ptr_nidx, ptr_old_new, ptr_old_new,
+                    1, tmp_region );
+        zeroVector( ptr_old_new, len );
+        n_cnct_old = 0;
+        for( vector<int>::const_iterator it_tmp = tmp_region.begin();
+             it_tmp != tmp_region.end(); ++ it_tmp ) {
+          idx = *it_tmp;
+          ptr_old_new[ 2 * ( idx - 1 ) ] = 1;
+          if( ptr_new_region[ 2 * ( idx - 1 ) ] != 1 ) {
+            ptr_cnct_old[ 2 * ( idx - 1 ) ] = 1;
+            ++ n_cnct_old;
+          } else {
+            ptr_cnct_old[ 2 * ( idx - 1 ) ] = 0;
+          }
+        }
+        inRegion( ptr_enclose_tumor, len, ptr_new_region, 1,
+                  ptr_cnct_old, 1, tmp_region, ptr_nidx,
+                  ptr_aidx, nr, nc, ns );
+        n_enclose_t = 0;
+        for( int j = 0; j < len; ++ j ) {
+          if( ptr_enclose_tumor[ 2 * j ] == 1 ) {
+            ++ n_enclose_t;
+          }
+        }
+        if( n_enclose_t > .3 * n_new ) {
+          clearVector( tmp_region );
+          for( int j = 0; j < len; ++ j ) {
+            if( ptr_enclose_tumor[ 2 * j ] == 1 ||
+                ptr_new_region[ 2 * j ] == 1 ) {
+              tmp_region.push_back( j + 1 );
+            }
+          }
+          spread_idx = spread( tmp_region, ptr_aidx );
+          if( spread_idx < 2 ) {
+            add = true;
+          } else {
+            add = false;
+          }
+        } else {
+          spread_idx = spread( region, ptr_aidx );
+          p_t_nbr = pTNbr( region, ptr_seg1, label1, ptr_nidx );
+          r = radius( region.size() );
+          if( 1 / p_t_nbr <  r ) {
+            if( spread_idx < spread_factor ) {
+              add = true;
+            } else {
+              add = false;
+            }
+          } else {
+            if( spread_idx < 2 ) {
+              add = true;
+            } else {
+              add = false;
             }
           }
         }
-        if( n_vio < 2 ) {
-          p_t_nbr = pTNbr( region, ptr_seg1, label1, ptr_nidx );
-          if( p_t_nbr < m_p_t_nbr ) {
-            spread_idx = spread( region, ptr_aidx );
-            if( spread_idx > spread_factor ) {
-              continue;
-            }
-          }
-          for( vector<int>::const_iterator it = region.begin();
-               it != region.end(); ++ it ) {
-            idx = *it;
-            if( idx != 0 ) {
-              ptr_on[ 2 * ( idx - 1 ) ] = 1;
+        if( add ) {
+          if( n_new < 0.2 * n_cnct_old ) {
+            for( vector<int>::const_iterator it = region.begin();
+                 it != region.end(); ++ it ) {
+              idx = *it;
+              if( idx != 0 ) {
+                ptr_on[ 2 * ( idx - 1 ) ] = 1;
+              }
             }
           }
         }
       }
     }
   }
+  
+  delete [] ptr_enclose_tumor;
+  delete [] ptr_new_region;
+  delete [] ptr_tmp_seg1;
+  delete [] ptr_old_new;
+  delete [] ptr_cnct_old;
+  
   pad2zero( ptr_seg2, len );
 }

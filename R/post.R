@@ -36,8 +36,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           max_prop_enh_enc = .1,
           min_tumor = 20000L,
           spread_add = 2,
-          spread_rm = 3,
-          min_prop_tumor_nbr = 0.6 ) {
+          spread_rm = 3 ) {
   ## Read segmentation results
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
@@ -52,8 +51,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
   post_seg <- postProcess( post_data, min_enh, min_enh_enc,
                            max_prop_enh_enc,
-                           min_tumor, spread_add, spread_rm, 
-                           min_prop_tumor_nbr )
+                           min_tumor, spread_add, spread_rm )
   # sink()
   if( post_seg$code != 0 ) {
     out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm", outfile )

@@ -1,13 +1,14 @@
 #include <cmath>
-#include "spread.h"
 
-using std::cbrt;
+#include "spread.h"
+#include "radius.h"
+
 using std::sqrt;
 
 // Measure the spread of the voxels in region
 double spread( const vector<int> &region, const int *ptr_aidx ) {
-  const double PI = 3.141592653589793;
-  double diameter = 2 * cbrt( ( double )region.size() * 3 / 4 / PI  );
+  
+  double diameter = 2 * radius( region.size() );
   double max_dist = 0, dist = 0;
   const int len = region.size();
   int r1, c1, s1, r2, c2, s2;

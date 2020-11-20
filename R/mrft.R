@@ -36,12 +36,11 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   max_prop_enh_enc = .1,
                   min_tumor = 20000L,
                   spread_add = 2,
-                  spread_rm = 3,
-                  min_prop_tumor_nbr = 0.6 ) {
+                  spread_rm = 3 ) {
   segment( patient, out, infolder, delta, gamma, alpha,
            beta, lambda2, a, nu2, maxit )
   post( patient, out, infolder, delta, gamma, alpha,
         beta, lambda2, a, nu2, maxit, 
         min_enh, min_enh_enc, max_prop_enh_enc, 
-        min_tumor, spread_add, spread_rm, min_prop_tumor_nbr )
+        min_tumor, spread_add, spread_rm )
 }
