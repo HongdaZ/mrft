@@ -2,9 +2,9 @@
 
 #include "Rinternals.h"
 
-bool excldRegion( const vector<int> &region, const int *ptr_nidx,
-                  int *ptr_seg1,
-                  const int *ptr_seg2, const int &label ) {
+int excldRegion( const vector<int> &region, const int *ptr_nidx,
+                  int *ptr_seg2,
+                  const int *ptr_seg1, const int &label1 ) {
   int n_idx, index;
   for( vector<int>::const_iterator it = region.begin(); 
        it != region.end(); ++ it ) {
@@ -13,9 +13,9 @@ bool excldRegion( const vector<int> &region, const int *ptr_nidx,
       for( int i = 0; i < 6; ++ i ) {
         n_idx = ptr_nidx[ 6 * ( index - 1 ) + i ];
         if( n_idx != NA_INTEGER ) {
-          if( ptr_seg1[ 2 * ( n_idx - 1 ) ] == 0 &&
-              ptr_seg2[ 2 * ( n_idx - 1 ) ] == label ) {
-            return false;
+          if( ptr_seg2[ 2 * ( n_idx - 1 ) ] == 0 &&
+              ptr_seg1[ 2 * ( n_idx - 1 ) ] == label1 ) {
+            return n_idx;
           }
         }
       }
@@ -25,10 +25,10 @@ bool excldRegion( const vector<int> &region, const int *ptr_nidx,
        it != region.end(); ++ it ) {
     index = *it;
     if( index != 0 ) {
-      ptr_seg1[ 2 * ( index - 1 ) ] = 0;
+      ptr_seg2[ 2 * ( index - 1 ) ] = 0;
     }
   }
-  return true;
+  return 0;
 }
 void excldRegion( const vector<int> &region,
                   int *ptr_seg1,

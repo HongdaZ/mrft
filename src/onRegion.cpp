@@ -23,7 +23,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
                vector<int> &region, const double &spread_factor,
                const int *ptr_nidx, const int *ptr_aidx,
                const int &nr, const int &nc, const int &ns ) {
-  int idx = 0;
+  int idx = 0, n_idx = 0;
   double p_t_nbr = 0;
   int n_enclose_t;
   double spread_idx = 0;
@@ -48,8 +48,9 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_seg2, ptr_seg2,
                     label2, region ) ) {
-      if( ! excldRegion( region, ptr_nidx, ptr_seg2,
-                         ptr_seg1, label1 ) ) {
+      int n_idx = excldRegion( region, ptr_nidx, ptr_seg2,
+                               ptr_seg1, label1 );
+      if(  n_idx != 0  ) {
         zeroVector( ptr_new_region, len );
         zeroVector( ptr_enclose_tumor, len );
         zeroVector( ptr_old_new, len );
@@ -64,9 +65,9 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           }
         }
         for( int j = 0; j < len; ++ j ) {
-          if( ptr_new_region[ 2 * i ] == 1 ||
-              ptr_tmp_seg1[ 2 * i ] == label1 ) {
-            ptr_old_new[ 2 * i ] = 1;
+          if( ptr_new_region[ 2 * j ] == 1 ||
+              ptr_tmp_seg1[ 2 * j ] == label1 ) {
+            ptr_old_new[ 2 * j ] = 1;
           }
         }
         cnctRegion( i + 1, ptr_nidx, ptr_old_new, ptr_old_new,
