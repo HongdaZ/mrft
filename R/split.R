@@ -164,7 +164,7 @@ split3 <- function( x, x_seg, x_factor ) {
   return( res )
 }
 ## Split edema || enh into to parts
-splitFthr <- function( post_seg, t2_intst ) {
+splitFthrE <- function( post_seg, t2_intst ) {
   post_mix_idx <- which( post_seg$image == 2 | post_seg$image == 4 )
   t2_mix <- t2_intst[ post_mix_idx ]
   valid_idx <- which( ! is.na( t2_mix ) )
@@ -187,6 +187,39 @@ splitFthr <- function( post_seg, t2_intst ) {
   }
   label[ post_mix_idx ] <- clst
   res <- list( label = label, intst = t2_intst, 
+               m = m )
+  return( res )
+}
+## Split CSF into parts
+splitFthrC <- function( post_seg, t1ce_intst ) {
+  post_mix_idx <- which( post_seg$image == 5 | 
+                         post_seg$image == 6 |
+                         post_seg$image == 1 )
+  t1ce_mix <- t1ce_intst[ post_mix_idx ]
+  valid_idx <- which( ! is.na( t1ce_mix ) )
+  t1ce_mix <- t1ce_mix[ valid_idx ]
+  post_mix_idx <- post_mix_idx[ valid_idx ]
+  
+  n_clst <- 5
+  start <- quantile( t1ce_mix, seq( 0, 1, length.out = n_clst ) )
+  k_m <- kmeans( t1ce_mix, start )
+  k_centers <- k_m$centers
+  k_cluster <- k_m$cluster
+  ord <- order( k_centers )
+  valid_idx2 <- which( k_cluster != ord[ 1 ] )
+  clst <- k_cluster[ valid_idx2 ]
+  t1ce_mix <- t1ce_mix[ valid_idx2 ]
+  post_mix_idx <- post_mix_idx[ valid_idx2 ]
+  
+  mean1 <- k_centers[ ord[ 2 ] ]
+  mean2 <- k_centers[ ord[ n_clst - 1 ] ]
+  m <- c( mean1, mean2 )
+  clst[ clst == ord[ 2 ] ] <- -1L
+  clst[ clst == ord[ 4 ] ] <- -2L
+  clst[ clst != -1L & clst != -2L ] <- -0L
+  label <- array( NA_integer_, dim = dim( t2_intst ) )
+  label[ post_mix_idx ] <- clst
+  res <- list( label = label, intst = t1ce_intst, 
                m = m )
   return( res )
 }

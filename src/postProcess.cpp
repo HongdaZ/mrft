@@ -87,6 +87,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_enclose_ncr = new int[ 2 * len ]();
   int *ptr_tumor = new int[ 2 * len ]();
   int *ptr_on = new int[ 2 * len ]();
+  int *ptr_enclose_csf = new int[ 2 * len ]();
   // Store the result of findRegion
   vector<int> region;
   region.reserve( len );
@@ -215,7 +216,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_hem, ptr_hemorrhage,
                     Tumor::HMG, region ) ) {
-      extRegion( region, ptr_enclose_hem, 1, .6, true );
+      extRegion( region, ptr_enclose_hem, 1, .6, false);
     }
   }
   // Recover the padding to zero
@@ -405,6 +406,26 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
                100, len );
   wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
           ptr_flair, ptr_seg, ptr_tumor );
+  // Find csf inside tumor
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_tumor[ 2 * i ] == 0 &&
+        ptr_t1ce[ 2 * i ] == T1ce::T1CSF ) {
+      ptr_csf[ 2 * i ] = 1;
+    } else {
+      ptr_csf[ 2 * i ] = 0;
+    }
+  }
+  inRegion( ptr_enclose_csf, len, ptr_tumor, 1,
+            ptr_csf, 1, region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_tumor[ 2 * i ] == 0 ) {
+      if( ptr_enclose_csf[ 2 * i ] == 1 ) {
+        ptr_seg[ 2 * i ] = Seg::SECSF;
+      } else if( ptr_csf[ 2 * i ] == 1 ) {
+        ptr_seg[ 2 * i ] = Seg::SCSF;
+      }
+    }
+  }
   // Restore the segmentation result to a image with the original
   // dimension
   restoreImg( ptr_idx, ptr_seg, ptr_res_image, len );
@@ -433,6 +454,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   delete [] ptr_seg;
   delete [] ptr_tumor;
   delete [] ptr_on;
+  delete [] ptr_enclose_csf;
   
   UNPROTECT( 4 );
   return res;

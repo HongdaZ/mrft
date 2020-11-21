@@ -9,7 +9,8 @@ updateDelta3T2 <- function( prop_bright,
                          t1ce_image == 2 ) &
                        flair_image == 4 ] 
   tumor <- tumor[ ! is.na( tumor ) ]
-  x <- kmeans( tumor, 9 )$centers
+  start <- quantile( tumor, probs = seq( 0, 1, length.out = 9 ) )
+  x <- kmeans( tumor, start )$centers
   y <- order( x )
   m <- x[ y ][ 3 ]
   ## t2_seg from est
@@ -32,7 +33,7 @@ updateDelta3Flair <- function( t1ce_image, flair_data, flair_seg ) {
                              ( t1ce_image == 4 |
                                t1ce_image == 2 ) ] 
   tumor <- tumor[ ! is.na( tumor ) ]
-  x <- kmeans( tumor, 5 )$centers
+  x <- kmeans( tumor, summary( tumor )[ -4 ] )$centers
   y <- order( x )
   m <- x[ y ][ 3 ]
   ## t2_seg from est
