@@ -56,6 +56,16 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      lambda2$t1ce[ 1 : 3 ], 
                      m, nu2$t1ce, 40L )
     t1ce_res <- t1ce_seg$parm[ c( 2, 3 ), ]
+    ## Update delta[ 1, 2 ] for t1ce
+    shift_t1ce1 <- delta$t1ce[ 3 ] - delta$t1ce[ 2 ]
+    shift_t1ce2 <- updateDelta12( t1ce_res[ 1, 3 ], 
+                                  t1ce_res[ 2, 3 ],
+                                  t1ce_res[ 1, 1], 
+                                  t1ce_res[ 2, 1 ], 
+                                  shift_t1ce1 )
+    delta$t1ce[ c( 1, 2 ) ] <- delta$t1ce[ c( 1, 2 ) ] - 
+      shift_t1ce2
+    delta$t1ce[ c( 3, 4 ) ] <- delta$t1ce[ 2 ] + shift_t1ce1
     t1ce_delta <- delta$t1ce
     ## Export normalized images
     t1ce_intst <- t1ce_data$t1ce
