@@ -67,7 +67,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     ## update beta
     sigma2 <- t1ce_seg$parm[ 3, ]
     beta$t1ce[ 1 : 3 ] <- ( alpha$t1ce[ 1 : 3 ] + 1 ) * ( sigma2 )
-    t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, delta$t1ce[ 3 ] )
+    t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, delta$t1ce[ 3 ] - 
+                           delta$t1ce[ 2 ] )
     ## update m
     m <- t1ce_data$m
     b <- getB( m, a )
@@ -125,7 +126,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     ## update beta
     sigma2 <- flair_seg$parm[ 3, ]
     beta$flair[ 1 : 3 ] <- ( alpha$flair[ 1 : 3 ] + 1 ) * ( sigma2 )
-    flair_data <- split4( flair_data$flair, flair_seg, delta$flair[ 3 ] )
+    flair_data <- split4( flair_data$flair, flair_seg, delta$flair[ 3 ] -
+                            delta$flair[ 2 ] )
     ## update m
     m <- flair_data$m
     b <- getB( m, a )
@@ -170,8 +172,9 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     t2_res <- t2_seg$parm[ c( 2, 3 ), 2 ]
     # sink()
     ## update delta
+    adjust_t2 <- 2
     if( is.na( delta$t2[ 3 ] ) ) {
-      delta$t2[ c( 3, 4 ) ] <- delta$t2[ 1 ] - 2 +
+      delta$t2[ c( 3, 4 ) ] <- delta$t2[ 1 ] - adjust_t2 +
         updateDelta3T2( prop_bright,
                       t1ce_image, flair_image,
                       t2_data, t2_seg ) 
@@ -188,7 +191,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     ## update beta
     sigma2 <- t2_seg$parm[ 3, ]
     beta$t2[ 1 : 2 ] <- ( alpha$t2[ 1 : 2 ] + 1 ) * sigma2
-    t2_data <- split3( t2_data$t2, t2_seg, delta$t2[ 3 ] )
+    t2_data <- split3( t2_data$t2, t2_seg, delta$t2[ 3 ] - delta$t2[ 1 ] +
+                         adjust_t2 )
     ## update m
     m <- t2_data$m
     b <- getB( m, a )
