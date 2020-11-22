@@ -47,3 +47,14 @@ updateDelta3Flair <- function( t1ce_image, flair_data, flair_seg ) {
   }
   return( delta_3 )
 }
+
+## Update delta[ 1, 2 ] or delta[ 1 ] for Flair or T2
+updateDelta12 <- function( m_u, sigma_u, m_l, sigma_l, shift_t ) {
+  res <- ( ( shift_t / 2 ) ^ 2 - 
+             ( ( m_u + shift_t / 2 * sqrt( sigma_u ) - m_l ) /
+                 sqrt( sigma_l ) ) ^ 2 ) / 2  
+  if( res < 0 ) {
+    res <- 0
+  }
+  res
+}

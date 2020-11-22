@@ -55,7 +55,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      alpha$t1ce[ 1 : 3 ], beta$t1ce[ 1 : 3 ], 
                      lambda2$t1ce[ 1 : 3 ], 
                      m, nu2$t1ce, 40L )
-    t1ce_res <- t1ce_seg$parm[ c( 2, 3 ), 3 ]
+    t1ce_res <- t1ce_seg$parm[ c( 2, 3 ), ]
     t1ce_delta <- delta$t1ce
     ## Export normalized images
     t1ce_intst <- t1ce_data$t1ce
@@ -108,12 +108,19 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                       alpha$flair[ 1 : 3 ], beta$flair[ 1 : 3 ], 
                       lambda2$flair[ 1 : 3 ],
                       m, nu2$flair, 40L )
-    flair_res <- flair_seg$parm[ c( 2, 3 ), 3 ]
+    flair_res <- flair_seg$parm[ c( 2, 3 ), ]
     ## update delta
     if( is.na( delta$flair[ 3 ] ) ) {
-      delta$flair[ c( 3, 4 ) ] <- delta$flair[ 2 ] +
-        updateDelta3Flair( t1ce_image, flair_data, flair_seg ) 
-      
+      shift_flair1 <- updateDelta3Flair( t1ce_image, 
+                                         flair_data, flair_seg )
+      shift_flair2 <- updateDelta12( flair_res[ 1, 3 ], 
+                                     flair_res[ 2, 3 ],
+                                     flair_res[ 1, 1], 
+                                     flair_res[ 2, 1 ], 
+                                     shift_flair1 )
+      delta$flair[ c( 1, 2 ) ] <- delta$flair[ c( 1, 2 ) ] - 
+        shift_flair2
+      delta$flair[ c( 3, 4 ) ] <- delta$flair[ 2 ] + shift_flair1
     }
     flair_delta <- delta$flair
     ## Export normalized images
@@ -169,16 +176,22 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                    alpha$t2[ 1 : 2 ], beta$t2[ 1 : 2 ], 
                    lambda2$t2[ 1 : 2 ],
                    m, nu2$t2, 40L )
-    t2_res <- t2_seg$parm[ c( 2, 3 ), 2 ]
+    t2_res <- t2_seg$parm[ c( 2, 3 ), ]
     # sink()
     ## update delta
     adjust_t2 <- 2
     if( is.na( delta$t2[ 3 ] ) ) {
+      shift_t21 <- updateDelta3T2( prop_bright,
+                                   t1ce_image, flair_image,
+                                   t2_data, t2_seg ) 
+      shift_t22 <- updateDelta12( t2_res[ 1, 2 ],
+                                  t2_res[ 2, 2 ],
+                                  t2_res[ 1, 1 ],
+                                  t2_res[ 2, 1 ],
+                                  shift_t21 )
+      delta$t2[ 1 ] <- delta$t2[ 1 ] - shift_t22
       delta$t2[ c( 3, 4 ) ] <- delta$t2[ 1 ] - adjust_t2 +
-        updateDelta3T2( prop_bright,
-                      t1ce_image, flair_image,
-                      t2_data, t2_seg ) 
-      
+        shift_t21
     }
     t2_delta <- delta$t2
     ## Export normalized images
