@@ -217,7 +217,7 @@ splitFthrC <- function( post_seg, t1ce_intst ) {
   clst[ clst == ord[ 2 ] ] <- -1L
   clst[ clst == ord[ 4 ] ] <- -2L
   clst[ clst != -1L & clst != -2L ] <- -0L
-  label <- array( NA_integer_, dim = dim( t2_intst ) )
+  label <- array( NA_integer_, dim = dim( t1ce_intst ) )
   label[ post_mix_idx ] <- clst
   res <- list( label = label, intst = t1ce_intst, 
                m = m )
