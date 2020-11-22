@@ -52,7 +52,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   post_seg <- postProcess( post_data, min_enh, min_enh_enc,
                            max_prop_enh_enc,
                            min_tumor, spread_add, spread_rm )
-  if( sum( post_seg$image == 6, na.rm = T ) != 0 ) {
+  if( sum( post_seg$image == 6, na.rm = T ) > 10 ) {
     ## With CSF inside tumor
     out_t1ce_norm <- gsub( "_flair.nii.gz", "_t1ce_norm", outfile )
     t1ce_intst <- readNIfTI( out_t1ce_norm, reorient = FALSE )@.Data
