@@ -57,6 +57,13 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      m, nu2$t1ce, 40L )
     t1ce_res <- t1ce_seg$parm[ c( 2, 3 ), 3 ]
     t1ce_delta <- delta$t1ce
+    ## Export normalized images
+    t1ce_intst <- t1ce_data$t1ce
+    out_t1ce_norm <- gsub( ".nii.gz", "", out_t1ce_norm )
+    writeNIfTI( nifti( t1ce_intst, datatype = 64 ) ,
+                out_t1ce_norm,
+                gzipped = T )
+    save( t1ce_res, t1ce_delta, file = out_t1ce_data )
     ## update beta
     sigma2 <- t1ce_seg$parm[ 3, ]
     beta$t1ce[ 1 : 3 ] <- ( alpha$t1ce[ 1 : 3 ] + 1 ) * ( sigma2 )
@@ -80,13 +87,6 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     out_t1ce_seg <- gsub( ".nii.gz", "", out_t1ce_seg )
     writeNIfTI( nifti( t1ce_image, datatype = 2 ),
                 filename = out_t1ce_seg, gzipped = TRUE )
-    ## Export normalized images
-    t1ce_intst <- t1ce_data$intst
-    out_t1ce_norm <- gsub( ".nii.gz", "", out_t1ce_norm )
-    writeNIfTI( nifti( t1ce_intst, datatype = 64 ) ,
-                out_t1ce_norm,
-                gzipped = T )
-    save( t1ce_res, t1ce_delta, file = out_t1ce_data )
   }
   
   out_flair_seg <- gsub( "_flair.nii.gz", "_flair_seg.nii.gz", outfile )
@@ -115,6 +115,13 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
       
     }
     flair_delta <- delta$flair
+    ## Export normalized images
+    flair_intst <- flair_data$flair
+    out_flair_norm <- gsub( ".nii.gz", "", out_flair_norm )
+    writeNIfTI( nifti( flair_intst, datatype = 64 ) ,
+                out_flair_norm,
+                gzipped = T )
+    save( flair_res, flair_delta, file = out_flair_data )
     ## update beta
     sigma2 <- flair_seg$parm[ 3, ]
     beta$flair[ 1 : 3 ] <- ( alpha$flair[ 1 : 3 ] + 1 ) * ( sigma2 )
@@ -139,13 +146,6 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     out_flair_seg <- gsub( ".nii.gz", "", out_flair_seg )
     writeNIfTI( nifti( flair_image, datatype = 2 ),
                 filename = out_flair_seg, gzipped = TRUE )
-    ## Export normalized images
-    flair_intst <- flair_data$intst
-    out_flair_norm <- gsub( ".nii.gz", "", out_flair_norm )
-    writeNIfTI( nifti( flair_intst, datatype = 64 ) ,
-                out_flair_norm,
-                gzipped = T )
-    save( flair_res, flair_delta, file = out_flair_data )
     
   }
   
@@ -178,6 +178,13 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
       
     }
     t2_delta <- delta$t2
+    ## Export normalized images
+    t2_intst <- t2_data$t2
+    out_t2_norm <- gsub( ".nii.gz", "", out_t2_norm )
+    writeNIfTI( nifti( t2_intst, datatype = 64 ) ,
+                out_t2_norm,
+                gzipped = T )
+    save( t2_res, t2_delta, file = out_t2_data )
     ## update beta
     sigma2 <- t2_seg$parm[ 3, ]
     beta$t2[ 1 : 2 ] <- ( alpha$t2[ 1 : 2 ] + 1 ) * sigma2
@@ -199,12 +206,5 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     out_t2_seg <- gsub( ".nii.gz", "", out_t2_seg )
     writeNIfTI( nifti( t2_image, datatype = 2 ),
                 filename = out_t2_seg, gzipped = TRUE )
-    ## Export normalized images
-    t2_intst <- t2_data$intst
-    out_t2_norm <- gsub( ".nii.gz", "", out_t2_norm )
-    writeNIfTI( nifti( t2_intst, datatype = 64 ) ,
-                out_t2_norm,
-                gzipped = T )
-    save( t2_res, t2_delta, file = out_t2_data )
   }
 }
