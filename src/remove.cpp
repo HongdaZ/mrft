@@ -60,7 +60,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
   } else {
     s_factor = spread_factor;
   }
-  Rprintf( "s_factor = %f\n", s_factor );
+  // Rprintf( "s_factor = %f\n", s_factor );
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
