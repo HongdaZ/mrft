@@ -292,6 +292,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_tumor[ 2 * i ] = 1;
       ptr_seg[ 2 * i ] = Seg::SED;
+      ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
   // ( T2( 4 ) && T1ce( 2 ) )
@@ -313,6 +314,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_tumor[ 2 * i ] = 1;
       ptr_seg[ 2 * i ] = Seg::SED;
+      ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
   // ( FLAIR( 4 ) && T2( 4 ) && T1ce( 3 ) )
@@ -335,6 +337,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_tumor[ 2 * i ] = 1;
       ptr_seg[ 2 * i ] = Seg::SED;
+      ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
   // 10-7.4: code
