@@ -106,8 +106,8 @@ splitT22 <- function( prop_bright, t2, t1ce_image, flair_image ) {
   sub_t1ce <- t1ce_image[ tbd ]
   
   ## Find white matter
-  q_t2 <- quantile( sub_t2, probs = c( .4, .5 ), na.rm = T )
-  wm <- sub_t1ce == 3L & sub_t2 < q_t2[ 1 ]
+  q_t2 <- quantile( sub_t2, probs = c( .4, .7 ), na.rm = T )
+  wm <- sub_t2 < q_t2[ 1 ]
   label[ tbd ][ wm ] <- -1L
   
   ## Find grey matter 

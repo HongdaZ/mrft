@@ -2,13 +2,13 @@
 post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           ## Always four numbers for delta
           delta = 
-            list( t1ce = c( -2, -1, 7, 7 ),
+            list( t1ce = c( -2.5, -1.5, 7, 7 ),
                   flair = c( 1, 0, NA_real_, NA_real_ ),
-                  t2 = c( 2, 0, NA_real_, NA_real_ ),
+                  t2 = c( 0, 0, NA_real_, NA_real_ ),
                   fthr = c( 0, 0, 4, 8 ) ),
           gamma = list( t1ce = 1,
                         flair = 1.5,
-                        t2 = 1,
+                        t2 = 0.2,
                         fthr = 1 ),
           ## #of healthy tissue types controlled by alpha
           alpha = list( t1ce = rep( 10, 4 ),
