@@ -1,3 +1,6 @@
+#include <R.h>
+#include <Rinternals.h>
+
 #include "remove.h"
 #include "pad2zero.h"
 #include "cnctRegion.h"
@@ -23,15 +26,24 @@ void remove( vector<int> &region, const int *ptr_aidx,
   for( int i = 0; i < len; ++ i ) {
     ptr_tmp_tumor[ 2 * i ] = ptr_tumor[ 2 * i ];
   }
+  int MAX = nr * nc * ns;
   int n_enc_t = 0;
   int max_size = 0;
-  bool have_enh = false;
+  double min_spread_idx = 0;
+  int n_enh = 0;
   int idx = 0;
   double spread_idx = 0;
   int size = 0;
+  double s_factor;
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
+      if( region.size() > 1000 ) {
+        spread_idx = spread( region, ptr_aidx );
+        if( spread_idx < min_spread_idx ) {
+          min_spread_idx = spread_idx;
+        }
+      }
       if( region.size() > max_size ) {
         max_size = region.size();
       }
@@ -43,31 +55,41 @@ void remove( vector<int> &region, const int *ptr_aidx,
   } else {
     size = max_size;
   }
+  if( min_spread_idx > spread_factor ) {
+    s_factor = min_spread_idx;
+  } else {
+    s_factor = spread_factor;
+  }
+  Rprintf( "s_factor = %f\n", s_factor );
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
       // Find enh inside the tumor region
       zeroVector( ptr_r_enh, len );
-      have_enh = false;
+      n_enh = 0;
       for( int j = 0; j < region.size(); ++ j ) {
         idx = region[ j ];
         if( idx != 0 ) {
           if( ptr_enh[ 2 * ( idx - 1 ) ] == Tumor::ET ) {
-            have_enh = true;
+            ++ n_enh;
             ptr_r_enh[ 2 * ( idx - 1 ) ] = 1;
           }
         }
       }
-      if( ! have_enh ) {
+      if( n_enh < 100 ) {
         // If not including enh, exclude small sized regions
-        excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
-                     ptr_necrosis, ptr_enh, ptr_edema, size );
-      } else {
-        // Remove tumor regions with spread > 2
         spread_idx = spread( region, ptr_aidx );
-        if( spread_idx > spread_factor ) {
+        if( spread_idx > s_factor ||
+            region.size() < size ) {
           excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
-                       ptr_necrosis, ptr_enh, ptr_edema, size );
+                       ptr_necrosis, ptr_enh, ptr_edema, MAX );
+        }
+      } else {
+        // Remove tumor regions with spread > spread_factor
+        spread_idx = spread( region, ptr_aidx );
+        if( spread_idx > s_factor ) {
+          excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
+                       ptr_necrosis, ptr_enh, ptr_edema, MAX );
         } else {
           // Remove regions with tumor enclosed enh < m_enh_enc
           n_enc_t = 0;
@@ -82,7 +104,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
           }
           if( n_enc_t < m_enh_enc ) {
             excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
-                         ptr_necrosis, ptr_enh, ptr_edema, size );
+                         ptr_necrosis, ptr_enh, ptr_edema, MAX );
           }
         }
       }
