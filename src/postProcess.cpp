@@ -23,6 +23,7 @@
 #include "remove.h"
 #include "assignCSF.h"
 #include "removeSmall.h"
+#include "addInside.h"
 
 using std::vector;
 using std::list;
@@ -340,6 +341,33 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
+  // 10-7.3.2 Add voxels inside tumor (2D)
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_extra_edema, len );
+  
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_whole[ 2 * i ] = 1;
+    }
+  }
+  addInside( ptr_extra_edema, len, ptr_tumor, 1, ptr_whole, 1,
+             region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_extra_edema[ 2 * i ] == 1 &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      if( ptr_t1ce[ 2 * i ] == T1ce::T1TM ||
+          ptr_t1ce[ 2 * i ] == T1ce::T1WM ) {
+        ptr_seg[ 2 * i ] = Seg::SET;
+        ptr_enh[ 2 * i ] = Tumor::ET;
+      } else {
+        ptr_seg[ 2 * i ] = Seg::SED;
+        ptr_edema[ 2 * i ] = Tumor::ED;
+      }
+    }
+  }
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_extra_edema, len );
   // 10-7.4: code
   // 0: HGG (no further seg)
   // 1: LGG (further seg)
