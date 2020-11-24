@@ -8,7 +8,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                           fthr = c( 0, 0, 4, 8 ) ),
                   gamma = list( t1ce = 1,
                                 flair = 1.5,
-                                t2 = 0.2,
+                                t2 = 1.5,
                                 fthr = 1 ),
                   ## #of healthy tissue types controlled by alpha
                   alpha = list( t1ce = rep( 10, 4 ),
