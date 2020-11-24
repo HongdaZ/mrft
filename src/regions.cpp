@@ -55,7 +55,7 @@ vector<list<vector<int>>> regions2D( int *ptr_seg, const int &len,
         plane.push_back( r );
       }
     }
-    res.push_back( plane );
+    res[ k ] = plane;
     pad2zero( ptr_seg, len );
   }
   return res;

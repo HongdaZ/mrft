@@ -22,7 +22,7 @@ void addInside( int *ptr_inside, const int &len,
                     ptr_inside, 1, region ) ) {
       p_t_nbr = pTNbr( region, ptr_seg1, label1, ptr_nidx );
       r = radius( region.size() );
-      if( 1 / p_t_nbr > r / 3 ) {
+      if( p_t_nbr < 2 * 3 / r  ) {
         excldRegion( region, ptr_inside, MAX );
       }
     }
