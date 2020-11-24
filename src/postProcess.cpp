@@ -284,7 +284,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 1, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {

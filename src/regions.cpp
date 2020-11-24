@@ -29,6 +29,37 @@ list<vector<int>> regions( int *ptr_seg, const int &len,
   pad2zero( ptr_seg, len );
   return res;
 }
+// 2D version of function above
+vector<list<vector<int>>> regions2D( int *ptr_seg, const int &len, 
+                                     vector<int> &region,
+                                     const int &label,
+                                     const int *ptr_nidx,
+                                     const int *ptr_aidx ) {
+  vector<list<vector<int>>> res( 3 );
+  list<vector<int>> plane;
+  int n;
+  int idx;
+  for( int k = 0; k < 3; ++ k ) {
+    for( int i = 0; i < len; ++ i ) {
+      if( cnctRegion( i + 1, ptr_nidx, ptr_aidx, k, ptr_seg, ptr_seg, 
+                      label, region ) ) { 
+        n = region.size();
+        vector<int> r( n * 4 );
+        for( int j = 0; j < n; ++ j ) {
+          idx = region[ j ];
+          r[ 4 * j ] = idx;
+          for( int k = 0; k < 3; ++ k ) {
+            r[ 4 * j + k + 1 ] = ptr_aidx[ 3 * ( idx - 1 ) + k ];
+          }
+        }
+        plane.push_back( r );
+      }
+    }
+    res.push_back( plane );
+    pad2zero( ptr_seg, len );
+  }
+  return res;
+}
 // All voxels with label == label is a whole region
 list<vector<int>> regions( const int *ptr_seg, const int &len, 
                            const int &label,
