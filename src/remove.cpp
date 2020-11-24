@@ -47,6 +47,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
       }
     }
   }
+  pad2zero( ptr_tumor, len );
   s_factor = ( min_spread_idx < spread_factor ) ?
   spread_factor : min_spread_idx;
 
@@ -62,9 +63,9 @@ void remove( vector<int> &region, const int *ptr_aidx,
       }
     }
   }
-  size = ( max_size > m_tumor ) ? m_tumor : max_size;
   pad2zero( ptr_tumor, len );
-
+  size = ( max_size > m_tumor ) ? m_tumor : max_size;
+  
   // Rprintf( "s_factor = %f\n", s_factor );
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
