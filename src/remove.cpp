@@ -35,6 +35,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
   double spread_idx = 0;
   int size = 0;
   double s_factor;
+
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
@@ -44,22 +45,26 @@ void remove( vector<int> &region, const int *ptr_aidx,
           min_spread_idx = spread_idx;
         }
       }
-      if( region.size() > max_size ) {
+    }
+  }
+  s_factor = ( min_spread_idx < spread_factor ) ?
+  spread_factor : min_spread_idx;
+
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
+                    1, region ) ) {
+      spread_idx = spread( region, ptr_aidx );
+      if( spread_idx > s_factor ) {
+        excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
+                     ptr_necrosis, ptr_enh, ptr_edema, MAX );
+      } else if( region.size() > max_size ) {
         max_size = region.size();
       }
     }
   }
+  size = ( max_size > m_tumor ) ? m_tumor : max_size;
   pad2zero( ptr_tumor, len );
-  if( max_size > m_tumor ) {
-    size = m_tumor;
-  } else {
-    size = max_size;
-  }
-  if( min_spread_idx > spread_factor ) {
-    s_factor = min_spread_idx;
-  } else {
-    s_factor = spread_factor;
-  }
+
   // Rprintf( "s_factor = %f\n", s_factor );
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
@@ -78,34 +83,25 @@ void remove( vector<int> &region, const int *ptr_aidx,
       }
       if( n_enh < 100 ) {
         // If not including enh, exclude small sized regions
-        spread_idx = spread( region, ptr_aidx );
-        if( spread_idx > s_factor ||
-            region.size() < size ) {
+        if( region.size() < size ) {
           excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
                        ptr_necrosis, ptr_enh, ptr_edema, MAX );
         }
       } else {
-        // Remove tumor regions with spread > spread_factor
-        spread_idx = spread( region, ptr_aidx );
-        if( spread_idx > s_factor ) {
+        // Remove regions with tumor enclosed enh < m_enh_enc
+        n_enc_t = 0;
+        zeroVector( ptr_enclose_tumor, len );
+        inRegion( ptr_enclose_tumor, len, ptr_r_enh, 1,
+                  ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
+                  nr, nc, ns );
+        for( int k = 0; k < len; ++ k ) {
+          if( ptr_enclose_tumor[ 2 * k ] == 1 ) {
+            ++ n_enc_t;
+          }
+        }
+        if( n_enc_t < m_enh_enc ) {
           excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
                        ptr_necrosis, ptr_enh, ptr_edema, MAX );
-        } else {
-          // Remove regions with tumor enclosed enh < m_enh_enc
-          n_enc_t = 0;
-          zeroVector( ptr_enclose_tumor, len );
-          inRegion( ptr_enclose_tumor, len, ptr_r_enh, 1,
-                    ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
-                    nr, nc, ns );
-          for( int k = 0; k < len; ++ k ) {
-            if( ptr_enclose_tumor[ 2 * k ] == 1 ) {
-              ++ n_enc_t;
-            }
-          }
-          if( n_enc_t < m_enh_enc ) {
-            excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
-                         ptr_necrosis, ptr_enh, ptr_edema, MAX );
-          }
         }
       }
     }
