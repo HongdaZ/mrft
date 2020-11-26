@@ -9,7 +9,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                              t2 = c( 1, 0, NA_real_, 2 ),
                              fthr = c( 0, 0, 4, 8 ) ),
                      delta_factor = 
-                       list( t1ce = 1 / 4,
+                       list( t1ce = 1,
                              flair = 1 / 4,
                              t2 = 1 / 9 ),
                      gamma = list( t1ce = 1,
