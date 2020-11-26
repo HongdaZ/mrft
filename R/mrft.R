@@ -2,14 +2,14 @@
 mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   ## Always four numbers for delta
                   delta = 
-                    list( t1ce = c( -1, 0, 6, 2 ),
-                          flair = c( -1, 0, NA_real_, 2 ),
+                    list( t1ce = c( -0.5, 0, 6.5, 2 ),
+                          flair = c( -0.5, 0, NA_real_, 2 ),
                           t2 = c( 1, 0, NA_real_, 2 ),
                           fthr = c( 0, 0, 4, 8 ) ),
                   delta_factor = 
-                    list( t1ce = 1 / 4,
-                          flair = 1 / 4,
-                          t2 = 1 / 9 ),
+                    list( t1ce = 1,
+                          flair = 1 / 1.5,
+                          t2 = 1 / 3 ),
                   gamma = list( t1ce = 1,
                                 flair = 1,
                                 t2 = 1,
