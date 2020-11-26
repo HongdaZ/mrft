@@ -2,10 +2,14 @@
 post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           ## Always four numbers for delta
           delta = 
-            list( t1ce = c( -2.5, -1.5, 7, 7 ),
-                  flair = c( 1, 0, NA_real_, NA_real_ ),
-                  t2 = c( 2, 0, NA_real_, NA_real_ ),
+            list( t1ce = c( -1, 0, 6, 2 ),
+                  flair = c( -1, 0, NA_real_, 2 ),
+                  t2 = c( 1, 0, NA_real_, 2 ),
                   fthr = c( 0, 0, 4, 8 ) ),
+          delta_factor = 
+            list( t1ce = 1 / 4,
+                  flair = 1 / 4,
+                  t2 = 1 / 9 ),
           gamma = list( t1ce = 1,
                         flair = 1,
                         t2 = 1,

@@ -4,10 +4,14 @@
 segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      ## Always four numbers for delta
                      delta = 
-                       list( t1ce = c( -2.5, -1.5, 7, 7 ),
-                             flair = c( 1, 0, NA_real_, NA_real_ ),
-                             t2 = c( 2, 0, NA_real_, NA_real_ ),
+                       list( t1ce = c( -1, 0, 6, 2 ),
+                             flair = c( -1, 0, NA_real_, 2 ),
+                             t2 = c( 1, 0, NA_real_, 2 ),
                              fthr = c( 0, 0, 4, 8 ) ),
+                     delta_factor = 
+                       list( t1ce = 1 / 4,
+                             flair = 1 / 4,
+                             t2 = 1 / 9 ),
                      gamma = list( t1ce = 1,
                                    flair = 1,
                                    t2 = 1,
@@ -57,7 +61,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      m, nu2$t1ce, 40L )
     t1ce_res <- t1ce_seg$parm[ c( 2, 3 ), ]
     ## Update delta[ 1, 2 ] for t1ce
-    shift_t1ce1 <- delta$t1ce[ 3 ] - delta$t1ce[ 2 ]
+    shift_t1ce1 <- delta$t1ce[ 3 ]
     shift_t1ce2 <- updateDelta12( t1ce_res[ 1, 3 ], 
                                   t1ce_res[ 2, 3 ],
                                   t1ce_res[ 1, 1], 
@@ -65,20 +69,21 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                                   shift_t1ce1 )
     delta$t1ce[ c( 1, 2 ) ] <- delta$t1ce[ c( 1, 2 ) ] - 
       shift_t1ce2
-    delta$t1ce[ c( 3, 4 ) ] <- delta$t1ce[ 2 ] + shift_t1ce1
-    t1ce_delta <- delta$t1ce
+    t1ce_shift <- c( delta$t1ce[ 1 : 2 ], shift_t1ce1, delta$t1ce[ 4 ] )
+    delta$t1ce[ 3 ] <- delta$t1ce[ 2 ] + 
+      t1ce_shift[ 3 ] * delta_factor$t1ce
+    
     ## Export normalized images
     t1ce_intst <- t1ce_data$t1ce
     out_t1ce_norm <- gsub( ".nii.gz", "", out_t1ce_norm )
     writeNIfTI( nifti( t1ce_intst, datatype = 64 ) ,
                 out_t1ce_norm,
                 gzipped = T )
-    save( t1ce_res, t1ce_delta, file = out_t1ce_data )
+    save( t1ce_res, t1ce_shift, file = out_t1ce_data )
     ## update beta
     sigma2 <- t1ce_seg$parm[ 3, ]
     beta$t1ce[ 1 : 3 ] <- ( alpha$t1ce[ 1 : 3 ] + 1 ) * ( sigma2 )
-    t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, delta$t1ce[ 3 ] - 
-                           delta$t1ce[ 2 ] )
+    t1ce_data <- split4( t1ce_data$t1ce, t1ce_seg, t1ce_shift[ 3 ] )
     ## update m
     m <- t1ce_data$m
     b <- getB( m, a )
@@ -130,21 +135,26 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                                      shift_flair1 )
       delta$flair[ c( 1, 2 ) ] <- delta$flair[ c( 1, 2 ) ] - 
         shift_flair2
-      delta$flair[ c( 3, 4 ) ] <- delta$flair[ 2 ] + shift_flair1
+      delta$flair[ 3 ] <- delta$flair[ 2 ] + 
+        shift_flair1 * delta_factor$flair
+      flair_shift <- c( delta$flair[ 1 : 2 ], shift_flair1, 
+                        delta$flair[ 4 ] )
+    } else {
+      flair_shift <- delta$flair
+      delta$flair[ 3 ] <- delta$flair[ 2 ] + 
+        flair_shift[ 3 ] * delta_factor$flair
     }
-    flair_delta <- delta$flair
     ## Export normalized images
     flair_intst <- flair_data$flair
     out_flair_norm <- gsub( ".nii.gz", "", out_flair_norm )
     writeNIfTI( nifti( flair_intst, datatype = 64 ) ,
                 out_flair_norm,
                 gzipped = T )
-    save( flair_res, flair_delta, file = out_flair_data )
+    save( flair_res, flair_shift, file = out_flair_data )
     ## update beta
     sigma2 <- flair_seg$parm[ 3, ]
     beta$flair[ 1 : 3 ] <- ( alpha$flair[ 1 : 3 ] + 1 ) * ( sigma2 )
-    flair_data <- split4( flair_data$flair, flair_seg, delta$flair[ 3 ] -
-                            delta$flair[ 2 ] )
+    flair_data <- split4( flair_data$flair, flair_seg, flair_shift[ 3 ] )
     ## update m
     m <- flair_data$m
     b <- getB( m, a )
@@ -200,22 +210,25 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                                   t2_res[ 2, 1 ],
                                   shift_t21 )
       delta$t2[ 1 ] <- delta$t2[ 1 ] - shift_t22
-      delta$t2[ c( 3, 4 ) ] <- delta$t2[ 1 ] - adjust_t2 +
-        shift_t21
+      delta$t2[ 3 ] <- delta$t2[ 1 ] + shift_t21 * delta_factor$t2
+      t2_shift <- c( delta$t2[ 1 : 2 ], shift_t21, 
+                     delta$t2[ 4 ] )
+    } else {
+      t2_shift <- delta$t2
+      delta$t2[ 3 ] <- delta$t2[ 1 ] + 
+        t2_shift[ 3 ] * delta_factor$t2
     }
-    t2_delta <- delta$t2
     ## Export normalized images
     t2_intst <- t2_data$t2
     out_t2_norm <- gsub( ".nii.gz", "", out_t2_norm )
     writeNIfTI( nifti( t2_intst, datatype = 64 ) ,
                 out_t2_norm,
                 gzipped = T )
-    save( t2_res, t2_delta, file = out_t2_data )
+    save( t2_res, t2_shift, file = out_t2_data )
     ## update beta
     sigma2 <- t2_seg$parm[ 3, ]
     beta$t2[ 1 : 2 ] <- ( alpha$t2[ 1 : 2 ] + 1 ) * sigma2
-    t2_data <- split3( t2_data$t2, t2_seg, delta$t2[ 3 ] - delta$t2[ 1 ] +
-                         adjust_t2 )
+    t2_data <- split3( t2_data$t2, t2_seg, t2_shift[ 3 ] )
     ## update m
     m <- t2_data$m
     b <- getB( m, a )
