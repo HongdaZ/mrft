@@ -2,17 +2,17 @@
 mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   ## Always four numbers for delta
                   delta = 
-                    list( t1ce = c( -0.5, 0, 6.5, 2 ),
-                          flair = c( -0.5, 0, NA_real_, 2 ),
-                          t2 = c( 1, 0, NA_real_, 2 ),
+                    list( t1ce = c( -0.5, 0, 6, 4 ),
+                          flair = c( -0.5, 0, NA_real_, 4 ),
+                          t2 = c( 0.5, 0, NA_real_, 4 ),
                           fthr = c( 0, 0, 4, 8 ) ),
                   delta_factor = 
-                    list( t1ce = 1,
-                          flair = 1 / 1.5,
-                          t2 = 1 / 4 ),
-                  gamma = list( t1ce = 0.8,
-                                flair = 0.8,
-                                t2 = 0.8,
+                    list( t1ce = 1.5,
+                          flair = 2.5,
+                          t2 = 4 ),
+                  gamma = list( t1ce = 0.6,
+                                flair = 0.6,
+                                t2 = 0.6,
                                 fthr = 1 ),
                   ## #of healthy tissue types controlled by alpha
                   alpha = list( t1ce = rep( 10, 4 ),

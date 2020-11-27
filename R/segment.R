@@ -4,17 +4,17 @@
 segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      ## Always four numbers for delta
                      delta = 
-                       list( t1ce = c( -0.5, 0, 6.5, 2 ),
-                             flair = c( -0.5, 0, NA_real_, 2 ),
-                             t2 = c( 1, 0, NA_real_, 2 ),
+                       list( t1ce = c( -0.5, 0, 6, 4 ),
+                             flair = c( -0.5, 0, NA_real_, 4 ),
+                             t2 = c( 0.5, 0, NA_real_, 4 ),
                              fthr = c( 0, 0, 4, 8 ) ),
                      delta_factor = 
-                       list( t1ce = 1,
-                             flair = 1 / 1.5,
-                             t2 = 1 / 4 ),
-                     gamma = list( t1ce = 0.8,
-                                   flair = 0.8,
-                                   t2 = 0.8,
+                       list( t1ce = 1.5,
+                             flair = 2.5,
+                             t2 = 4 ),
+                     gamma = list( t1ce = 0.6,
+                                   flair = 0.6,
+                                   t2 = 0.6,
                                    fthr = 1 ),
                      ## #of healthy tissue types controlled by alpha
                      alpha = list( t1ce = rep( 10, 4 ),
@@ -71,7 +71,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
       shift_t1ce2
     t1ce_shift <- c( delta$t1ce[ 1 : 2 ], shift_t1ce1, delta$t1ce[ 4 ] )
     delta$t1ce[ 3 ] <- delta$t1ce[ 2 ] + 
-      t1ce_shift[ 3 ] * delta_factor$t1ce
+      ( t1ce_shift[ 3 ] / delta_factor$t1ce ) ^ 2 / 2
     
     ## Export normalized images
     t1ce_intst <- t1ce_data$t1ce
@@ -136,13 +136,13 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
       delta$flair[ c( 1, 2 ) ] <- delta$flair[ c( 1, 2 ) ] - 
         shift_flair2
       delta$flair[ 3 ] <- delta$flair[ 2 ] + 
-        shift_flair1 * delta_factor$flair
+        ( shift_flair1 / delta_factor$flair ) ^ 2 / 2
       flair_shift <- c( delta$flair[ 1 : 2 ], shift_flair1, 
                         delta$flair[ 4 ] )
     } else {
       flair_shift <- delta$flair
       delta$flair[ 3 ] <- delta$flair[ 2 ] + 
-        flair_shift[ 3 ] * delta_factor$flair
+        ( flair_shift[ 3 ] / delta_factor$flair ) ^ 2 / 2
     }
     ## Export normalized images
     flair_intst <- flair_data$flair
@@ -210,13 +210,14 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                                   t2_res[ 2, 1 ],
                                   shift_t21 )
       delta$t2[ 1 ] <- delta$t2[ 1 ] - shift_t22
-      delta$t2[ 3 ] <- delta$t2[ 1 ] + shift_t21 * delta_factor$t2
+      delta$t2[ 3 ] <- delta$t2[ 1 ] + 
+        ( shift_t21 / delta_factor$t2 ) ^ 2 / 2
       t2_shift <- c( delta$t2[ 1 : 2 ], shift_t21, 
                      delta$t2[ 4 ] )
     } else {
       t2_shift <- delta$t2
       delta$t2[ 3 ] <- delta$t2[ 1 ] + 
-        t2_shift[ 3 ] * delta_factor$t2
+        ( t2_shift[ 3 ] / delta_factor$t2 ) ^ 2 / 2
     }
     ## Export normalized images
     t2_intst <- t2_data$t2
