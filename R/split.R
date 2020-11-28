@@ -156,11 +156,11 @@ split3 <- function( t1ce_image, flair_image, prop_bright,
   q_t2 <- quantile( x, 1 - prop_bright, na.rm = T )
   x_sub <- x[ x > q_t2 ] 
   x_sub <- x_sub[ ! is.na( x_sub ) ]
-  start <- quantile( x_sub, seq( 0, 1, length.out = 7 ) )
+  start <- quantile( x_sub, seq( 0, 1, length.out = 5 ) )
   mu <- kmeans( x_sub, start )$centers
   csf <- ( t1ce_image == 1 |
            flair_image == 1 ) &
-           x > mu[ 2 ]
+           x > mu[ 3 ]
   csf <- which( csf )
   
   label[ x_seg$image == -1 ] <- -1L
