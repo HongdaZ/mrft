@@ -145,9 +145,24 @@ split4 <- function( x, x_seg, x_factor ) {
   return( res )
 }
 ## split t2 images for prediction
-split3 <- function( x, x_seg, x_factor ) {
+split3 <- function( t1ce_image, flair_image, prop_bright,
+                    x, x_seg, x_factor ) {
   label <- array( -4L, dim = dim( x ) )
-  label[ ! is.nan( x ) ] <- 0L
+  na_intst <- is.nan( x )
+  label[ ! na_intst ] <- 0L
+  t1ce_image[ na_intst ] <- 0L
+  flair_image[ na_intst ] <- 0L
+  
+  q_t2 <- quantile( x, 1 - prop_bright, na.rm = T )
+  x_sub <- x[ x > q_t2 ] 
+  x_sub <- x_sub[ ! is.na( x_sub ) ]
+  start <- quantile( x_sub, seq( 0, 1, length.out = 7 ) )
+  mu <- kmeans( x_sub, start )$centers
+  csf <- ( t1ce_image == 1 |
+           flair_image == 1 ) &
+           x > mu[ 2 ]
+  csf <- which( csf )
+  
   label[ x_seg$image == -1 ] <- -1L
   label[ x_seg$image == -2 ] <- -2L
   m_2 <- x_seg$parm[ 2, 2 ]
@@ -157,10 +172,12 @@ split3 <- function( x, x_seg, x_factor ) {
   label[ x > m_3 ] <- 4L
   m_1 <- x_seg$parm[ 2, 1 ]
   
+  label[ csf ] <- NA_integer_
   label[ label == -4L ] <- NA_integer_
   
   res <- list( label = label, intst = x, 
-               m = c( m_1, m_2, m_3 ) )
+               m = c( m_1, m_2, m_3 ),
+               csf = csf )
   return( res )
 }
 ## Split edema || enh into to parts

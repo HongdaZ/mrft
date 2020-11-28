@@ -199,7 +199,6 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     t2_res <- t2_seg$parm[ c( 2, 3 ), ]
     # sink()
     ## update delta
-    adjust_t2 <- 6
     if( is.na( delta$t2[ 3 ] ) ) {
       shift_t21 <- updateDelta3T2( prop_bright,
                                    t1ce_image, flair_image,
@@ -229,13 +228,15 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     ## update beta
     sigma2 <- t2_seg$parm[ 3, ]
     beta$t2[ 1 : 2 ] <- ( alpha$t2[ 1 : 2 ] + 1 ) * sigma2
-    t2_data <- split3( t2_data$t2, t2_seg, t2_shift[ 3 ] )
+    t2_data <- split3( t1ce_image, flair_image, prop_bright,
+                       t2_data$t2, t2_seg, t2_shift[ 3 ] )
     ## update m
     m <- t2_data$m
     b <- getB( m, a )
     t2_model <- initEst( t2_data$label, t2_data$intst )
     t2_seg <- pred( t2_model, delta$t2, gamma$t2, alpha$t2, beta$t2,
                     lambda2$t2, a, b, m, nu2$t2, maxit$t2 )
+    t2_seg$image[ t2_data$csf ] <- -4L
     ## t2
     t2_image <- t2_seg$image
     t2_image[ is.na( t2_image ) ] <- 0L
