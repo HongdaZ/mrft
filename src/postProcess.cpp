@@ -495,8 +495,16 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
                ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
                100, len );
-  wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
-          ptr_flair, ptr_seg, ptr_tumor );
+  if( ptr_code[ 0 ] == 1 ) {
+    // LGG
+    wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
+            ptr_flair, ptr_seg, ptr_tumor );
+  } else {
+    // HGG
+    wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
+            ptr_seg, ptr_tumor );
+  }
+  
   // Find csf inside tumor
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 &&
