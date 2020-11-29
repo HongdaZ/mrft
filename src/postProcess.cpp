@@ -170,9 +170,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     ptr_on[ i ] = ptr_flair[ i ];
   }
   // Remove large 2D slices of T2(4) and Flair(4)
-  removeSlice( ptr_whole, T2::T2CSF, 20, 0.8, len,
+  removeSlice( ptr_whole, T2::T2CSF, 10, 0.8, len,
                region, ptr_nidx, ptr_aidx, nr, nc, ns );
-  removeSlice( ptr_on, Flair::FTM, 20, 0.4, len,
+  removeSlice( ptr_on, Flair::FTM, 10, 0.4, len,
                region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ( (
