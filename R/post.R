@@ -38,6 +38,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           min_enh = 2000L,
           min_enh_enc = 1000L,
           max_prop_enh_enc = .1,
+          max_prop_enh_slice = .2,
           min_tumor = 20000L,
           spread_add = 4,
           spread_rm = 3 ) {
@@ -54,7 +55,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   post_data <- initPost( t1ce_image, flair_image, t2_image )
   # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
   post_seg <- postProcess( post_data, min_enh, min_enh_enc,
-                           max_prop_enh_enc,
+                           max_prop_enh_enc, max_prop_enh_slice,
                            min_tumor, spread_add, spread_rm )
   if( sum( post_seg$image == 6, na.rm = T ) > 10 ) {
     ## With CSF inside tumor

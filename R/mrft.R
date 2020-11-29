@@ -38,6 +38,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   min_enh = 2000L,
                   min_enh_enc = 1000L,
                   max_prop_enh_enc = .1,
+                  max_prop_enh_slice = .2,
                   min_tumor = 20000L,
                   spread_add = 4,
                   spread_rm = 3 ) {
@@ -48,5 +49,6 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
         gamma, alpha,
         beta, lambda2, a, nu2, maxit, 
         min_enh, min_enh_enc, max_prop_enh_enc, 
+        max_prop_enh_slice,
         min_tumor, spread_add, spread_rm )
 }

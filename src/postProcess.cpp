@@ -24,6 +24,7 @@
 #include "assignCSF.h"
 #include "removeSmall.h"
 #include "addInside.h"
+#include "removeSlice.h"
 
 using std::vector;
 using std::list;
@@ -32,10 +33,12 @@ using std::list;
 extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh,
                              SEXP min_enh_enc,
                              SEXP max_prop_enh_enc,
+                             SEXP max_prop_enh_slice,
                              SEXP min_tumor, SEXP spread_add,
                              SEXP spread_rm ) ;
 SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP min_enh_enc, SEXP max_prop_enh_enc,
+                  SEXP max_prop_enh_slice,
                   SEXP min_tumor, SEXP spread_add,
                   SEXP spread_rm ) {
   SEXP t1ce = getListElement( post_data, "t1ce_seg" );
@@ -95,6 +98,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   const int m_enh = INTEGER( min_enh )[ 0 ];
   const int m_enh_enc = INTEGER( min_enh_enc )[ 0 ];
   const double m_prop_enh_enc = REAL( max_prop_enh_enc )[ 0 ];
+  const double m_prop_enh_slice = REAL( max_prop_enh_slice )[ 0 ];
   const int m_tumor = INTEGER( min_tumor )[ 0 ];
   const double s_add = REAL( spread_add )[ 0 ];
   const double s_rm = REAL( spread_rm )[ 0 ];
@@ -144,8 +148,14 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   pad2zero( ptr_necrosis, len );
   zeroVector( ptr_whole, len );
   // 10-3: Find rough regions of enhancing tumor core
+  for( int i = 0; i < 2 * len; ++ i ) {
+    ptr_whole[ i ] = ptr_t1ce[ i ];
+  }
+  // Remove large 2D slices of T1ce(4)
+  removeSlice( ptr_whole, T1ce::T1TM, 20, m_prop_enh_slice, len,
+               region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_t1ce[ 2 * i ] == T1ce::T1TM &&
+    if( ptr_whole[ 2 * i ] == T1ce::T1TM &&
         ( ptr_t2[ 2 * i ] == T2::T2CSF ||
         ptr_flair[ 2 * i ] == Flair::FTM ) &&
         ptr_necrosis[ 2 * i ] != Tumor::NCR &&
@@ -153,28 +163,40 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_enh[ 2 * i ] = Tumor::ET;
     }
   }
+  zeroVector( ptr_whole, len );
   // 10-4: Find rough regions of edema
+  for( int i = 0; i < 2 * len; ++ i ) {
+    ptr_whole[ i ] = ptr_t2[ i ];
+    ptr_on[ i ] = ptr_flair[ i ];
+  }
+  // Remove large 2D slices of T2(4) and Flair(4)
+  removeSlice( ptr_whole, T2::T2CSF, 20, 0.8, len,
+               region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  removeSlice( ptr_on, Flair::FTM, 20, 0.4, len,
+               region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
-    if( ( ( 
-        ptr_t2[ 2 * i ] == T2::T2CSF &&
-        ( ptr_flair[ 2 * i ] == Flair::FTM &&
+    if( ( (
+        ptr_whole[ 2 * i ] == T2::T2CSF &&
+        ( ptr_on[ 2 * i ] == Flair::FTM &&
         ptr_t1ce[ 2 * i ] == T1ce::T1GM ) ) ||
-        ptr_enh[ 2 * i ] == Tumor::ET ) && 
+        ptr_enh[ 2 * i ] == Tumor::ET ) &&
         ( ptr_necrosis[ 2 * i ] != Tumor::NCR &&
         ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) ) {
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_on, len );
   // 10-5: Find necrosis
   // necrosis enclosed by edema
-  inRegion( ptr_enclose_nec, len, ptr_edema, Tumor::ED, 
-            ptr_necrosis, Tumor::NCR, 
+  inRegion( ptr_enclose_nec, len, ptr_edema, Tumor::ED,
+            ptr_necrosis, Tumor::NCR,
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
   // Remove necrosis regions separate from edema
   for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_enclose_nec, 
+    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_enclose_nec,
                     1, region ) ) {
-      excldRegion( region, ptr_nidx, ptr_enclose_nec, 
+      excldRegion( region, ptr_nidx, ptr_enclose_nec,
                    ptr_edema, Tumor::ED );
     }
   }
@@ -182,7 +204,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   pad2zero( ptr_enclose_nec, len );
   // Extend in ptr_necrosis
   for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_necrosis, 
+    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_necrosis,
                     Tumor::NCR, region ) ) {
       extRegion( region, ptr_enclose_nec, 1, .6, true );
     }
@@ -197,10 +219,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_necrosis[ 2 * i ] = 0;
     }
   }
-  
+
   // 10-6: Find hemorrhage
   // hemorrhage enclosed by edema
-  inRegion( ptr_enclose_hem, len, ptr_edema, Tumor::ED, 
+  inRegion( ptr_enclose_hem, len, ptr_edema, Tumor::ED,
             ptr_hemorrhage, Tumor::HMG,
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
   // Remove hemorrhage regions separate from edema
@@ -230,7 +252,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
- 
+
   // 10-7.1: Remove 3D connected regions with
   // size < min_tumor or Keep the tumor regions with
   // size = max_size
@@ -244,7 +266,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // Wrap up the segmentation result
   // Now edema only includes edema
   for( int i = 0; i < len; ++ i ) {
-    if( ( 
+    if( (
         // ( ptr_flair[ 2 * i ] == Flair::FTM &&
         // ptr_t1ce[ 2 * i ] ==  T1ce::T1GM ) ||
         ( ptr_t2[ 2 * i ] == T2::T2CSF &&
@@ -274,7 +296,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
                ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
                100, len );
-  // 10-7.3: Extend edema in ( FLAIR( 4 ) && T1ce( 2 ) ) 
+  // 10-7.3: Extend edema in ( FLAIR( 4 ) && T1ce( 2 ) )
   for( int i = 0; i < len; ++ i ) {
     if(
         ( ptr_flair[ 2 * i ] == Flair::FTM &&
@@ -344,7 +366,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // 10-7.3.2 Add voxels inside tumor (2D)
   zeroVector( ptr_whole, len );
   zeroVector( ptr_extra_edema, len );
-  
+
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
@@ -384,7 +406,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     // code
     ptr_code[ 0 ] = 1; // LGG (further seg)
   } else {
-    // 10-7.5: tumor || T1ce( 1 ) || Flair( 4 ) 
+    // 10-7.5: tumor || T1ce( 1 ) || Flair( 4 )
     // || T2( 4 ) \ T1ce( 4 )
     // inside enh is necrosis
     // Find total number of voxels inside convex hull
@@ -408,7 +430,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     // Remove new regions with size > 100
     zeroVector( ptr_on, len );
     for( int i = 0; i < len; ++ i ) {
-      if( ptr_tumor[ 2 * i ] == 0 && 
+      if( ptr_tumor[ 2 * i ] == 0 &&
           ptr_enclose_ncr[ 2 * i ] == 1 ) {
         ptr_on[ 2 * i ] = 1;
       } else {
