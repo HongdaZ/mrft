@@ -2,6 +2,7 @@
 #include "cnctRegion.h"
 #include "pad2zero.h"
 #include "excldRegion.h"
+#include "tissueType.h"
 
 void removeSlice( int *ptr_seg, const int &label, const int &last_slices,
                   const double &prop, const int &len,
@@ -21,9 +22,10 @@ void removeSlice( int *ptr_seg, const int &label, const int &last_slices,
   }
   last_nonzero = last_nonzero - last_slices;
   for( int i = 0; i < len; ++ i ) {
-    slice = ptr_aidx[ 3 * i + 2 ];
+    slice = ptr_aidx[ 3 * i + Plane::Axial ];
     if( slice > last_nonzero ) {
-      if( cnctRegion( i + 1, ptr_nidx, ptr_aidx, 2, ptr_seg, ptr_seg, 
+      if( cnctRegion( i + 1, ptr_nidx, ptr_aidx, Plane::Axial, 
+                      ptr_seg, ptr_seg, 
                       label, region ) ) {
         n = region.size();
         if( n > prop * count[ slice - 1 ] ) {

@@ -40,7 +40,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   max_prop_enh_enc = .1,
                   max_prop_enh_slice = .2,
                   min_tumor = 20000L,
-                  spread_add = 4,
+                  spread_add = 3,
                   spread_rm = 3 ) {
   segment( patient, out, infolder, delta, delta_factor,
            gamma, alpha,
