@@ -112,14 +112,14 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           spread_idx = spread( region, ptr_aidx );
           p_t_nbr = pTNbr( region, ptr_seg1, label1, ptr_nidx );
           r = radius( region.size() );
-          if( 1 / p_t_nbr <  r ) {
-            if( spread_idx < spread_factor ) {
+          if( 1 / p_t_nbr <  r / 3 ) {
+            if( spread_idx < 4 ) {
               add = true;
             } else {
               add = false;
             }
           } else {
-            if( spread_idx < 2 ) {
+            if( spread_idx < spread_factor ) {
               add = true;
             } else {
               add = false;
