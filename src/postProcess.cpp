@@ -124,9 +124,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   
   // 10-2: Find necrosis
   for( int i = 0; i < len; ++ i ) {
-    if( ( ptr_t1ce[ 2 * i ] == T1ce::T1CSF || 
-        ptr_flair[ 2 * i ] == Flair::FCSF ) &&
-        ptr_flair[ 2 * i ] != Flair::FTM ) {
+    if( ptr_t1ce[ 2 * i ] == T1ce::T1CSF || 
+        ptr_flair[ 2 * i ] == Flair::FCSF ) {
       ptr_necrosis[ 2 * i ] = Tumor::NCR;
     }
   }
