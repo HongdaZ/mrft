@@ -119,7 +119,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
               add = false;
             }
           } else {
-            if( spread_idx < 2) {
+            if( spread_idx < 1.5 ) {
               add = true;
             } else {
               add = false;
