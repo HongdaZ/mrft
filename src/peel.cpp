@@ -49,22 +49,7 @@ int peel( int *ptr_whole, const int &len,
         nidx = ptr_nidx[ 6 * ( idx - 1 ) + i ];
         if( nidx != NA_INTEGER ) {
           if( ptr_whole[ 2 * ( nidx - 1 ) ] == 1 ) {
-            rm = false;
-            for( int j = 0; j < 6; ++ j ) {
-              nnidx = ptr_nidx[ 6 * ( nidx - 1 ) + j ];
-              if( nnidx != NA_INTEGER ) {
-                if( ptr_whole[ 2 * ( nnidx - 1 ) ] == 0 ) {
-                  rm = true;
-                  break;
-                }
-              } else {
-                rm = true;
-                break;
-              }
-            }
-            if( rm ) {
-              outer_new.push_back( nidx );
-            }
+            outer_new.push_back( nidx );
           }
         }
       }
