@@ -1,38 +1,77 @@
 #include "Rinternals.h"
 
+#include <list>
+
 #include "peel.h"
+#include "clearVector.h"
+
+using std::list;
 
 int peel( int *ptr_whole, const int &len,
            const int *ptr_nidx ) {
-  int last = -1, n_tumor = 1, nidx = 0;
+  list<int> outer_old;
+  list<int> outer_new;
+  int last = 0, idx = 0, nidx = 0, nnidx = 0;
   bool rm = false;
-  // Remove all tumor voxels
-  while( n_tumor > 0 ) {
-    n_tumor = 0;
-    for( int i = 0; i < len; ++ i ) {
-      if( ptr_whole[ 2 * i ] == 1 ) {
-        rm = false;
-        for( int j = 0; j < 6; ++ j ) {
-          nidx = ptr_nidx[ 6 * i + j ];
-          if( nidx != NA_INTEGER ) {
-            if( ptr_whole[ 2 * ( nidx - 1 ) ] == 0 ) {
-              rm = true;
-              ptr_whole[ 2 * i ] = 0;
-              last = i;
-              break;
-            }
-          } else {
+  // Find the initial outer tumor voxels
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_whole[ 2 * i ] == 1 ) {
+      rm = false;
+      for( int j = 0; j < 6; ++ j ) {
+        nidx = ptr_nidx[ 6 * i + j ];
+        if( nidx != NA_INTEGER ) {
+          if( ptr_whole[ 2 * ( nidx - 1 ) ] == 0 ) {
             rm = true;
-            ptr_whole[ 2 * i ] = 0;
-            last = i;
             break;
           }
+        } else {
+          rm = true;
+          break;
         }
-        if( ! rm ) {
-          ++ n_tumor;
-        }
+      }
+      if( rm ) {
+        outer_old.push_back( i + 1 );
       }
     }
   }
+  while( outer_old.size() != 0 ) {
+    // Peel outer part
+    for( list<int>::const_iterator it = outer_old.begin();
+         it != outer_old.end(); ++ it ) {
+      idx = *it;
+      ptr_whole[ 2 * ( idx - 1 ) ] = 0;
+    }
+    // Find new outer part
+    for( list<int>::const_iterator it = outer_old.begin();
+         it != outer_old.end(); ++ it ) {
+      idx = *it;
+      for( int i = 0; i < 6; ++ i ) {
+        nidx = ptr_nidx[ 6 * ( idx - 1 ) + i ];
+        if( nidx != NA_INTEGER ) {
+          if( ptr_whole[ 2 * ( nidx - 1 ) ] == 1 ) {
+            rm = false;
+            for( int j = 0; j < 6; ++ j ) {
+              nnidx = ptr_nidx[ 6 * ( nidx - 1 ) + j ];
+              if( nnidx != NA_INTEGER ) {
+                if( ptr_whole[ 2 * ( nnidx - 1 ) ] == 0 ) {
+                  rm = true;
+                  break;
+                }
+              } else {
+                rm = true;
+                break;
+              }
+            }
+            if( rm ) {
+              outer_new.push_back( nidx );
+            }
+          }
+        }
+      }
+    }
+    outer_old = outer_new;
+    clearVector( outer_new );
+  }
+  
   return last;
 }
