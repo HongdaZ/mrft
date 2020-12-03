@@ -25,6 +25,7 @@
 #include "removeSmall.h"
 #include "addInside.h"
 #include "removeSlice.h"
+#include "trim.h"
 
 using std::vector;
 using std::list;
@@ -532,6 +533,13 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       } else if( ptr_csf[ 2 * i ] == 1 ) {
         ptr_seg[ 2 * i ] = Seg::SCSF;
       }
+    }
+  }
+  // Trim tumor region
+  trim( ptr_tumor, ptr_nidx, region, len );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_seg[ 2 * i ] = 0;
     }
   }
   // Restore the segmentation result to a image with the original

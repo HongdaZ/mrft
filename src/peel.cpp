@@ -7,7 +7,7 @@
 
 using std::list;
 
-int peel( int *ptr_whole, const int &len,
+int peel( int *ptr_one, const int &len,
            const int *ptr_nidx ) {
   list<int> outer_old;
   list<int> outer_new;
@@ -15,12 +15,12 @@ int peel( int *ptr_whole, const int &len,
   bool rm = false;
   // Find the initial outer tumor voxels
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_whole[ 2 * i ] == 1 ) {
+    if( ptr_one[ 2 * i ] == 1 ) {
       rm = false;
       for( int j = 0; j < 6; ++ j ) {
         nidx = ptr_nidx[ 6 * i + j ];
         if( nidx != NA_INTEGER ) {
-          if( ptr_whole[ 2 * ( nidx - 1 ) ] == 0 ) {
+          if( ptr_one[ 2 * ( nidx - 1 ) ] == 0 ) {
             rm = true;
             break;
           }
@@ -39,7 +39,7 @@ int peel( int *ptr_whole, const int &len,
     for( list<int>::const_iterator it = outer_old.begin();
          it != outer_old.end(); ++ it ) {
       idx = *it;
-      ptr_whole[ 2 * ( idx - 1 ) ] = 0;
+      ptr_one[ 2 * ( idx - 1 ) ] = 0;
     }
     // Find new outer part
     for( list<int>::const_iterator it = outer_old.begin();
@@ -48,7 +48,7 @@ int peel( int *ptr_whole, const int &len,
       for( int i = 0; i < 6; ++ i ) {
         nidx = ptr_nidx[ 6 * ( idx - 1 ) + i ];
         if( nidx != NA_INTEGER ) {
-          if( ptr_whole[ 2 * ( nidx - 1 ) ] == 1 ) {
+          if( ptr_one[ 2 * ( nidx - 1 ) ] == 1 ) {
             outer_new.push_back( nidx );
           }
         }
