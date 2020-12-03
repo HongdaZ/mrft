@@ -8,7 +8,6 @@
 #include "pTNbr.h"
 #include "clearVector.h"
 #include "radius.h"
-#include "peel.h"
 #include "nTumor.h"
 #include "nSurface.h"
 
@@ -21,7 +20,7 @@ void grow( const int &last, int &n_tumor, const int &len,
   int idx = 0, nidx = 0, spread_keep = 0, spread_remain = 0;
   int n_surface = 0, n_tnbr = 0;
   double p_tnbr = 0, r = 0;
-  bool add, keep;
+  bool keep;
   zeroVector( ptr_keep, len );
   zeroVector( ptr_remain, len );
   for( int i = 0; i < len; ++ i ) {

@@ -40,6 +40,7 @@ int peel( int *ptr_one, const int &len,
          it != outer_old.end(); ++ it ) {
       idx = *it;
       ptr_one[ 2 * ( idx - 1 ) ] = 0;
+      last = idx;
     }
     // Find new outer part
     for( list<int>::const_iterator it = outer_old.begin();
