@@ -59,10 +59,8 @@ void grow( const int &last, int &n_tumor, const int &len,
           for( vector<int>::const_iterator it = region.begin();
                it != region.end(); ++ it ) {
             idx = *it;
-            if( idx != 0 ) {
-              ptr_one[ 2 * ( idx - 1 ) ] = 0;
-              ptr_remain[ 2 * ( idx - 1 ) ] = 0;
-            }
+            ptr_one[ 2 * ( idx - 1 ) ] = 0;
+            ptr_remain[ 2 * ( idx - 1 ) ] = 0;
           }
         }
       }
@@ -83,7 +81,6 @@ void grow( const int &last, int &n_tumor, const int &len,
     }
     outer_old = outer_new;
     clearVector( outer_new );
-    
   }
   // Keep the tumor region
   if( keep ) {

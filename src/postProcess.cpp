@@ -536,10 +536,14 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
   }
   // Trim tumor region
-  trim( ptr_tumor, ptr_nidx, region, len );
+  trim( ptr_tumor, ptr_nidx, ptr_aidx, region, len );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
       ptr_seg[ 2 * i ] = 0;
+      ptr_hemorrhage[ 2 * i ] = 0;
+      ptr_necrosis[ 2 * i ] = 0;
+      ptr_enh[ 2 * i ] = 0;
+      ptr_edema[ 2 * i ] = 0;
     }
   }
   // Restore the segmentation result to a image with the original
