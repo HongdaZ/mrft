@@ -252,12 +252,22 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
-
+  // 10-7.0: Trim tumor region
+  wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
+          ptr_seg, ptr_tumor );
+  trim( ptr_tumor, ptr_nidx, ptr_aidx, region, len );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_seg[ 2 * i ] = 0;
+      ptr_hemorrhage[ 2 * i ] = 0;
+      ptr_necrosis[ 2 * i ] = 0;
+      ptr_enh[ 2 * i ] = 0;
+      ptr_edema[ 2 * i ] = 0;
+    }
+  }
   // 10-7.1: Remove 3D connected regions with
   // size < min_tumor or Keep the tumor regions with
   // size = max_size
-  wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
-          ptr_seg, ptr_tumor );
   remove( region, ptr_aidx, ptr_nidx, ptr_tumor, ptr_seg,
           ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
           m_tumor, m_enh_enc, len, nr, nc, ns, s_rm );
@@ -296,7 +306,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
                ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
                100, len );
-  // 10-7.3: Extend edema in ( FLAIR( 4 ) && T1ce( 2 ) )
+  // 10-7.3.1: Extend edema in ( FLAIR( 4 ) && T1ce( 2 ) )
   for( int i = 0; i < len; ++ i ) {
     if(
         ( ptr_flair[ 2 * i ] == Flair::FTM &&
@@ -534,17 +544,6 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       } else if( ptr_csf[ 2 * i ] == 1 ) {
         ptr_seg[ 2 * i ] = Seg::SCSF;
       }
-    }
-  }
-  // Trim tumor region
-  trim( ptr_tumor, ptr_nidx, ptr_aidx, region, len );
-  for( int i = 0; i < len; ++ i ) {
-    if( ptr_tumor[ 2 * i ] == 0 ) {
-      ptr_seg[ 2 * i ] = 0;
-      ptr_hemorrhage[ 2 * i ] = 0;
-      ptr_necrosis[ 2 * i ] = 0;
-      ptr_enh[ 2 * i ] = 0;
-      ptr_edema[ 2 * i ] = 0;
     }
   }
   // Restore the segmentation result to a image with the original
