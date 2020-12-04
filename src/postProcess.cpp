@@ -530,6 +530,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     if( ptr_tumor[ 2 * i ] == 0 ) {
       if( ptr_enclose_csf[ 2 * i ] == 1 ) {
         ptr_seg[ 2 * i ] = Seg::SECSF;
+        ptr_tumor[ 2 * i ] = 1;
       } else if( ptr_csf[ 2 * i ] == 1 ) {
         ptr_seg[ 2 * i ] = Seg::SCSF;
       }

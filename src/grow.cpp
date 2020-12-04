@@ -20,6 +20,7 @@ void grow( const int &last, int &n_tumor, const int &len,
   int idx = 0, nidx = 0, spread_keep = 0, spread_remain = 0;
   int n_surface = 0, n_tnbr = 0;
   double p_tnbr = 0, r = 0;
+  double spread_rm = 3;
   bool keep;
   zeroVector( ptr_keep, len );
   zeroVector( ptr_remain, len );
@@ -27,6 +28,7 @@ void grow( const int &last, int &n_tumor, const int &len,
     ptr_remain[ 2 * i ] = ptr_one[ 2 * i ];
   }
   outer_old.push_back( last );
+  ptr_remain[ 2 * last - 1 ] = 1;
   keep = true;
   while( outer_old.size() > 0 ) {
     // Add outer part to keep
@@ -40,7 +42,7 @@ void grow( const int &last, int &n_tumor, const int &len,
     cnctRegion( idx, ptr_nidx, ptr_keep, ptr_keep, 1, region );
     pad2zero( ptr_keep, region );
     spread_keep = spread( region, ptr_aidx );
-    if( spread_keep > 4 ) {
+    if( spread_keep > spread_rm ) {
       keep = false;
       break;
     }
@@ -53,8 +55,8 @@ void grow( const int &last, int &n_tumor, const int &len,
         spread_remain = spread( region, ptr_aidx );
         r = radius( region.size() );
         if( n_tnbr < ( double )n_surface / 54 &&
-            1 / p_tnbr > 4 * r &&
-            spread_remain > 4 ) {
+            // 1 / p_tnbr > 4 * r &&
+            spread_remain > spread_rm ) {
           // Remove from ptr_one and ptr_remain
           for( vector<int>::const_iterator it = region.begin();
                it != region.end(); ++ it ) {
@@ -73,8 +75,10 @@ void grow( const int &last, int &n_tumor, const int &len,
       for( int i = 0; i < 6; ++ i ) {
         nidx = ptr_nidx[ 6 * ( idx - 1 ) + i ];
         if( nidx != NA_INTEGER ) {
-          if( ptr_remain[ 2 * ( nidx - 1 ) ] == 1 ) {
+          if( ptr_remain[ 2 * ( nidx - 1 ) ] == 1 &&
+              ptr_remain[ 2 * nidx - 1 ] != 1 ) {
             outer_new.push_back( nidx );
+            ptr_remain[ 2 * nidx - 1 ] = 1;
           }
         }
       }

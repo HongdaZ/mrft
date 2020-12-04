@@ -22,7 +22,6 @@ void trim( int *ptr_tumor, const int *ptr_nidx,
       ++ n_tumor;
     }
   }
-  
   // Let peel apples
   while( n_tumor != 0 ) {
     for( int i = 0; i < len; ++ i ) {
@@ -40,6 +39,13 @@ void trim( int *ptr_tumor, const int *ptr_nidx,
              it != region.end(); ++ it ) {
           idx = *it;
           ptr_one[ 2 * ( idx - 1 ) ] = 1;
+        }
+        
+        int n_ptr_one = 0;
+        for( int j = 0; j < len; ++ j ) {
+          if( ptr_one[ 2 * j ] == 1 ) {
+            ++ n_ptr_one;
+          }
         }
         grow( last, n_tumor, len, region, ptr_nidx, 
               ptr_aidx, ptr_whole, ptr_res, ptr_one,
