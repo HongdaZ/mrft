@@ -35,7 +35,7 @@ void trim( int *ptr_tumor, int *ptr_exclude,
           idx = *it;
           ptr_one[ 2 * ( idx - 1 ) ] = 1;
         }
-        last = peel( ptr_one, len, ptr_nidx );
+        last = peel( ptr_one, len, ptr_nidx, ptr_aidx );
         for( vector<int>::const_iterator it = region.begin();
              it != region.end(); ++ it ) {
           idx = *it;
