@@ -7,7 +7,8 @@
 #include "zeroVector.h"
 #include "grow.h"
 
-void trim( int *ptr_tumor, const int *ptr_nidx, 
+void trim( int *ptr_tumor, int *ptr_exclude,
+           const int *ptr_nidx, 
            const int *ptr_aidx, vector<int> &region,
            const int &len, const double &s_trim ) {
   int *ptr_whole = new int[ 2 * len ]();
@@ -54,8 +55,10 @@ void trim( int *ptr_tumor, const int *ptr_nidx,
     }
   }
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_res[ 2 * i ] == 0 ) {
+    if( ptr_res[ 2 * i ] == 0 && 
+        ptr_tumor[ 2 * i ] == 1 ) {
       ptr_tumor[ 2 * i ] = 0;
+      ptr_exclude[ 2 * i ] = 1;
     }
   }
   delete [] ptr_whole;

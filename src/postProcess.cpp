@@ -93,6 +93,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_tumor = new int[ 2 * len ]();
   int *ptr_on = new int[ 2 * len ]();
   int *ptr_enclose_csf = new int[ 2 * len ]();
+  int *ptr_exclude = new int[ 2 * len ]();
   // Store the result of findRegion
   vector<int> region;
   region.reserve( len );
@@ -263,7 +264,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
           ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
           m_tumor, m_enh_enc, len, nr, nc, ns, s_rm );
   // Trim tumor region
-  trim( ptr_tumor, ptr_nidx, ptr_aidx, region, len, s_trim );
+  trim( ptr_tumor, ptr_exclude,
+        ptr_nidx, ptr_aidx, region, len, s_trim );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
       ptr_seg[ 2 * i ] = 0;
@@ -589,6 +591,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   delete [] ptr_tumor;
   delete [] ptr_on;
   delete [] ptr_enclose_csf;
+  delete [] ptr_exclude;
   
   UNPROTECT( 4 );
   return res;
