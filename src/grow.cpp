@@ -18,7 +18,8 @@ void grow( const int &last, int &n_tumor, const int &len,
            int *ptr_one, int *ptr_keep, int *ptr_remain, 
            const double &s_trim ) {
   list<int> outer_old, outer_new;
-  int idx = 0, nidx = 0, spread_keep = 0, spread_remain = 0;
+  int idx = 0, nidx = 0;
+  double spread_keep = 0, spread_remain = 0;
   int n_surface = 0, n_tnbr = 0;
   double p_tnbr = 0, r = 0;
   bool keep;
@@ -39,10 +40,10 @@ void grow( const int &last, int &n_tumor, const int &len,
       ptr_remain[ 2 * ( idx - 1 ) ] = 0;
       -- n_tumor;
     }
+    
     cnctRegion( idx, ptr_nidx, ptr_keep, ptr_keep, 1, region );
     pad2zero( ptr_keep, region );
     spread_keep = spread( region, ptr_aidx );
-    Rprintf( "spread_keep = %f\n", spread_keep );
     if( spread_keep > s_trim) {
       keep = false;
       break;
