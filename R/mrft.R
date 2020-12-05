@@ -42,7 +42,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   min_tumor = 20000L,
                   spread_add = 4,
                   spread_rm = 4,
-                  spread_trim = 4 ) {
+                  spread_trim = 3 ) {
   segment( patient, out, infolder, delta, delta_factor,
            gamma, alpha,
            beta, lambda2, a, nu2, maxit )
