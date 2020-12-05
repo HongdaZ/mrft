@@ -43,13 +43,35 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   spread_add = 4,
                   spread_rm = 4,
                   spread_trim = 3 ) {
-  segment( patient, out, infolder, delta, delta_factor,
-           gamma, alpha,
-           beta, lambda2, a, nu2, maxit )
-  post( patient, out, infolder, delta, delta_factor,
-        gamma, alpha,
-        beta, lambda2, a, nu2, maxit, 
-        min_enh, min_enh_enc, max_prop_enh_enc, 
-        max_prop_enh_slice,
-        min_tumor, spread_add, spread_rm, spread_trim )
+  infile <- patient[ 1 ]
+  outfile <- gsub( infolder, out, infile )
+  out_new_delta_t2 <- gsub( "_flair.nii.gz", "_post.rds", outfile )
+  redo <- TRUE
+  if( file.exists( out_new_delta_t2 ) ) {
+    new_delta_t2 <- readRDS( out_new_delta_t2 )
+    if( is.null( new_delta_t2 ) ) {
+      redo <- FALSE
+    } else {
+      delta$t2 <- new_delta_t2
+    }
+  }
+  while( redo ) {
+    segment( patient, out, infolder, delta, delta_factor,
+             gamma, alpha,
+             beta, lambda2, a, nu2, maxit )
+    post( patient, out, infolder, delta, delta_factor,
+          gamma, alpha,
+          beta, lambda2, a, nu2, maxit, 
+          min_enh, min_enh_enc, max_prop_enh_enc, 
+          max_prop_enh_slice,
+          min_tumor, spread_add, spread_rm, spread_trim )
+  }
+  if( file.exists( out_new_delta_t2 ) ) {
+    new_delta_t2 <- readRDS( out_new_delta_t2 )
+    if( is.null( new_delta_t2 ) ) {
+      redo <- FALSE
+    } else {
+      delta$t2 <- new_delta_t2
+    }
+  }
 }

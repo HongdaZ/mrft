@@ -36,7 +36,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                                  fthr = rep( .25, 2 ) ),
                      maxit = 
                        list( t1ce = 10L, flair = 1L,
-                             t2 = 1L, fthr = 40L ) ) {
+                             t2 = 1L, fthr = 40L ) 
+                     ) {
   images <- readImage( patient )
   ## Output files
   infile <- patient[ 1 ]
@@ -221,9 +222,6 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     ## Export normalized images
     t2_intst <- t2_data$t2
     out_t2_norm <- gsub( ".nii.gz", "", out_t2_norm )
-    writeNIfTI( nifti( t2_intst, datatype = 64 ) ,
-                out_t2_norm,
-                gzipped = T )
     save( t2_res, t2_shift, file = out_t2_data )
     ## update beta
     sigma2 <- t2_seg$parm[ 3, ]
@@ -248,5 +246,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     out_t2_seg <- gsub( ".nii.gz", "", out_t2_seg )
     writeNIfTI( nifti( t2_image, datatype = 2 ),
                 filename = out_t2_seg, gzipped = TRUE )
+    writeNIfTI( nifti( t2_intst, datatype = 64 ) ,
+                out_t2_norm,
+                gzipped = T )
   }
 }
