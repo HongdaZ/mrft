@@ -34,8 +34,8 @@ double spread( const vector<int> &region, const int *ptr_aidx ) {
       r1 = ptr_aidx[ 3 * ( index1 - 1 ) ];
       c1 = ptr_aidx[ 3 * ( index1 - 1 ) + 1 ];
       s1 = ptr_aidx[ 3 * ( index1 - 1 ) + 2 ];
-      dist =  sqrt( pow( r1 - cr, 2 ) + pow( c1 - cc, 2) +
-        pow( s1 - cs, 2 ) );
+      dist =  sqrt( pow( r1 - cr + 0.71, 2 ) + pow( c1 - cc + 0.71, 2 ) +
+        pow( s1 - cs + 0.71, 2 ) );
       if( max_dist < dist ) {
         max_dist = dist;
       }

@@ -9,7 +9,7 @@
 
 void trim( int *ptr_tumor, const int *ptr_nidx, 
            const int *ptr_aidx, vector<int> &region,
-           const int &len ) {
+           const int &len, const double &s_trim ) {
   int *ptr_whole = new int[ 2 * len ]();
   int *ptr_res = new int[ 2 * len ]();
   int *ptr_one = new int[ 2 * len ]();
@@ -49,7 +49,7 @@ void trim( int *ptr_tumor, const int *ptr_nidx,
         }
         grow( last, n_tumor, len, region, ptr_nidx, 
               ptr_aidx, ptr_whole, ptr_res, ptr_one,
-              ptr_keep, ptr_remain );
+              ptr_keep, ptr_remain, s_trim );
       }
     }
   }

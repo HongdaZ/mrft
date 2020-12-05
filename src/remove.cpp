@@ -1,6 +1,9 @@
 #include <R.h>
 #include <Rinternals.h>
 
+#include <algorithm>
+#include <list>
+
 #include "remove.h"
 #include "pad2zero.h"
 #include "cnctRegion.h"
@@ -9,6 +12,9 @@
 #include "zeroVector.h"
 #include "spread.h"
 #include "inRegion.h"
+
+using std::max;
+using std::list;
 
 void remove( vector<int> &region, const int *ptr_aidx, 
              const int *ptr_nidx, int *ptr_tumor, int *ptr_seg,
@@ -29,32 +35,49 @@ void remove( vector<int> &region, const int *ptr_aidx,
   int MAX = nr * nc * ns;
   int n_enc_t = 0;
   int max_size = 0;
-  double min_spread_idx = 0;
+  double max_spread_idx = 0, min_spread_idx = 0;
   int n_enh = 0;
   int idx = 0;
   double spread_idx = 0;
   int size = 0;
   double s_factor;
-
-  for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
-                    1, region ) ) {
-      if( region.size() > 1000 ) {
-        spread_idx = spread( region, ptr_aidx );
-        if( spread_idx < min_spread_idx ) {
-          min_spread_idx = spread_idx;
-        }
-      }
-    }
-  }
-  pad2zero( ptr_tumor, len );
-  s_factor = ( min_spread_idx < spread_factor ) ?
-  spread_factor : min_spread_idx;
+  list<int> region_size;
+  list<int> region_spread;
 
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
       spread_idx = spread( region, ptr_aidx );
+      region_size.push_back( region.size() );
+      region_spread.push_back( spread_idx );
+      // min_spread is also updated later
+      if( max_spread_idx < spread_idx ) {
+        max_spread_idx = spread_idx;
+      }
+    }
+  }
+  pad2zero( ptr_tumor, len );
+  min_spread_idx = max_spread_idx;
+  
+  list<int>::const_iterator it_size = region_size.begin();
+  list<int>::const_iterator it_spread = region_spread.begin();
+  
+  for( ; it_size != region_size.end(); ++ it_size, ++ it_spread ) {
+    if( *it_size > 5000 ) {
+      spread_idx = *it_spread;
+      if( spread_idx < min_spread_idx ) {
+        min_spread_idx = spread_idx;
+      }
+    }
+  }
+  
+  s_factor = max( min_spread_idx, spread_factor );
+  // Rprintf( "s_factor = %f\n", s_factor );
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
+                    1, region ) ) {
+      spread_idx = spread( region, ptr_aidx );
+      // Rprintf( "spread_idx = %f\n", spread_idx );
       if( spread_idx > s_factor ) {
         excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
                      ptr_necrosis, ptr_enh, ptr_edema, MAX );

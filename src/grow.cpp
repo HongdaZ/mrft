@@ -15,12 +15,12 @@ void grow( const int &last, int &n_tumor, const int &len,
            vector<int> &region,
            const int *ptr_nidx, const int *ptr_aidx,
            int *ptr_whole, int *ptr_res,
-           int *ptr_one, int *ptr_keep, int *ptr_remain ) {
+           int *ptr_one, int *ptr_keep, int *ptr_remain, 
+           const double &s_trim ) {
   list<int> outer_old, outer_new;
   int idx = 0, nidx = 0, spread_keep = 0, spread_remain = 0;
   int n_surface = 0, n_tnbr = 0;
   double p_tnbr = 0, r = 0;
-  double spread_rm = 3;
   bool keep;
   zeroVector( ptr_keep, len );
   zeroVector( ptr_remain, len );
@@ -42,7 +42,8 @@ void grow( const int &last, int &n_tumor, const int &len,
     cnctRegion( idx, ptr_nidx, ptr_keep, ptr_keep, 1, region );
     pad2zero( ptr_keep, region );
     spread_keep = spread( region, ptr_aidx );
-    if( spread_keep > spread_rm ) {
+    Rprintf( "spread_keep = %f\n", spread_keep );
+    if( spread_keep > s_trim) {
       keep = false;
       break;
     }
@@ -50,13 +51,16 @@ void grow( const int &last, int &n_tumor, const int &len,
     for( int i = 0; i < len; ++ i ) {
       if( cnctRegion( i + 1, ptr_nidx, ptr_remain, ptr_remain, 1,
                       region ) ) {
+        Rprintf( "length region = %f\n", region.size() );
         p_tnbr = pTNbr( region, ptr_keep, 1, ptr_nidx );
         n_tnbr = p_tnbr * region.size();
         spread_remain = spread( region, ptr_aidx );
+        
+        Rprintf( "spread_remain = %f\n", spread_remain );
         r = radius( region.size() );
-        if( n_tnbr < ( double )n_surface / 54 &&
+        if( n_tnbr < ( double )n_surface / 12 &&
             // 1 / p_tnbr > 4 * r &&
-            spread_remain > spread_rm ) {
+            spread_remain > s_trim ) {
           // Remove from ptr_one and ptr_remain
           for( vector<int>::const_iterator it = region.begin();
                it != region.end(); ++ it ) {
