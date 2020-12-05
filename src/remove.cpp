@@ -42,7 +42,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
   int size = 0;
   double s_factor;
   list<int> region_size;
-  list<int> region_spread;
+  list<double> region_spread;
 
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
@@ -60,7 +60,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
   min_spread_idx = max_spread_idx;
   
   list<int>::const_iterator it_size = region_size.begin();
-  list<int>::const_iterator it_spread = region_spread.begin();
+  list<double>::const_iterator it_spread = region_spread.begin();
   
   for( ; it_size != region_size.end(); ++ it_size, ++ it_spread ) {
     if( *it_size > 5000 ) {
