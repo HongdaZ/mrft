@@ -52,12 +52,11 @@ void grow( const int &last, int &n_tumor, const int &len,
     for( int i = 0; i < len; ++ i ) {
       if( cnctRegion( i + 1, ptr_nidx, ptr_remain, ptr_remain, 1,
                       region ) ) {
-        Rprintf( "length region = %f\n", region.size() );
         p_tnbr = pTNbr( region, ptr_keep, 1, ptr_nidx );
         n_tnbr = p_tnbr * region.size();
         spread_remain = spread( region, ptr_aidx );
-        
-        Rprintf( "spread_remain = %f\n", spread_remain );
+        // Rprintf( "length region = %d, n_tnbr = %d, spread_remain = %f\n",
+        //          region.size(), n_tnbr, spread_remain );
         r = radius( region.size() );
         if( n_tnbr < ( double )n_surface / 12 &&
             // 1 / p_tnbr > 4 * r &&
