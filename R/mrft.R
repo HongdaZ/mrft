@@ -52,7 +52,11 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     if( is.null( new_delta_t2 ) ) {
       redo <- FALSE
     } else {
-      delta$t2 <- new_delta_t2
+      if( new_delta_t2[ 3 ] < 2 ) {
+        redo <- FALSE
+      } else {
+        delta$t2 <- new_delta_t2
+      }
     }
   }
   while( redo ) {
@@ -71,7 +75,11 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     if( is.null( new_delta_t2 ) ) {
       redo <- FALSE
     } else {
-      delta$t2 <- new_delta_t2
+      if( new_delta_t2[ 3 ] < 2 ) {
+        redo <- FALSE
+      } else {
+        delta$t2 <- new_delta_t2
+      }
     }
   }
 }

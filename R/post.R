@@ -60,7 +60,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                            min_tumor, spread_add, spread_rm,
                            spread_trim )
   # sink()
-  if( sum( post_seg$image == 2, na.rm = T ) < 1000 ) {
+  if( sum( post_seg$image == 2, na.rm = T ) < 2000 ) {
     ## Needs to segment t2 again
     post_seg$image[ post_seg$image == 6 ] <- NA_integer_
     post_seg$image[ post_seg$image == 5 ] <- NA_integer_
@@ -68,6 +68,8 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     load( out_t2_data )
     new_delta_t2 <- t2_shift
     new_delta_t2[ 3 ] <- new_delta_t2[ 3 ] - 0.5
+    out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm.nii.gz", outfile )
+    file.remove( out_t2_norm )
   } else {
     if( sum( post_seg$image == 6, na.rm = T ) > 10 ) {
       ## With CSF inside tumor
@@ -124,6 +126,4 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
               filename = out_post_seg, gzipped = TRUE )
   out_new_delta_t2 <- gsub( "_flair.nii.gz", "_post.rds", outfile )
   saveRDS( new_delta_t2, out_new_delta_t2 )
-  out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm.nii.gz", outfile )
-  file.remove( out_t2_norm )
 }
