@@ -69,16 +69,16 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           min_enh, min_enh_enc, max_prop_enh_enc, 
           max_prop_enh_slice,
           min_tumor, spread_add, spread_rm, spread_trim )
-  }
-  if( file.exists( out_new_delta_t2 ) ) {
-    new_delta_t2 <- readRDS( out_new_delta_t2 )
-    if( is.null( new_delta_t2 ) ) {
-      redo <- FALSE
-    } else {
-      if( new_delta_t2[ 3 ] < 2 ) {
+    if( file.exists( out_new_delta_t2 ) ) {
+      new_delta_t2 <- readRDS( out_new_delta_t2 )
+      if( is.null( new_delta_t2 ) ) {
         redo <- FALSE
       } else {
-        delta$t2 <- new_delta_t2
+        if( new_delta_t2[ 3 ] < 2 ) {
+          redo <- FALSE
+        } else {
+          delta$t2 <- new_delta_t2
+        }
       }
     }
   }
