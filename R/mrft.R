@@ -9,7 +9,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   delta_factor = 
                     list( t1ce = 1.75,
                           flair = 2.75,
-                          t2 = 4 ),
+                          t2 = 4.5 ),
                   gamma = list( t1ce = 1,
                                 flair = 0.6,
                                 t2 = 0.6,
