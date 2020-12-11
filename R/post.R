@@ -2,7 +2,7 @@
 post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           ## Always four numbers for delta
           delta = 
-            list( t1ce = c( -0.5, 0, 6, 4 ),
+            list( t1ce = c( -0.5, 0.5, 6, 4 ),
                   flair = c( -0.5, 0, NA_real_, 4 ),
                   t2 = c( 0.5, 0, NA_real_, 4 ),
                   fthr = c( 0, 0, 4, 8 ) ),
