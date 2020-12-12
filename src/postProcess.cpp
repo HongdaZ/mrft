@@ -159,9 +159,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   removeSlice( ptr_whole, T1ce::T1TM, 20, m_prop_enh_slice, len,
                region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
-    ptr_enh_exclude[ 2 * i ] = ptr_t1ce[ 2 * i ];
+    if( ptr_t1ce[ 2 * i ] == T1ce::T1TM ) {
+      ptr_enh_exclude[ 2 * i ] = 1;
+    } 
+    
   }
-  removeEnh( ptr_enh_exclude, T1ce::T1TM, .70, 1 / 2, 3, len, 
+  removeEnh( ptr_enh_exclude, 1, .70, 1 / 2, 3, len, 
              region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_whole[ 2 * i ] == T1ce::T1TM &&
@@ -229,7 +232,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_necrosis[ 2 * i ] = 0;
     }
   }
-  
+
   // 10-6: Find hemorrhage
   // hemorrhage enclosed by edema
   inRegion( ptr_enclose_hem, len, ptr_edema, Tumor::ED,
@@ -262,7 +265,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
-  
+
   // 10-7.1: Remove 3D connected regions with
   // size < min_tumor or Keep the tumor regions with
   // size = max_size
@@ -563,8 +566,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       }
     }
   }
-  // // Restore the segmentation result to a image with the original
-  // // dimension
+  // Restore the segmentation result to a image with the original
+  // dimension
   
   restoreImg( ptr_idx, ptr_seg, ptr_res_image, len );
   
