@@ -27,6 +27,7 @@
 #include "removeSlice.h"
 #include "trim.h"
 #include "removeEnh.h"
+#include "removeEnhBlock.h"
 
 using std::vector;
 using std::list;
@@ -415,7 +416,37 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_on[ 2 * i ] = 1;
     }
   }
-  
+  removeEnhBlock( ptr_enh_exclude, ptr_on, 1,
+                  ptr_whole, 1, 0.3, 0.8, len, region,
+                  ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enh_exclude[ 2 * i ] == 1 ) {
+      ptr_tumor[ 2 * i ] = 0;
+      ptr_enh[ 2 * i ] = 0;
+      ptr_seg[ 2 * i ] = 0;
+    }
+  }
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_on, len );
+  // T1ce(4)
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enh_include[ 2 * i ] == 1 ) {
+      ptr_whole[ 2 * i ] = 1;
+    } else {
+      ptr_whole[ 2 * i ] = 0;
+    }
+  }
+  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+            region, s_add,
+            ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_on[ 2 * i ] == 1 &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      ptr_seg[ 2 * i ] = Seg::SET;
+      ptr_enh[ 2 * i ] = Tumor::ET;
+    }
+  }
   zeroVector( ptr_whole, len );
   zeroVector( ptr_on, len );
   // 10-7.3.2 Add voxels inside tumor (2D)

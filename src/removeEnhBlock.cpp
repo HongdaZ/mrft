@@ -18,7 +18,6 @@ void removeEnhBlock( int *ptr_exclude,
   tmp_region.reserve( len );
   int *ptr_copy_seg1 = new int[ 2 * len ]();
   int *ptr_local_seg1 = new int[ 2 * len ]();
-  int *ptr_local_seg2 = new int[ 2 * len ]();
   int *ptr_enclose = new int[ 2 * len ]();
   int idx = 0, n_in = 0, n_out = 0;
   for( int i = 0; i < len; ++ i ) {
@@ -45,7 +44,7 @@ void removeEnhBlock( int *ptr_exclude,
                 ptr_seg2, label2, tmp_region, ptr_nidx,
                 ptr_aidx, nr, nc, ns );
       for( int j = 0; j < len; ++ j ) {
-        if( ptr_enclose[ 2 * i ] == 1 ) {
+        if( ptr_enclose[ 2 * j ] == 1 ) {
           ++ n_in;
         }
       }
@@ -101,6 +100,5 @@ void removeEnhBlock( int *ptr_exclude,
   
   delete [] ptr_copy_seg1;
   delete [] ptr_local_seg1;
-  delete [] ptr_local_seg2;
   delete [] ptr_enclose;
 }
