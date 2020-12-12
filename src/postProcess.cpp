@@ -95,6 +95,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_on = new int[ 2 * len ]();
   int *ptr_enclose_csf = new int[ 2 * len ]();
   int *ptr_exclude = new int[ 2 * len ]();
+  int *ptr_enh_include = new int[ 2 * len]();
   int *ptr_enh_exclude = new int[ 2 * len]();
   // Store the result of findRegion
   vector<int> region;
@@ -158,13 +159,13 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // Remove large 2D slices of T1ce(4)
   removeSlice( ptr_whole, T1ce::T1TM, 20, m_prop_enh_slice, len,
                region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  // Remove big regions of enh
   for( int i = 0; i < len; ++ i ) {
     if( ptr_t1ce[ 2 * i ] == T1ce::T1TM ) {
-      ptr_enh_exclude[ 2 * i ] = 1;
-    } 
-    
+      ptr_enh_include[ 2 * i ] = 1;
+    }
   }
-  removeEnh( ptr_enh_exclude, 1, .70, 1 / 2, 3, len, 
+  removeEnh( ptr_enh_include, 1, .70, 1 / 2, 3, len, 
              region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_whole[ 2 * i ] == T1ce::T1TM &&
@@ -172,11 +173,17 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         ptr_flair[ 2 * i ] == Flair::FTM ) &&
         ptr_necrosis[ 2 * i ] != Tumor::NCR &&
         ptr_hemorrhage[ 2 * i ] != Tumor::HMG &&
-        ptr_enh_exclude[ 2 * i ] == 1 ) {
+        ptr_enh_include[ 2 * i ] == 1 ) {
       ptr_enh[ 2 * i ] = Tumor::ET;
     }
   }
   zeroVector( ptr_whole, len );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_necrosis[ 2 * i ] == Tumor::NCR ||
+        ptr_hemorrhage[ 2 * i ] == Tumor::HMG ) {
+      ptr_enh_include[ 2 * i ] = 0;
+    }
+  }
   // 10-4: Find rough regions of edema
   for( int i = 0; i < 2 * len; ++ i ) {
     ptr_whole[ i ] = ptr_t2[ i ];
@@ -394,6 +401,23 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
+  // Remove large blocks of enh
+  zeroVector( ptr_whole, len ); // tumor \ enh
+  zeroVector( ptr_on, len );    // enh
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_tumor[ 2 * i ] == 1 && 
+        ptr_enh[ 2 * i ] == 0 ) {
+      ptr_whole[ 2 * i ] = 1;
+    }
+  }
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_enh[ 2 * i ] == Tumor::ET ) {
+      ptr_on[ 2 * i ] = 1;
+    }
+  }
+  
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_on, len );
   // 10-7.3.2 Add voxels inside tumor (2D)
   zeroVector( ptr_whole, len );
   zeroVector( ptr_extra_edema, len );
@@ -597,6 +621,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   delete [] ptr_on;
   delete [] ptr_enclose_csf;
   delete [] ptr_exclude;
+  delete [] ptr_enh_include;
   delete [] ptr_enh_exclude;
   
   UNPROTECT( 4 );
