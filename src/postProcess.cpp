@@ -428,23 +428,33 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   zeroVector( ptr_on, len );
-  // T1ce(4)
+  // T1ce(4) || ( T2(4) && T1ce(3) )
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_enh_include[ 2 * i ] == 1 ) {
+    if( ( ptr_enh_include[ 2 * i ] == 1 &&
+        ptr_tumor[ 2 * i ] == 0 ) ||
+        ( ptr_t2[ 2 * i ] == T2::T2CSF &&
+        ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) &&
+        ptr_exclude[ 2 * i ] != 1 &&
+        ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
     } else {
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
-            region, s_add,
+  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
+            region, 5,
             ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_tumor[ 2 * i ] = 1;
-      ptr_seg[ 2 * i ] = Seg::SET;
-      ptr_enh[ 2 * i ] = Tumor::ET;
+      if( ptr_enh_include[ 2 * i ] == 1 ) {
+        ptr_seg[ 2 * i ] = Seg::SET;
+        ptr_enh[ 2 * i ] = Tumor::ET;
+      } else {
+        ptr_seg[ 2 * i ] = Seg::SED;
+        ptr_edema[ 2 * i ] = Tumor::ED;
+      }
     }
   }
   zeroVector( ptr_whole, len );
@@ -464,9 +474,11 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     if( ptr_extra_edema[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_tumor[ 2 * i ] = 1;
-      if( ( ptr_t1ce[ 2 * i ] == T1ce::T1TM ) &&
-          ( ptr_flair[ 2 * i ] == Flair::FTM ||
-          ptr_t2[ 2 * i ] == T2::T2CSF ) ) {
+      if( ptr_t1ce[ 2 * i ] == T1ce::T1TM 
+          //   &&
+          // ( ptr_flair[ 2 * i ] == Flair::FTM ||
+          // ptr_t2[ 2 * i ] == T2::T2CSF )
+          ) {
         ptr_seg[ 2 * i ] = Seg::SET;
         ptr_enh[ 2 * i ] = Tumor::ET;
       } else {
