@@ -44,3 +44,44 @@ double spread( const vector<int> &region, const int *ptr_aidx ) {
   
   return max_dist / r;
 }
+// 2D version of the function above
+double spread( const vector<int> &region, const int &plane,
+               const int *ptr_aidx ) {
+  vector<int> plane_idx{ 1, 2, 0, 2, 0, 1 };
+  vector<int> curr_plane{ plane_idx[ 2 * plane ], 
+                          plane_idx[ 2 * plane + 1 ] };
+  double r = radius2D( region.size() );
+  double max_dist = 0, dist = 0;
+  const int len = region.size();
+  double n = 0;
+  vector<double> center( 2, 0 );
+  vector<double> xyz( 2, 0 );
+  int index1;
+  for( int i = 0; i < len; ++ i ) {
+    if( region[ i ] != 0 ) {
+      index1 = region[ i ];
+      for( int j = 0; j < 2; ++ j ) {
+        xyz[ j ] = ptr_aidx[ 3 * ( index1 - 1 ) + curr_plane[ j ] ];
+        center[ j ] += xyz[ j ];
+      }
+      ++ n;
+    }
+  }
+  center[ 0 ] /= n;
+  center[ 1 ] /= n;
+  
+  for( int i = 0; i < len; ++ i ) {
+    if( region[ i ] != 0 ) {
+      index1 = region[ i ];
+      for( int j = 0; j < 2; ++ j ) {
+        xyz[ j ] = ptr_aidx[ 3 * ( index1 - 1 ) + curr_plane[ j ] ];
+      }
+      dist =  sqrt( pow( xyz[ 0 ] - center[ 0 ] + 0.71, 2 ) + 
+        pow( xyz[ 1 ] - center[ 1 ] + 0.71, 2 ) );
+      if( max_dist < dist ) {
+        max_dist = dist;
+      }
+    }
+  }
+  return max_dist / r;
+}
