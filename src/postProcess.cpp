@@ -26,6 +26,7 @@
 #include "addInside.h"
 #include "removeSlice.h"
 #include "trim.h"
+#include "removeEnh.h"
 
 using std::vector;
 using std::list;
@@ -94,6 +95,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_on = new int[ 2 * len ]();
   int *ptr_enclose_csf = new int[ 2 * len ]();
   int *ptr_exclude = new int[ 2 * len ]();
+  int *ptr_enh_exclude = new int[ 2 * len]();
   // Store the result of findRegion
   vector<int> region;
   region.reserve( len );
@@ -157,11 +159,17 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   removeSlice( ptr_whole, T1ce::T1TM, 20, m_prop_enh_slice, len,
                region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
+    ptr_enh_exclude[ 2 * i ] = ptr_t1ce[ 2 * i ];
+  }
+  removeEnh( ptr_enh_exclude, T1ce::T1TM, .70, 1 / 2, 3, len, 
+             region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
     if( ptr_whole[ 2 * i ] == T1ce::T1TM &&
         ( ptr_t2[ 2 * i ] == T2::T2CSF ||
         ptr_flair[ 2 * i ] == Flair::FTM ) &&
         ptr_necrosis[ 2 * i ] != Tumor::NCR &&
-        ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) {
+        ptr_hemorrhage[ 2 * i ] != Tumor::HMG &&
+        ptr_enh_exclude[ 2 * i ] == 1 ) {
       ptr_enh[ 2 * i ] = Tumor::ET;
     }
   }
@@ -586,6 +594,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   delete [] ptr_on;
   delete [] ptr_enclose_csf;
   delete [] ptr_exclude;
+  delete [] ptr_enh_exclude;
   
   UNPROTECT( 4 );
   return res;
