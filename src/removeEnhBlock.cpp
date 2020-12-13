@@ -5,6 +5,7 @@
 #include "pad2zero.h"
 #include "tissueType.h"
 #include "pTNbr.h"
+#include "radius.h"
 
 // seg1: enh, seg2: tumor \ enh
 void removeEnhBlock( int *ptr_exclude,
@@ -20,8 +21,10 @@ void removeEnhBlock( int *ptr_exclude,
   int *ptr_copy_seg1 = new int[ 2 * len ]();
   int *ptr_local_seg1 = new int[ 2 * len ]();
   int *ptr_enclose = new int[ 2 * len ]();
-  int idx = 0, n_in = 0, n_out = 0;
-  double p_t_nbr = 0;
+  int idx = 0, n_in = 0, n_out = 0, n_t_nbr = 0;
+  double p_t_nbr = 0, r = 0;
+  const double PI = 3.141592653589793;
+  
   for( int i = 0; i < len; ++ i ) {
     if( ptr_seg1[ 2 * i ] == label1 ) {
       ptr_copy_seg1[ 2 * i ] = label1;
@@ -82,8 +85,12 @@ void removeEnhBlock( int *ptr_exclude,
           }
         }
       }
-      p_t_nbr = pTNbr( region, ptr_seg2, label2, ptr_nidx );
-      if( n_in > ( 1 - prop2 ) * n_out || p_t_nbr > 0 ) {
+      p_t_nbr = pTNbr2D( region, ptr_seg2, label2, ptr_nidx,
+                         ptr_aidx, Plane::Axial );
+      n_t_nbr = p_t_nbr * n_out;
+      r = radius2D( n_out );
+      if( n_in > ( 1 - prop2 ) * n_out || 
+          n_t_nbr > 2 * PI * r / 8 ) {
         for( vector<int>::const_iterator it = region.begin();
              it != region.end(); ++ it ) {
           idx = *it;
