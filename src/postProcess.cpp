@@ -591,15 +591,15 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
   }
   pad2zero( ptr_enclose_enh, len );
-  // Extend in ptr_enh_include
-  for( int i = 0; i < len; ++ i ) {
-    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_enh, 
-                    ptr_enh_include, 1, region ) ) {
-      extRegion( region, ptr_enclose_enh, 1, .2, false);
-    }
-  }
-  // Recover the padding to zero
-  pad2zero( ptr_enclose_enh, len );
+  // // Extend in ptr_enh_include
+  // for( int i = 0; i < len; ++ i ) {
+  //   if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_enh, 
+  //                   ptr_enh_include, 1, region ) ) {
+  //     extRegion( region, ptr_enclose_enh, 1, .6, false);
+  //   }
+  // }
+  // // Recover the padding to zero
+  // pad2zero( ptr_enclose_enh, len );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_enclose_enh[ 2 * i ] == 1 &&
         ptr_seg[ 2 * i ] == 0 ) {
