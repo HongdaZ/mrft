@@ -428,12 +428,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   zeroVector( ptr_on, len );
-  // T1ce(4) || ( T2(4) && T1ce(3) )
+  // T1ce(4) || ( FLAIR( 4 ) && T2( 4 ) && T1ce( 3 ) )
   for( int i = 0; i < len; ++ i ) {
-    if( ( ptr_enh_include[ 2 * i ] == 1 &&
-        ptr_tumor[ 2 * i ] == 0 ) ||
-        ( ptr_t2[ 2 * i ] == T2::T2CSF &&
-        ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) &&
+    if( ( ptr_enh_include[ 2 * i ] == 1 ||
+          ( ptr_flair[ 2 * i ] == Flair::FTM &&
+            ptr_t2[ 2 * i ] == T2::T2CSF &&
+            ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) ) &&
         ptr_exclude[ 2 * i ] != 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
@@ -590,6 +590,15 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
                    ptr_enh, Tumor::ET );
     }
   }
+  pad2zero( ptr_enclose_enh, len );
+  // Extend in ptr_enh_include
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_enh, 
+                    ptr_enh_include, 1, region ) ) {
+      extRegion( region, ptr_enclose_enh, 1, .2, false);
+    }
+  }
+  // Recover the padding to zero
   pad2zero( ptr_enclose_enh, len );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_enclose_enh[ 2 * i ] == 1 &&
