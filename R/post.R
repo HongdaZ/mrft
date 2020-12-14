@@ -9,7 +9,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           delta_factor = 
             list( t1ce = 1.75,
                   flair = 2.50,
-                  t2 = 4.25 ),
+                  t2 = 4.50 ),
           gamma = list( t1ce = 1,
                         flair = 0.6,
                         t2 = 0.6,
