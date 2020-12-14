@@ -62,7 +62,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   while( redo ) {
     segment( patient, out, infolder, delta, delta_factor,
              gamma, alpha,
-             beta, lambda2, a, nu2, maxit )
+             beta, lambda2, a, nu2, maxit, redo )
     post( patient, out, infolder, delta, delta_factor,
           gamma, alpha,
           beta, lambda2, a, nu2, maxit, 

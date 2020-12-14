@@ -36,7 +36,8 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                                  fthr = rep( .25, 2 ) ),
                      maxit = 
                        list( t1ce = 10L, flair = 1L,
-                             t2 = 1L, fthr = 40L ) 
+                             t2 = 1L, fthr = 40L ),
+                     redo = TRUE
                      ) {
   images <- readImage( patient )
   ## Output files
@@ -182,9 +183,10 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   out_t2_seg <- gsub( "_flair.nii.gz", "_t2_seg.nii.gz", outfile )
   out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm.nii.gz", outfile )
   out_t2_data <- gsub( "_flair.nii.gz", "_t2.RData", outfile )
-  if( ! ( file.exists( out_t2_seg ) & 
+  if( ( ! ( file.exists( out_t2_seg ) & 
           file.exists( out_t2_norm ) &
-          file.exists( out_t2_data ) ) ) {
+          file.exists( out_t2_data ) ) ) || 
+      redo ) {
     ## split t2 to grey matter and white matter
     prop_bright <- propBright( t1ce_image, flair_image, images$t2 )
     t2_data <- splitT22( prop_bright, images$t2, t1ce_image, flair_image )

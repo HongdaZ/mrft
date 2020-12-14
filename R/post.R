@@ -68,8 +68,6 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
     load( out_t2_data )
     new_delta_t2 <- t2_shift
     new_delta_t2[ 3 ] <- new_delta_t2[ 3 ] - 0.5
-    out_t2_norm <- gsub( "_flair.nii.gz", "_t2_norm.nii.gz", outfile )
-    file.remove( out_t2_norm )
   } else {
     if( sum( post_seg$image == 6, na.rm = T ) > 10 ) {
       ## With CSF inside tumor
