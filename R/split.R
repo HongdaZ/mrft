@@ -181,8 +181,9 @@ split3 <- function( t1ce_image, flair_image, prop_bright,
   return( res )
 }
 ## Split edema || enh into to parts
-splitFthrE <- function( post_seg, t2_intst ) {
-  post_mix_idx <- which( post_seg$image == 2 | post_seg$image == 4 )
+## image: sub-image for each seperate tumor regions
+splitFthrE <- function( image, t2_intst ) {
+  post_mix_idx <- which( image == 2 | image == 4 )
   t2_mix <- t2_intst[ post_mix_idx ]
   valid_idx <- which( ! is.na( t2_mix ) )
   t2_mix <- t2_mix[ valid_idx ]
