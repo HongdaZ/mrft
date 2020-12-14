@@ -111,7 +111,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                            m, nu2$fthr, maxit$fthr )
       m <- further_seg$parm[ 2, ]
       sigma2 <- further_seg$parm[ 3, ]
-      if( ( m[ 2 ] - m[ 1 ] ) /  delta$fthr[ 4 ] > sqrt( sigma2[ 2 ] ) ) {
+      if( ( m[ 2 ] - m[ 1 ] ) /  delta$fthr[ 4 ] > sqrt( sigma2[ 1 ] ) ) {
         edema_idx <- post_seg$image == 2
         edema_idx[ is.na( edema_idx ) ] <- FALSE
         post_seg$image[ edema_idx ] <- further_seg$image[ edema_idx ]
