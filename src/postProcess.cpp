@@ -296,7 +296,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
                ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
-               100, len );
+               200, len );
   // 10-7.2: FLAIR( 4 ) || T2( 4 )
   // inside tumor >> edema
   // Wrap up the segmentation result
@@ -328,10 +328,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   // Remove 3D connected regions with
-  // size < 100
+  // size < 200
   removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
                ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
-               100, len );
+               200, len );
   // 10-7.3: Extend edema in ( FLAIR( 4 ) && T1ce( 2 ) )
   for( int i = 0; i < len; ++ i ) {
     if(
@@ -524,7 +524,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     inRegion( ptr_enclose_ncr, len, ptr_enh, Tumor::ET,
               ptr_whole, 1,
               region, ptr_nidx, ptr_aidx, nr, nc, ns );
-    // Remove new regions with size > 100
+    // Remove new regions with size > 200
     zeroVector( ptr_on, len );
     for( int i = 0; i < len; ++ i ) {
       if( ptr_tumor[ 2 * i ] == 0 &&
@@ -610,7 +610,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
                ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
-               100, len );
+               200, len );
   if( ptr_code[ 0 ] == 1 ) {
     // LGG
     wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
@@ -620,6 +620,21 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     wrapUp( len, ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
             ptr_seg, ptr_tumor );
   }
+  // Trim tumor region
+  trim( ptr_tumor, ptr_exclude,
+        ptr_nidx, ptr_aidx, region, len, s_trim );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_seg[ 2 * i ] = 0;
+      ptr_hemorrhage[ 2 * i ] = 0;
+      ptr_necrosis[ 2 * i ] = 0;
+      ptr_enh[ 2 * i ] = 0;
+      ptr_edema[ 2 * i ] = 0;
+    }
+  }
+  removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
+               ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
+               200, len );
 
   // Find csf inside tumor
   for( int i = 0; i < len; ++ i ) {
