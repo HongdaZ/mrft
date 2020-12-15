@@ -46,8 +46,10 @@ void wrapUp( const int &len, int *ptr_edema_regions,
              int *ptr_edema,
              const int *ptr_flair,
              int *ptr_seg, int *ptr_tumor ) {
+  int remainder = 0;
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_edema_regions[ 2 * i ] == 1 ) {
+    remainder = ptr_edema_regions[ 2 * i ] % 10;
+    if( remainder == 1 ) {
       if( ptr_hemorrhage[ 2 * i ] == Tumor::HMG ) {
         ptr_seg[ 2 * i ] = Seg::SNET;
         ptr_tumor[ 2 * i ] = 1;
