@@ -506,6 +506,30 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   zeroVector( ptr_extra_edema, len );
+  // 10-7.3.3: T1ce(3) in tumor and connected to enh is enh
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_tumor[ 2 * i ] == 1 &&
+        ptr_t1ce[ 2 * i ] == T1ce::T1WM ) {
+      ptr_whole[ 2 * i ] = 1;
+    }
+  }
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_whole, ptr_whole,
+                    1, region ) ) {
+      excldRegion( region, ptr_nidx, ptr_whole,
+                   ptr_seg, Seg::SET );
+    }
+  }
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_whole[ 2 * i ] == 1 ) {
+      ptr_enh[ 2 * i ] = Tumor::ET;
+      ptr_hemorrhage[ 2 * i ] = 0;
+      ptr_necrosis[ 2 * i ] = 0;
+      ptr_edema[ 2 * i ] = 0;
+      ptr_seg[ 2 * i ] = Seg::SET;
+    }
+  }
+  zeroVector( ptr_whole, len );
   // 10-7.4: code
   // 0: HGG (no further seg)
   // 1: LGG (further seg)
