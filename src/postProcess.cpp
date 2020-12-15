@@ -78,7 +78,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_seg = new int[ 2 * len ]();
   int *ptr_edema_regions = new int[ 2 * len ]();
   int *ptr_csf_regions = new int[ 2 * len ]();
-  int *ptr_edema_code, *ptr_csf_code;
+  int e_code;
   int *ptr_res_image = INTEGER( res_image );
   int *ptr_res_edema = INTEGER( res_edema );
   int *ptr_res_csf = INTEGER( res_csf );
@@ -544,7 +544,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       if( n_enh < m_enh &&
           p_nt_nbr < p_edema_nbr ) {
         // code
-        ptr_edema_code[ 0 ] = 1; // LGG (further seg)
+        e_code = 1; // LGG (further seg)
       } else {
         // 10-7.5: tumor || T1ce( 1 ) || Flair( 4 )
         // || T2( 4 ) \ T1ce( 4 )
@@ -620,14 +620,14 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         // Rprintf( "n_other = %d, n_enh = %d\n", n_other, n_enh );
         if( ( n_enh + n_other ) < m_prop_enh_enc *  n_tumor ||
             p_nt_nbr > p_edema_nbr ) {
-          ptr_edema_code[ 0 ] = 2; // HGG (further seg)
+          e_code = 2; // HGG (further seg)
         } else {
-          ptr_edema_code[ 0 ] = 3; // HGG (no further seg)
+          e_code = 3; // HGG (no further seg)
         }
       }
       for( int i = 0; i < len; ++ i ) {
         if( ptr_sub_region[ 2 * i ] == 1 ) {
-          ptr_edema_regions[ 2 * i ] = ptr_edema_code[ 0 ];
+          ptr_edema_regions[ 2 * i ] = e_code;
         }
       }
     }
@@ -651,7 +651,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   for( int j = 0; j < len; ++ j ) {
     if( cnctRegion( j + 1, ptr_nidx, ptr_tumor_copy, ptr_tumor_copy, 1,
                     region_tmp ) ) {
-      ptr_edema_code[ 0 ] = ptr_edema_regions[ 2 * j ];
+      e_code = ptr_edema_regions[ 2 * j ];
       int idx = 0;
       zeroVector( ptr_sub_region, len );
       for( vector<int>::const_iterator it = region_tmp.begin();
@@ -695,7 +695,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       }
       for( int i = 0; i < len; ++ i ) {
         if( ptr_sub_region[ 2 * i ] == 1 ) {
-          ptr_edema_regions[ 2 * i ] = ptr_edema_code[ 0 ];
+          ptr_edema_regions[ 2 * i ] = e_code;
         }
       }
     }
@@ -747,8 +747,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         }
       }
     }
+    pad2zero( ptr_edema_regions, len );
   }
-  pad2zero( ptr_edema_regions, len );
+  
   // Find csf inside tumor
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 &&
