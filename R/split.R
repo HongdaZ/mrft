@@ -209,10 +209,10 @@ splitFthrE <- function( image, t2_intst ) {
   return( res )
 }
 ## Split CSF into parts
-splitFthrC <- function( post_seg, t1ce_intst ) {
-  post_mix_idx <- which( post_seg$image == 5 | 
-                         post_seg$image == 6 |
-                         post_seg$image == 1 )
+splitFthrC <- function( image, t1ce_intst ) {
+  post_mix_idx <- which( image == 5 | 
+                         image == 6 |
+                         image == 1 )
   t1ce_mix <- t1ce_intst[ post_mix_idx ]
   valid_idx <- which( ! is.na( t1ce_mix ) )
   t1ce_mix <- t1ce_mix[ valid_idx ]

@@ -9,8 +9,8 @@ void wrapUp( const int &len,
              int *ptr_edema,
               int *ptr_seg,
               int *ptr_tumor );
-// Wrap up results for LGG
-void wrapUp( const int &len,
+// Wrap up results for last step
+void wrapUp( const int &len, int *ptr_edema_regions,
              int *ptr_hemorrhage,
              int *ptr_necrosis,
              int *ptr_enh,
