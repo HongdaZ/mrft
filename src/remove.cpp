@@ -14,13 +14,14 @@
 #include "inRegion.h"
 
 using std::max;
+using std::min;
 using std::list;
 
 void remove( vector<int> &region, const int *ptr_aidx, 
              const int *ptr_nidx, int *ptr_tumor, int *ptr_seg,
              int *ptr_hemorrhage, int *ptr_necrosis, 
              int *ptr_enh, int *ptr_edema, const int &m_tumor, 
-             const int &m_enh_enc,
+             const int &m_enh, const int &m_enh_enc,
              const int len, const int &nr, const int &nc, const int &ns,
              const double &spread_factor ) {
   int *ptr_r_enh = new int[ 2 * len ]();
@@ -49,6 +50,9 @@ void remove( vector<int> &region, const int *ptr_aidx,
                     1, region ) ) {
       spread_idx = spread( region, ptr_aidx );
       region_size.push_back( region.size() );
+      if( max_size < region.size() ) {
+        max_size = region.size(); 
+      }
       region_spread.push_back( spread_idx );
       // min_spread is also updated later
       if( max_spread_idx < spread_idx ) {
@@ -57,6 +61,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
     }
   }
   pad2zero( ptr_tumor, len );
+  size = min( m_tumor, max_size );
   min_spread_idx = max_spread_idx;
   
   list<int>::const_iterator it_size = region_size.begin();
@@ -78,16 +83,15 @@ void remove( vector<int> &region, const int *ptr_aidx,
                     1, region ) ) {
       spread_idx = spread( region, ptr_aidx );
       // Rprintf( "spread_idx = %f\n", spread_idx );
-      if( spread_idx > s_factor ) {
+      if( region.size() < size &&
+          spread_idx > s_factor ) {
         excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
                      ptr_necrosis, ptr_enh, ptr_edema, MAX );
-      } else if( region.size() > max_size ) {
-        max_size = region.size();
       }
     }
   }
   pad2zero( ptr_tumor, len );
-  size = ( max_size > m_tumor ) ? m_tumor : max_size;
+  
   
   // Rprintf( "s_factor = %f\n", s_factor );
   for( int i = 0; i < len; ++ i ) {
@@ -105,7 +109,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
           }
         }
       }
-      if( n_enh < 100 ) {
+      if( n_enh < m_enh ) {
         // If not including enh, exclude small sized regions
         if( region.size() < size ) {
           excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
