@@ -1,3 +1,5 @@
+#include "Rinternals.h"
+
 #include "enclose.h"
 #include "cHull.h"
 #include "inPoly.h"
@@ -5,11 +7,12 @@
 // Find part of slices2 enclosed in slices1
 void enclose( int *ptr_seg, const int &len, 
               const vector<list<vector<int>>> &slices1,
-              const vector<list<vector<int>>> &slices2 ) {
+              const vector<list<vector<int>>> &slices2,
+              const int n_in ) {
   // Axial, sagittal and coronal
   vector<int> enclosed( 3 * len );
   vector<int> row{ 2, 3, 1, 3, 1, 2 };
-  int plane1, plane2, len_slice1, len_slice2, v1, v2, idx;
+  int plane1, plane2, len_slice1, len_slice2, v1, v2, idx, local_n_in;
   for( int i = 0; i < 3; ++ i ) {
     const list<vector<int>> &p_slice1 = slices1[ i ];
     const list<vector<int>> &p_slice2 = slices2[ i ];
@@ -52,11 +55,16 @@ void enclose( int *ptr_seg, const int &len,
       }
     }
   }
+  // Rprintf( "n_in = %d \n", n_in );
   for( int i = 0; i < len; ++ i ) {
-    if( enclosed[ 3 * i ] == 1 &&
-        enclosed[ 3 * i + 1 ] == 1 &&
-        enclosed[ 3 * i + 2 ] == 1 ) {
-      ptr_seg[ 2 * i ] = 1;
+    local_n_in = 0;
+    for( int j = 0; j < 3; ++ j ) {
+      if( enclosed[ 3 * i + j ] == 1 ) {
+        ++ local_n_in;
+      }
+    }
+    if( local_n_in >= n_in ) {
+      ptr_seg[ 2 * i ] = 1; 
     }
   }
 }

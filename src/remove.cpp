@@ -97,39 +97,41 @@ void remove( vector<int> &region, const int *ptr_aidx,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
-      // Find enh inside the tumor region
-      zeroVector( ptr_r_enh, len );
-      n_enh = 0;
-      for( int j = 0; j < region.size(); ++ j ) {
-        idx = region[ j ];
-        if( idx != 0 ) {
-          if( ptr_enh[ 2 * ( idx - 1 ) ] == Tumor::ET ) {
-            ++ n_enh;
-            ptr_r_enh[ 2 * ( idx - 1 ) ] = 1;
+      if( region.size() < size ) {
+        // Find enh inside the tumor region
+        zeroVector( ptr_r_enh, len );
+        n_enh = 0;
+        for( int j = 0; j < region.size(); ++ j ) {
+          idx = region[ j ];
+          if( idx != 0 ) {
+            if( ptr_enh[ 2 * ( idx - 1 ) ] == Tumor::ET ) {
+              ++ n_enh;
+              ptr_r_enh[ 2 * ( idx - 1 ) ] = 1;
+            }
           }
         }
-      }
-      if( n_enh < m_enh ) {
-        // If not including enh, exclude small sized regions
-        if( region.size() < size ) {
-          excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
-                       ptr_necrosis, ptr_enh, ptr_edema, MAX );
-        }
-      } else {
-        // Remove regions with tumor enclosed enh < m_enh_enc
-        n_enc_t = 0;
-        zeroVector( ptr_enclose_tumor, len );
-        inRegion( ptr_enclose_tumor, len, ptr_r_enh, 1,
-                  ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
-                  nr, nc, ns );
-        for( int k = 0; k < len; ++ k ) {
-          if( ptr_enclose_tumor[ 2 * k ] == 1 ) {
-            ++ n_enc_t;
+        if( n_enh < m_enh ) {
+          // If not including enh, exclude small sized regions
+          if( region.size() < size ) {
+            excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
+                         ptr_necrosis, ptr_enh, ptr_edema, MAX );
           }
-        }
-        if( n_enc_t < m_enh_enc ) {
-          excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
-                       ptr_necrosis, ptr_enh, ptr_edema, MAX );
+        } else {
+          // Remove regions with tumor enclosed enh < m_enh_enc
+          n_enc_t = 0;
+          zeroVector( ptr_enclose_tumor, len );
+          inRegion( ptr_enclose_tumor, len, ptr_r_enh, 1,
+                    ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
+                    nr, nc, ns );
+          for( int k = 0; k < len; ++ k ) {
+            if( ptr_enclose_tumor[ 2 * k ] == 1 ) {
+              ++ n_enc_t;
+            }
+          }
+          if( n_enc_t < m_enh_enc ) {
+            excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
+                         ptr_necrosis, ptr_enh, ptr_edema, MAX );
+          }
         }
       }
     }
