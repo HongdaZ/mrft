@@ -1,3 +1,5 @@
+#include "Rinternals.h"
+
 #include "extRegion.h"
 
 // Extend the region
@@ -16,7 +18,7 @@ void extRegion( const vector<int> &region, int *ptr_seg,
       }
     }
   }
-  if( n2 > n1 * ratio ) {
+  if( ( double ) n2 / n1 > ratio ) {
     for( vector<int>::const_iterator it = region.begin();
          it != region.end(); ++ it ) {
       if( *it != 0 ) {
