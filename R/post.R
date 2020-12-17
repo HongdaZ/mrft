@@ -149,7 +149,6 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
         }
       }
     }
-   
   }
   ## Export the results to .nii images
   post_seg$image[ is.na( post_seg$image ) ] <- 0

@@ -9,7 +9,8 @@ using std::vector;
 // ptr_seg1 == label1
 int excldRegion( const vector<int> &region, const int *ptr_nidx,
                  int *ptr_seg2,
-                 const int *ptr_seg1, const int &label1 );
+                 const int *ptr_seg1, 
+                 const int &label1, const bool &has = true );
 // Remove the region from ptr_seg1 if the number of voxels with 
 // ptr_seg2 == label is less than size
 void excldRegion( const vector<int> &region,
