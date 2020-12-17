@@ -477,6 +477,30 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   zeroVector( ptr_on, len );
+  // T1ce( 1 ) && Flair( 1 ) && T2( 4 ) as Necrosis
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_flair[ 2 * i ] == Flair::FCSF &&
+        ptr_t2[ 2 * i ] == T2::T2CSF &&
+        ptr_t1ce[ 2 * i ] ==  T1ce::T1CSF &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_whole[ 2 * i ] = 1;
+    } else {
+      ptr_whole[ 2 * i ] = 0;
+    }
+  }
+  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
+            region, 5,
+            ptr_nidx, ptr_aidx, nr, nc, ns );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_on[ 2 * i ] == 1 &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      ptr_seg[ 2 * i ] = Seg::SNET;
+      ptr_necrosis[ 2 * i ] = Tumor::NCR;
+    }
+  }
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_on, len );
   // 10-7.3.2 Add voxels inside tumor (2D)
   zeroVector( ptr_whole, len );
   zeroVector( ptr_extra_edema, len );
