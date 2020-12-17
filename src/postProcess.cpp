@@ -638,6 +638,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
             ++ n_other;
           } else if( ptr_local_enh[ 2 * i ] == Tumor::ET ) {
             ++ n_enh;
+          } else if( ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
+            ptr_seg[ 2 * i ] = Seg::SED;
+            ptr_necrosis[ 2 * i ] = 0;
+            ptr_edema[ 2 * i ] = Tumor::ED;
           }
         }
         int n_tumor = 0;
