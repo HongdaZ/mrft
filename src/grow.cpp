@@ -90,6 +90,7 @@ void grow( const int &last, int &n_tumor, const int &len,
     outer_old = outer_new;
     clearVector( outer_new );
   }
+  pad2zero( ptr_remain, len );
   // Keep the tumor region
   if( keep ) {
     for( int i = 0; i < len; ++ i ) {
