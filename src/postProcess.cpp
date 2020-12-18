@@ -488,6 +488,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
+  Rprintf( "onRegion necrosis \n" );
   onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
             region, 5,
             ptr_nidx, ptr_aidx, nr, nc, ns );
@@ -501,6 +502,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   zeroVector( ptr_on, len );
+  Rprintf( "necrosis added \n" );
   // 10-7.3.2 Add voxels inside tumor (2D)
   zeroVector( ptr_whole, len );
   zeroVector( ptr_extra_edema, len );

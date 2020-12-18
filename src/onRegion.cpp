@@ -13,6 +13,10 @@
 #include "inRegion.h"
 #include "clearVector.h"
 #include "radius.h"
+#include "expRatio.h"
+#include "areaRatio.h"
+#include "ballCrownVol.h"
+#include "thick.h"
 
 using std::cbrt;
 
@@ -31,6 +35,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
   double r = 0;
   int n_cnct_old;
   int n_new = 0;
+  double h, v, area_ratio, exp_ratio, r0;
   
   int *ptr_enclose_tumor = new int[ 2 * len ]();
   int *ptr_new_region = new int[ 2 * len ]();
@@ -109,21 +114,23 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
             add = false;
           }
         } else {
-          spread_idx = spread( region, ptr_aidx );
           p_t_nbr = pTNbr( region, ptr_seg1, label1, ptr_nidx );
-          r = radius( region.size() );
-          if( 1 / p_t_nbr <  r / 3 ) {
-            if( spread_idx < spread_factor ) {
-              add = true;
-            } else {
-              add = false;
-            }
+          r0 = radius2D( p_t_nbr * region.size() ); 
+          h = thick( ptr_tmp_seg1, label1, ptr_new_region, 1,
+                     len, ptr_nidx );
+          area_ratio = areaRatio( ptr_tmp_seg1, label1, 
+                                  ptr_new_region, 1, 
+                                  len, ptr_nidx );
+          
+          exp_ratio = expRatio( r0, h );
+          v = ballCrownVol( r0, h );
+          Rprintf( "region.size = %d, v * .8 = %f, area_ratio = %f, exp_ratio * 0.8 = %f \n",
+                   region.size(), v * .8, area_ratio, exp_ratio * .8 );
+          if( region.size() > v * 0.8 &&
+              area_ratio > exp_ratio * 0.8 ) {
+            add = true;
           } else {
-            if( spread_idx < 1.5 ) {
-              add = true;
-            } else {
-              add = false;
-            }
+            add = false;
           }
         }
         if( add ) {
