@@ -488,7 +488,6 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  Rprintf( "onRegion necrosis \n" );
   onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
             region, 5,
             ptr_nidx, ptr_aidx, nr, nc, ns );
@@ -502,7 +501,6 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   zeroVector( ptr_on, len );
-  Rprintf( "necrosis added \n" );
   // 10-7.3.2 Add voxels inside tumor (2D)
   zeroVector( ptr_whole, len );
   zeroVector( ptr_extra_edema, len );
@@ -563,9 +561,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   // 10-7.4: code
-  // 0: HGG (no further seg)
+  // 0: HGG (non-tumor)
   // 1: LGG (further seg)
   // 2: HGG (further seg)
+  // 3: HGG (no further seg)
   for( int i = 0; i < len; ++ i ) {
     ptr_tumor_copy[ 2 * i ] = ptr_tumor[ 2 * i ];
   }
@@ -664,7 +663,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
             ++ n_other;
           } else if( ptr_local_enh[ 2 * i ] == Tumor::ET ) {
             ++ n_enh;
-          } else if( ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
+          } else if( ptr_sub_region[ 2 * i ] == 1 &&
+                     ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
             ptr_seg[ 2 * i ] = Seg::SED;
             ptr_necrosis[ 2 * i ] = 0;
             ptr_edema[ 2 * i ] = Tumor::ED;

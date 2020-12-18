@@ -54,12 +54,12 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   t2_image <- readNIfTI( out_t2_seg, reorient = FALSE )@.Data
   ## Initialize data for postprocessing
   post_data <- initPost( t1ce_image, flair_image, t2_image )
-  sink( '/media/hzhang/ZHD-P1/result/output.txt' )
+  # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
   post_seg <- postProcess( post_data, min_enh, min_enh_enc,
                            max_prop_enh_enc, max_prop_enh_slice,
                            min_tumor, spread_add, spread_rm,
                            spread_trim )
-  sink()
+  # sink()
   if( sum( post_seg$image == 2, na.rm = T ) < 2000 ) {
     ## Needs to segment t2 again
     post_seg$image[ post_seg$image == 6 ] <- NA_integer_

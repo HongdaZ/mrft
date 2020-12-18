@@ -124,8 +124,6 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           
           exp_ratio = expRatio( r0, h );
           v = ballCrownVol( r0, h );
-          Rprintf( "region.size = %d, v * .8 = %f, area_ratio = %f, exp_ratio * 0.8 = %f \n",
-                   region.size(), v * .8, area_ratio, exp_ratio * .8 );
           if( region.size() > v * 0.8 &&
               area_ratio > exp_ratio * 0.8 ) {
             add = true;
