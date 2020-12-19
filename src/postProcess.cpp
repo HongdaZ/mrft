@@ -117,6 +117,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   region.reserve( len );
   vector<int> region_tmp;
   region_tmp.reserve( len );
+  list<int> ncr_switch;
   
   const int m_enh = INTEGER( min_enh )[ 0 ];
   const int m_enh_enc = INTEGER( min_enh_enc )[ 0 ];
@@ -245,7 +246,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     if( cnctRegion( i + 1, ptr_nidx, ptr_aidx, Plane::Axial,
                     ptr_enclose_nec, ptr_necrosis,
                     Tumor::NCR, region ) ) {
-      extRegion( region, ptr_enclose_nec, 1, 0.4, false );
+      extRegion( region, ptr_enclose_nec, 1, 0.8, false );
     }
   }
   // Recover the padding to zero
@@ -668,6 +669,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
             ptr_seg[ 2 * i ] = Seg::SED;
             ptr_necrosis[ 2 * i ] = 0;
             ptr_edema[ 2 * i ] = Tumor::ED;
+            ncr_switch.push_back( i + 1 );
           }
         }
         int n_tumor = 0;
@@ -683,6 +685,13 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
           e_code = 2; // HGG (further seg)
         } else {
           e_code = 3; // HGG (no further seg)
+          while( ncr_switch.size() > 0 ) {
+            idx = ncr_switch.front();
+            ptr_seg[ 2 * ( idx - 1 ) ] = Seg::SNET;
+            ptr_necrosis[ 2 * ( idx - 1 ) ] = Tumor::NCR;
+            ptr_edema[ 2 * ( idx - 1 ) ] = 0;
+            ncr_switch.pop_front();
+          }
         }
       }
       for( int i = 0; i < len; ++ i ) {
