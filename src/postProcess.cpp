@@ -713,7 +713,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
               ptr_edema[ 2 * i ] = 0;
               ptr_hemorrhage[ 2 * i ] = 0;
               ptr_enh[ 2 * i ] = 0;
-           }
+            }
+          }
         }
       }
       for( int i = 0; i < len; ++ i ) {
