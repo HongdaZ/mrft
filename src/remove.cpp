@@ -12,6 +12,7 @@
 #include "zeroVector.h"
 #include "spread.h"
 #include "inRegion.h"
+#include "removeSmall.h"
 
 using std::max;
 using std::min;
@@ -141,4 +142,23 @@ void remove( vector<int> &region, const int *ptr_aidx,
   delete [] ptr_r_enh;
   delete [] ptr_enclose_tumor;
   delete [] ptr_tmp_tumor;
+}
+// Remove small regions
+void remove( vector<int> &region, const int *ptr_nidx, int *ptr_tumor,
+             int *ptr_seg, int *ptr_hemorrhage, int *ptr_necrosis, 
+             int *ptr_enh, int *ptr_edema, const int &m_tumor, 
+             const int len ) {
+  int max_size = 0;
+  for( int i = 0; i < len; ++ i ) {
+    if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
+                    1, region ) ) {
+      if( max_size < region.size() ) {
+        max_size = region.size(); 
+      }
+    }
+  }
+  pad2zero( ptr_tumor, len );
+  max_size = min( m_tumor, max_size );
+  removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor, ptr_hemorrhage, 
+               ptr_necrosis, ptr_enh, ptr_edema,  max_size, len );
 }

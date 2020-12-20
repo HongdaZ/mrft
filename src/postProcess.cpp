@@ -811,9 +811,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_edema[ 2 * i ] = 0;
     }
   }
-  removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
-               ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
-               200, len );
+  remove( region, ptr_nidx, ptr_tumor, ptr_seg, ptr_hemorrhage, 
+          ptr_necrosis, ptr_enh, ptr_edema, m_tumor, len );
   
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
