@@ -279,7 +279,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     if( cnctRegion( i + 1, ptr_nidx, ptr_aidx, Plane::Axial,
                     ptr_enclose_hem, ptr_hemorrhage,
                     Tumor::HMG, region ) ) {
-      extRegion( region, ptr_enclose_hem, 1, .4, false);
+      extRegion( region, ptr_enclose_hem, 1, .8, false);
     }
   }
   // Recover the padding to zero
@@ -692,6 +692,28 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
             ptr_edema[ 2 * ( idx - 1 ) ] = 0;
             ncr_switch.pop_front();
           }
+          // Tumor enclosed in enh in 3D is necrosis
+          zeroVector( ptr_whole, len );
+          for( int i = 0; i < len; ++ i ) {
+            if( ptr_sub_region[ 2 * i ] == 1 &&
+                ptr_enh[ 2 * i ] != Tumor::ET ) {
+              ptr_whole[ 2 * i ] = 1;
+            } else {
+              ptr_whole[ 2 * i ] = 0;
+            }
+          }
+          zeroVector( ptr_enclose_ncr, len );
+          inRegion( ptr_enclose_ncr, len, ptr_local_enh, Tumor::ET,
+                    ptr_whole, 1,
+                    region, ptr_nidx, ptr_aidx, nr, nc, ns );
+          for( int i = 0; i < len; ++ i ) {
+            if( ptr_enclose_ncr[ 2 * i ] == 1 ) {
+              ptr_seg[ 2 * i ] = Seg::SNET;
+              ptr_necrosis[ 2 * i ] = Tumor::NCR;
+              ptr_edema[ 2 * i ] = 0;
+              ptr_hemorrhage[ 2 * i ] = 0;
+              ptr_enh[ 2 * i ] = 0;
+           }
         }
       }
       for( int i = 0; i < len; ++ i ) {
