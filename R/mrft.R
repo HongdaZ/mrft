@@ -35,7 +35,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   maxit = 
                     list( t1ce = 10L, flair = 1L,
                           t2 = 1L, fthr = 40L ),
-                  min_enh = 2000L,
+                  min_enh = 500L,
                   min_enh_enc = 2000L,
                   max_prop_enh_enc = .1,
                   max_prop_enh_slice = .2,
