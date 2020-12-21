@@ -303,7 +303,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
           m_tumor, m_enh, m_enh_enc, len, nr, nc, ns, s_rm );
   // Trim tumor region
   trim( ptr_tumor, ptr_exclude,
-        ptr_nidx, ptr_aidx, region, len, s_trim );
+        ptr_nidx, ptr_aidx, region, len, 4 );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
       ptr_seg[ 2 * i ] = 0;
