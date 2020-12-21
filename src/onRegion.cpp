@@ -17,6 +17,7 @@
 #include "areaRatio.h"
 #include "ballCrownVol.h"
 #include "thick.h"
+#include "round.h"
 
 using std::cbrt;
 
@@ -35,7 +36,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
   double r = 0;
   int n_cnct_old;
   int n_new = 0;
-  double h, v, area_ratio, exp_ratio, r0;
+  double h, v, area_ratio, exp_ratio, r0, roundness;
   
   int *ptr_enclose_tumor = new int[ 2 * len ]();
   int *ptr_new_region = new int[ 2 * len ]();
@@ -118,6 +119,9 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           r0 = radius2D( p_t_nbr * region.size() ); 
           h = thick( ptr_tmp_seg1, label1, ptr_new_region, 1,
                      len, ptr_nidx );
+          roundness = round( ptr_tmp_seg1, label1, ptr_new_region, 1,
+                             len, ptr_nidx, ptr_aidx );
+          Rprintf( "roundness = %f\n", roundness );
           area_ratio = areaRatio( ptr_tmp_seg1, label1, 
                                   ptr_new_region, 1, 
                                   len, ptr_nidx );
@@ -125,7 +129,8 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           exp_ratio = expRatio( r0, h );
           v = ballCrownVol( r0, h );
           if( region.size() > v * 0.8 &&
-              area_ratio > exp_ratio * 0.8 ) {
+              area_ratio > exp_ratio * 0.8 &&
+              roundness < spread_factor ) {
             add = true;
           } else {
             add = false;
