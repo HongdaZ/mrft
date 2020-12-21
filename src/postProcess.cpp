@@ -461,7 +461,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
   }
   onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
-            region, 20,
+            region, 5,
             ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
@@ -489,11 +489,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  Rprintf( "onRegion necrosis\n" );
   onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
             region, 2,
             ptr_nidx, ptr_aidx, nr, nc, ns );
-  Rprintf( "end\n" );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
