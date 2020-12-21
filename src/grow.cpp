@@ -44,7 +44,7 @@ void grow( const int &last, int &n_tumor, const int &len,
     cnctRegion( idx, ptr_nidx, ptr_keep, ptr_keep, 1, region );
     pad2zero( ptr_keep, region );
     spread_keep = spread( region, ptr_aidx );
-    if( spread_keep > s_trim ) {
+    if( spread_keep > s_trim * .75 ) {
       keep = false;
       break;
     }
