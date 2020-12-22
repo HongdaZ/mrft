@@ -18,14 +18,14 @@ using std::max;
 using std::min;
 using std::list;
 
-void remove( vector<int> &region, const int *ptr_aidx, 
+void remove( vector<int> &region, const int *ptr_aidx,
              const int *ptr_nidx, int *ptr_tumor, int *ptr_seg,
-             int *ptr_hemorrhage, int *ptr_necrosis, 
-             int *ptr_enh, int *ptr_edema, const int &m_tumor, 
+             int *ptr_hemorrhage, int *ptr_necrosis,
+             int *ptr_enh, int *ptr_edema, const int &m_tumor,
              const int &m_enh, const int &m_enh_enc,
              const int len, const int &nr, const int &nc, const int &ns,
              const double &spread_factor ) {
-  int *ptr_r_enh = new int[ 2 * len ]();
+  
   int *ptr_enclose_tumor = new int[ 2 * len ]();
   int *ptr_tmp_tumor = new int[ 2 * len ]();
   vector<int> tmp_region;
@@ -45,14 +45,14 @@ void remove( vector<int> &region, const int *ptr_aidx,
   double s_factor;
   list<int> region_size;
   list<double> region_spread;
-
+  
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
       spread_idx = spread( region, ptr_aidx );
       region_size.push_back( region.size() );
       if( max_size < region.size() ) {
-        max_size = region.size(); 
+        max_size = region.size();
       }
       region_spread.push_back( spread_idx );
       // min_spread is also updated later
@@ -92,22 +92,22 @@ void remove( vector<int> &region, const int *ptr_aidx,
     }
   }
   pad2zero( ptr_tumor, len );
-  
-  
+  // Tumor enclosed by enh (including enh)
+  inRegion( ptr_enclose_tumor, len, ptr_enh, Tumor::ET,
+            ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
+            nr, nc, ns );
   // Rprintf( "s_factor = %f\n", s_factor );
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
       if( region.size() < size ) {
         // Find enh inside the tumor region
-        zeroVector( ptr_r_enh, len );
         n_enh = 0;
         for( int j = 0; j < region.size(); ++ j ) {
           idx = region[ j ];
           if( idx != 0 ) {
             if( ptr_enh[ 2 * ( idx - 1 ) ] == Tumor::ET ) {
               ++ n_enh;
-              ptr_r_enh[ 2 * ( idx - 1 ) ] = 1;
             }
           }
         }
@@ -120,13 +120,12 @@ void remove( vector<int> &region, const int *ptr_aidx,
         } else {
           // Remove regions with tumor enclosed enh < m_enh_enc
           n_enc_t = 0;
-          zeroVector( ptr_enclose_tumor, len );
-          inRegion( ptr_enclose_tumor, len, ptr_r_enh, 1,
-                    ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
-                    nr, nc, ns );
-          for( int k = 0; k < len; ++ k ) {
-            if( ptr_enclose_tumor[ 2 * k ] == 1 ) {
-              ++ n_enc_t;
+          for( int j = 0; j < region.size(); ++ j ) {
+            idx = region[ j ];
+            if( idx != 0 ) {
+              if( ptr_enclose_tumor[ 2 * ( idx - 1 ) ] == 1 ) {
+                ++ n_enc_t;
+              }
             }
           }
           if( n_enc_t < m_enh_enc ) {
@@ -139,21 +138,21 @@ void remove( vector<int> &region, const int *ptr_aidx,
   }
   pad2zero( ptr_tumor, len );
   
-  delete [] ptr_r_enh;
   delete [] ptr_enclose_tumor;
   delete [] ptr_tmp_tumor;
 }
-// Remove regions with size < m_tumor && max enh size < m_enh &&
-//                     enclosed tumor < m_enh_enc && 
-//                     prop enclose tumor < 0.75
-void remove( vector<int> &region, const int *ptr_aidx, 
+// Remove regions with size < m_tumor &&
+//                     ( spread_idx > 2 ||
+//                       ( max enh size < m_enh &&
+//                         enclosed tumor < m_enh_enc &&
+//                         prop enclose tumor < 0.75 ) )
+void remove( vector<int> &region, const int *ptr_aidx,
              const int *ptr_nidx, int *ptr_tumor, int *ptr_seg,
-             int *ptr_hemorrhage, int *ptr_necrosis, 
-             int *ptr_enh, int *ptr_edema, const int &m_tumor, 
-             const int &m_enh, const int &m_enh_enc, const int len, 
+             int *ptr_hemorrhage, int *ptr_necrosis,
+             int *ptr_enh, int *ptr_edema, const int &m_tumor,
+             const int &m_enh, const int &m_enh_enc, const int len,
              const int &nr, const int &nc, const int &ns ) {
   
-  int *ptr_r_enh = new int[ 2 * len ]();
   int *ptr_enclose_tumor = new int[ 2 * len ]();
   int *ptr_tmp_tumor = new int[ 2 * len ]();
   vector<int> tmp_region;
@@ -161,6 +160,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
   int max_size = 0, n_enc_t = 0, idx = 0;
   int MAX = nr * nc * ns;
   bool remove = true;
+  double spread_idx = 0;
   
   for( int i = 0; i < len; ++ i ) {
     ptr_tmp_tumor[ 2 * i ] = ptr_tumor[ 2 * i ];
@@ -170,57 +170,56 @@ void remove( vector<int> &region, const int *ptr_aidx,
     if( cnctRegion( i + 1, ptr_nidx, ptr_tmp_tumor, ptr_tmp_tumor,
                     1, region ) ) {
       if( max_size < region.size() ) {
-        max_size = region.size(); 
+        max_size = region.size();
       }
     }
   }
   pad2zero( ptr_tmp_tumor, len );
+  inRegion( ptr_enclose_tumor, len, ptr_enh, Tumor::ET,
+            ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
+            nr, nc, ns );
   max_size = min( m_tumor, max_size );
   // remove
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
       if( region.size() < max_size ) {
-        // Find enh inside the tumor region
         remove = true;
-        for( int j = 0; j < region.size(); ++ j ) {
-          idx = region[ j ];
-          if( idx != 0 ) {
-            cnctRegion( idx, ptr_nidx, ptr_enh, ptr_enh, Tumor::ET, 
-                        tmp_region );
-            if( tmp_region.size() > m_enh ) {
-              remove = false;
-              break;
-            } else {
-              zeroVector( ptr_r_enh, len );
-              zeroVector( ptr_enclose_tumor, len );
-              n_enc_t = 0;
-              for( vector<int>::const_iterator it = tmp_region.begin();
-                   it != tmp_region.end(); ++ it ) {
-                idx = *it;
-                if( idx != 0 ) {
-                  ptr_r_enh[ 2 * ( idx - 1 ) ] = 1;
-                }
-              }
-              inRegion( ptr_enclose_tumor, len, ptr_r_enh, 1,
-                        ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
-                        nr, nc, ns );
-              for( int k = 0; k < len; ++ k ) {
-                if( ptr_enclose_tumor[ 2 * k ] == 1 ) {
-                  ++ n_enc_t;
-                }
-              }
-              if( n_enc_t > m_enh_enc ) {
-                remove = false;
-                break;
-              } else if( ( double ) n_enc_t / region.size() > 0.75 ){
+        spread_idx = spread( region, ptr_aidx );
+        if( spread_idx < 2 ) {
+          // Find enh inside the tumor region
+          for( int j = 0; j < region.size(); ++ j ) {
+            idx = region[ j ];
+            if( idx != 0 ) {
+              cnctRegion( idx, ptr_nidx, ptr_enh, ptr_enh, Tumor::ET,
+                          tmp_region );
+              if( tmp_region.size() > m_enh ) {
                 remove = false;
                 break;
               }
             }
           }
+          pad2zero( ptr_enh, len );
+          if( remove ) {
+            for( int j = 0; j < region.size(); ++ j ) {
+              idx = region[ j ];
+              if( idx != 0 ) {
+                cnctRegion( idx, ptr_nidx,
+                            ptr_enclose_tumor, ptr_enclose_tumor, 1,
+                            tmp_region );
+                if( tmp_region.size() > m_enh_enc ) {
+                  remove = false;
+                  break;
+                } else if( ( double ) tmp_region.size() /
+                  region.size() > 0.75 ){
+                  remove = false;
+                  break;
+                }
+              }
+            }
+            pad2zero( ptr_enclose_tumor, len );
+          }
         }
-        pad2zero( ptr_enh, len );
         if( remove ) {
           excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
                        ptr_necrosis, ptr_enh, ptr_edema, MAX );
@@ -230,7 +229,6 @@ void remove( vector<int> &region, const int *ptr_aidx,
   }
   pad2zero( ptr_tumor, len );
   
-  delete [] ptr_r_enh;
   delete [] ptr_enclose_tumor;
   delete [] ptr_tmp_tumor;
   
