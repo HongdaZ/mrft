@@ -185,40 +185,42 @@ void remove( vector<int> &region, const int *ptr_aidx,
                     1, region ) ) {
       if( region.size() < max_size ) {
         remove = true;
-        spread_idx = spread( region, ptr_aidx );
-        if( spread_idx < 2 ) {
-          // Find enh inside the tumor region
-          for( int j = 0; j < region.size(); ++ j ) {
-            idx = region[ j ];
-            if( idx != 0 ) {
-              cnctRegion( idx, ptr_nidx, ptr_enh, ptr_enh, Tumor::ET,
-                          tmp_region );
-              if( tmp_region.size() > m_enh ) {
-                remove = false;
-                break;
-              }
-            }
-          }
-          pad2zero( ptr_enh, len );
-          if( remove ) {
+        if( region.size() > 200 ) {
+          spread_idx = spread( region, ptr_aidx );
+          if( spread_idx < 2 ) {
+            // Find enh inside the tumor region
             for( int j = 0; j < region.size(); ++ j ) {
               idx = region[ j ];
               if( idx != 0 ) {
-                cnctRegion( idx, ptr_nidx,
-                            ptr_enclose_tumor, ptr_enclose_tumor, 1,
+                cnctRegion( idx, ptr_nidx, ptr_enh, ptr_enh, Tumor::ET,
                             tmp_region );
-                if( tmp_region.size() > m_enh_enc ) {
-                  remove = false;
-                  break;
-                } else if( ( double ) tmp_region.size() /
-                  region.size() > 0.75 ){
+                if( tmp_region.size() > m_enh ) {
                   remove = false;
                   break;
                 }
               }
             }
-            pad2zero( ptr_enclose_tumor, len );
-          }
+            pad2zero( ptr_enh, len );
+            if( remove ) {
+              for( int j = 0; j < region.size(); ++ j ) {
+                idx = region[ j ];
+                if( idx != 0 ) {
+                  cnctRegion( idx, ptr_nidx,
+                              ptr_enclose_tumor, ptr_enclose_tumor, 1,
+                              tmp_region );
+                  if( tmp_region.size() > m_enh_enc ) {
+                    remove = false;
+                    break;
+                  } else if( ( double ) tmp_region.size() /
+                    region.size() > 0.75 ){
+                    remove = false;
+                    break;
+                  }
+                }
+              }
+              pad2zero( ptr_enclose_tumor, len );
+            }
+          } 
         }
         if( remove ) {
           excldRegion( region, ptr_seg,  ptr_tumor, ptr_hemorrhage,
