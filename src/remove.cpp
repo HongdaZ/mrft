@@ -212,7 +212,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
                     remove = false;
                     break;
                   } else if( ( double ) tmp_region.size() /
-                    region.size() > 0.75 ){
+                    region.size() > 0.80 ){
                     remove = false;
                     break;
                   }

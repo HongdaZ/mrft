@@ -124,8 +124,8 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           
           exp_ratio = expRatio( r0, h );
           v = ballCrownVol( r0, h );
-          if( region.size() > v * 0.8 &&
-              area_ratio > exp_ratio * 0.8 ) {
+          if( region.size() > v * 0.75 &&
+              area_ratio > exp_ratio * 0.75 ) {
             add = true;
           } else {
             add = false;
