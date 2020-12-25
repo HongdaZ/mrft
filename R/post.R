@@ -61,7 +61,8 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                            spread_trim )
   # sink()
   if( sum( post_seg$image == 2 |
-           post_seg$image == 1, na.rm = T ) < 2000 ) {
+           post_seg$image == 1 |
+           post_seg$image == 4 , na.rm = T ) < 2000 ) {
     ## Needs to segment t2 again
     post_seg$image[ post_seg$image == 6 ] <- NA_integer_
     post_seg$image[ post_seg$image == 5 ] <- NA_integer_
