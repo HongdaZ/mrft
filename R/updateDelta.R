@@ -28,7 +28,7 @@ updateDelta3T2 <- function( prop_bright,
 updateDelta3Flair <- function( t1ce_image, flair_data, flair_seg ) {
   flair_brain <- flair_data$flair[ ! is.na( flair_data$flair ) ]
   ## Find grey matter + tumor
-  q_flair <- quantile( flair_brain, probs = 0.80, na.rm = T )
+  q_flair <- quantile( flair_brain, probs = 0.70, na.rm = T )
   tumor <- flair_data$flair[ flair_data$flair > q_flair &
                              ( t1ce_image == 4 |
                                t1ce_image == 2 ) ] 
@@ -42,8 +42,8 @@ updateDelta3Flair <- function( t1ce_image, flair_data, flair_seg ) {
   m_3 <- flair_seg$parm[ 2, 3 ]
   
   delta_3 <- ( m - m_3 ) / sqrt( sigma2_3 )
-  if( delta_3 > 12.5 ) {
-    delta_3 <- 12.5  
+  if( delta_3 > 13 ) {
+    delta_3 <- 13  
   } else if( delta_3 < 4 ) {
     delta_3 <- 4
   }
