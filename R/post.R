@@ -8,7 +8,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   fthr = c( 0, 0, 4, 5 ) ),
           delta_factor = 
             list( t1ce = 1.75,
-                  flair = 2.70,
+                  flair = 2.75,
                   t2 = 4.50 ),
           gamma = list( t1ce = 0.8,
                         flair = 0.4,
