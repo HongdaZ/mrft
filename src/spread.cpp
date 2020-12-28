@@ -1,3 +1,5 @@
+#include "Rinternals.h"
+
 #include <cmath>
 
 #include "spread.h"
@@ -26,7 +28,7 @@ double spread( const vector<int> &region,
   spread_idx = sqrt( ( double ) p / 4 / PI ) / r;
   
   delete [] ptr_seg;
-  return spread_idx;
+  return spread_idx * spread_idx;
 }
 // 2D version of the function above
 double spread( const vector<int> &region,
@@ -47,7 +49,6 @@ double spread( const vector<int> &region,
   }
   int p = perimeter( ptr_seg, 1, len, ptr_nidx, plane );
   spread_idx = ( double ) p / 2 / PI / r;
-  
   delete [] ptr_seg;
-  return spread_idx;
+  return spread_idx * spread_idx;
 }
