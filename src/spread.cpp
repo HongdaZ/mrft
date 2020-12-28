@@ -2,86 +2,52 @@
 
 #include "spread.h"
 #include "radius.h"
+#include "perimeter.h"
 
 using std::sqrt;
 
 // Measure the spread of the voxels in region
-double spread( const vector<int> &region, const int *ptr_aidx ) {
-  
+double spread( const vector<int> &region,
+               const int &len, const int *ptr_nidx ) {
+  const double PI = 3.14159265358979323846;
   double r = radius( region.size() );
-  double max_dist = 0, dist = 0;
-  const int len = region.size();
-  double cr = 0, cc = 0, cs = 0, r1, c1, s1, n = 0;
-  int index1;
-  for( int i = 0; i < len; ++ i ) {
-    if( region[ i ] != 0 ) {
-      index1 = region[ i ];
-      r1 = ptr_aidx[ 3 * ( index1 - 1 ) ];
-      c1 = ptr_aidx[ 3 * ( index1 - 1 ) + 1 ];
-      s1 = ptr_aidx[ 3 * ( index1 - 1 ) + 2 ];
-      cr += r1;
-      cc += c1;
-      cs += s1;
-      ++ n;
-    }
-  }
-  cr /= n;
-  cc /= n;
-  cs /= n;
-  for( int i = 0; i < len; ++ i ) {
-    if( region[ i ] != 0 ) {
-      index1 = region[ i ];
-      r1 = ptr_aidx[ 3 * ( index1 - 1 ) ];
-      c1 = ptr_aidx[ 3 * ( index1 - 1 ) + 1 ];
-      s1 = ptr_aidx[ 3 * ( index1 - 1 ) + 2 ];
-      dist =  sqrt( pow( r1 - cr + 0.71, 2 ) + pow( c1 - cc + 0.71, 2 ) +
-        pow( s1 - cs + 0.71, 2 ) );
-      if( max_dist < dist ) {
-        max_dist = dist;
-      }
-    }
-  }
+  double spread_idx = 0;
+  int *ptr_seg = new int[ 2 * len ]();
+  int idx = 0;
   
-  return max_dist / r;
+  for( vector<int>::const_iterator it = region.begin(); 
+       it != region.end(); ++ it ) {
+    idx = *it;
+    if( idx != 0 ) {
+      ptr_seg[ 2 * ( idx - 1 ) ] = 1;
+    }
+  }
+  int p = perimeter( ptr_seg, 1, len, ptr_nidx );
+  spread_idx = sqrt( ( double ) p / 4 / PI ) / r;
+  
+  delete [] ptr_seg;
+  return spread_idx;
 }
 // 2D version of the function above
-double spread( const vector<int> &region, const int &plane,
-               const int *ptr_aidx ) {
-  vector<int> plane_idx{ 1, 2, 0, 2, 0, 1 };
-  vector<int> curr_plane{ plane_idx[ 2 * plane ], 
-                          plane_idx[ 2 * plane + 1 ] };
+double spread( const vector<int> &region,
+               const int &len, const int *ptr_nidx,
+               const int &plane ) {
+  const double PI = 3.14159265358979323846;
   double r = radius2D( region.size() );
-  double max_dist = 0, dist = 0;
-  const int len = region.size();
-  double n = 0;
-  vector<double> center( 2, 0 );
-  vector<double> xyz( 2, 0 );
-  int index1;
-  for( int i = 0; i < len; ++ i ) {
-    if( region[ i ] != 0 ) {
-      index1 = region[ i ];
-      for( int j = 0; j < 2; ++ j ) {
-        xyz[ j ] = ptr_aidx[ 3 * ( index1 - 1 ) + curr_plane[ j ] ];
-        center[ j ] += xyz[ j ];
-      }
-      ++ n;
-    }
-  }
-  center[ 0 ] /= n;
-  center[ 1 ] /= n;
+  double spread_idx = 0;
+  int *ptr_seg = new int[ 2 * len ]();
+  int idx = 0;
   
-  for( int i = 0; i < len; ++ i ) {
-    if( region[ i ] != 0 ) {
-      index1 = region[ i ];
-      for( int j = 0; j < 2; ++ j ) {
-        xyz[ j ] = ptr_aidx[ 3 * ( index1 - 1 ) + curr_plane[ j ] ];
-      }
-      dist =  sqrt( pow( xyz[ 0 ] - center[ 0 ] + 0.71, 2 ) + 
-        pow( xyz[ 1 ] - center[ 1 ] + 0.71, 2 ) );
-      if( max_dist < dist ) {
-        max_dist = dist;
-      }
+  for( vector<int>::const_iterator it = region.begin(); 
+       it != region.end(); ++ it ) {
+    idx = *it;
+    if( idx != 0 ) {
+      ptr_seg[ 2 * ( idx - 1 ) ] = 1;
     }
   }
-  return max_dist / r;
+  int p = perimeter( ptr_seg, 1, len, ptr_nidx, plane );
+  spread_idx = ( double ) p / 2 / PI / r;
+  
+  delete [] ptr_seg;
+  return spread_idx;
 }

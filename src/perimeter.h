@@ -4,9 +4,9 @@
 // Find perimeter of a 2D region
 int perimeter( const int *ptr_seg, const int &label, 
                const int &len, const int *ptr_nidx,
-               const int *ptr_aidx, const int &plane );
+               const int &plane );
 // 3D version of the function above
 int perimeter( const int *ptr_seg, const int &label,
-                 const int &len, const int *ptr_nidx );
+               const int &len, const int *ptr_nidx );
 
 #endif
