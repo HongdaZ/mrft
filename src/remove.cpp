@@ -49,7 +49,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
-      spread_idx = spread( region, ptr_aidx );
+      spread_idx = spread( region, len, ptr_nidx );
       region_size.push_back( region.size() );
       if( max_size < region.size() ) {
         max_size = region.size();
@@ -82,7 +82,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
-      spread_idx = spread( region, ptr_aidx );
+      spread_idx = spread( region, len, ptr_nidx );
       // Rprintf( "spread_idx = %f\n", spread_idx );
       if( region.size() < size &&
           spread_idx > s_factor ) {
@@ -186,7 +186,7 @@ void remove( vector<int> &region, const int *ptr_aidx,
       if( region.size() < max_size ) {
         remove = true;
         if( region.size() > 200 ) {
-          spread_idx = spread( region, ptr_aidx );
+          spread_idx = spread( region, len, ptr_nidx );
           if( spread_idx < 2 ) {
             // Find enh inside the tumor region
             for( int j = 0; j < region.size(); ++ j ) {

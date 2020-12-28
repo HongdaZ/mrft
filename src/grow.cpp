@@ -43,7 +43,7 @@ void grow( const int &last, int &n_tumor, const int &len,
     
     cnctRegion( idx, ptr_nidx, ptr_keep, ptr_keep, 1, region );
     pad2zero( ptr_keep, region );
-    spread_keep = spread( region, ptr_aidx );
+    spread_keep = spread( region, len, ptr_nidx );
     if( spread_keep > s_trim * .85 ) {
       keep = false;
       break;
@@ -54,7 +54,7 @@ void grow( const int &last, int &n_tumor, const int &len,
                       region ) ) {
         p_tnbr = pTNbr( region, ptr_keep, 1, ptr_nidx );
         n_tnbr = p_tnbr * region.size();
-        spread_remain = spread( region, ptr_aidx );
+        spread_remain = spread( region, len, ptr_nidx );
         // Rprintf( "length region = %d, n_tnbr = %d, spread_remain = %f\n",
         //          region.size(), n_tnbr, spread_remain );
         r = radius( region.size() );

@@ -107,7 +107,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
               tmp_region.push_back( j + 1 );
             }
           }
-          spread_idx = spread( tmp_region, ptr_aidx );
+          spread_idx = spread( tmp_region, len, ptr_nidx );
           if( spread_idx < 2 ) {
             add = true;
           } else {

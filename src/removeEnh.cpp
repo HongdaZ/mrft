@@ -41,7 +41,7 @@ void removeEnh( int *ptr_seg, const int &label,
                       label, region ) ) {
         n_enh = region.size();
         r_enh = radius2D( n_enh );
-        spread_enh = spread( region, Plane::Axial, ptr_aidx );
+        spread_enh = spread( region, len, ptr_nidx, Plane::Axial );
         if( spread_enh > spread_rm ) {
           r_brain = radius2D( count[ slice - 1 ] );
           max_dist = spread_enh * r_enh;
