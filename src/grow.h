@@ -10,6 +10,6 @@ void grow( const int &last, int &n_tumor, const int &len,
            const int *ptr_nidx, const int *ptr_aidx,
            int *ptr_whole, int *ptr_res,
            int *ptr_one, int *ptr_keep, int *ptr_remain, 
-           const double &s_trim ); 
+           const double &s_trim, const double &r_trim ); 
 
 #endif

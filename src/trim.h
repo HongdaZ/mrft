@@ -9,5 +9,6 @@ using std::vector;
 void trim( int *ptr_tumor, int *ptr_exclude,
            const int *ptr_nidx, 
            const int *ptr_aidx, vector<int> &region,
-           const int &len, const double &s_trim );
+           const int &len, const double &s_trim,
+           const double &r_trim );
 #endif
