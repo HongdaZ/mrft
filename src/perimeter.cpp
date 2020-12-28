@@ -19,14 +19,15 @@ int perimeter( const int *ptr_seg, const int &label,
                                 plane_idx[ 4 * plane + 2 ],
                                 plane_idx[ 4 * plane + 3 ] };
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_seg[ 2 * i ] == label ) {
+    if( ptr_seg[ 2 * i ] != label ) {
       for( int j = 0; j < 4; ++ j ) {
         nidx = ptr_nidx[ 6 * i + curr_plane[ j ] ];
         if( nidx == NA_INTEGER ) {
-          ++ count;
+          continue;
         } else {
-          if( ptr_seg[ 2 * ( nidx - 1 ) ] != label ) {
+          if( ptr_seg[ 2 * ( nidx - 1 ) ] == label ) {
             ++ count;
+            break;
           }
         }
       }
@@ -39,14 +40,15 @@ int perimeter( const int *ptr_seg, const int &label,
                  const int &len, const int *ptr_nidx ) {
   int count = 0, nidx = 0;
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_seg[ 2 * i ] == label ) {
+    if( ptr_seg[ 2 * i ] != label ) {
       for( int j = 0; j < 6; ++ j ) {
         nidx = ptr_nidx[ 6 * i + j ];
         if( nidx == NA_INTEGER ) {
-          ++ count;
+          continue;
         } else {
-          if( ptr_seg[ 2 * ( nidx - 1 ) ] != label ) {
+          if( ptr_seg[ 2 * ( nidx - 1 ) ] == label ) {
             ++ count;
+            break;
           }
         }
       }
