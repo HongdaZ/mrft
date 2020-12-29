@@ -11,6 +11,7 @@ void removeEnh( int *ptr_seg, const int &label,
                 const double &spread_idx, const int &len,
                 vector<int> &region, const int *ptr_nidx, 
                 const int *ptr_aidx,
-                const int &nr, const int &nc, const int &ns );
+                const int &nr, const int &nc, const int &ns,
+                int *ptr_seg_copy );
 
 #endif

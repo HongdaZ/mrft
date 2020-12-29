@@ -26,7 +26,8 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
                int *ptr_seg2, const int &label2,
                vector<int> &region, const double &spread_factor,
                const int *ptr_nidx, const int *ptr_aidx,
-               const int &nr, const int &nc, const int &ns ) {
+               const int &nr, const int &nc, const int &ns,
+               int *ptr_seg_copy ) {
   int idx = 0, n_idx = 0;
   double p_t_nbr = 0;
   int n_enclose_t;
@@ -107,7 +108,8 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
               tmp_region.push_back( j + 1 );
             }
           }
-          spread_idx = spread( tmp_region, len, ptr_nidx );
+          spread_idx = spread( tmp_region, ptr_seg_copy, 
+                               len, ptr_nidx );
           if( spread_idx < 2 ) {
             add = true;
           } else {

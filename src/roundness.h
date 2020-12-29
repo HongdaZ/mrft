@@ -9,5 +9,5 @@ using std::vector;
 double roundness( const vector<int> &region, const int *ptr_aidx );
 // 2D version of the function above
 double roundness( const vector<int> &region, const int &plane,
-               const int *ptr_aidx );
+                  const int *ptr_aidx );
 #endif

@@ -11,7 +11,8 @@ void removeEnh( int *ptr_seg, const int &label,
                 const double &spread_rm, const int &len,
                 vector<int> &region, const int *ptr_nidx, 
                 const int *ptr_aidx,
-                const int &nr, const int &nc, const int &ns ) {
+                const int &nr, const int &nc, const int &ns,
+                int *ptr_seg_copy ) {
   int n_enh = 0, last_slice = 0, slice = 0, max_n = 0;
   double bound = 0, r_enh = 0, r_brain = 0,
     spread_enh = 0, spread_brain = 0, max_dist = 0;
@@ -41,7 +42,8 @@ void removeEnh( int *ptr_seg, const int &label,
                       label, region ) ) {
         n_enh = region.size();
         r_enh = radius2D( n_enh );
-        spread_enh = spread( region, len, ptr_nidx, Plane::Axial );
+        spread_enh = spread( region, ptr_seg_copy,
+                             len, ptr_nidx, Plane::Axial );
         if( spread_enh > spread_rm ) {
           r_brain = radius2D( count[ slice - 1 ] );
           max_dist = spread_enh * r_enh;

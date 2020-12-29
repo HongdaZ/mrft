@@ -18,7 +18,8 @@ using std::max;
 using std::min;
 using std::list;
 
-void remove( vector<int> &region, const int *ptr_aidx,
+void remove( vector<int> &region, int *ptr_seg_copy,
+             const int *ptr_aidx,
              const int *ptr_nidx, int *ptr_tumor, int *ptr_seg,
              int *ptr_hemorrhage, int *ptr_necrosis,
              int *ptr_enh, int *ptr_edema, const int &m_tumor,
@@ -49,7 +50,8 @@ void remove( vector<int> &region, const int *ptr_aidx,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
-      spread_idx = spread( region, len, ptr_nidx );
+      spread_idx = spread( region, ptr_seg_copy, 
+                           len, ptr_nidx );
       region_size.push_back( region.size() );
       if( max_size < region.size() ) {
         max_size = region.size();
@@ -82,7 +84,8 @@ void remove( vector<int> &region, const int *ptr_aidx,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor,
                     1, region ) ) {
-      spread_idx = spread( region, len, ptr_nidx );
+      spread_idx = spread( region, ptr_seg_copy,
+                           len, ptr_nidx );
       // Rprintf( "spread_idx = %f\n", spread_idx );
       if( region.size() < size &&
           spread_idx > s_factor ) {
@@ -146,7 +149,8 @@ void remove( vector<int> &region, const int *ptr_aidx,
 //                       ( max enh size < m_enh &&
 //                         enclosed tumor < m_enh_enc &&
 //                         prop enclose tumor < 0.75 ) )
-void remove( vector<int> &region, const int *ptr_aidx,
+void remove( vector<int> &region, int *ptr_seg_copy,
+             const int *ptr_aidx,
              const int *ptr_nidx, int *ptr_tumor, int *ptr_seg,
              int *ptr_hemorrhage, int *ptr_necrosis,
              int *ptr_enh, int *ptr_edema, const int &m_tumor,
@@ -186,7 +190,8 @@ void remove( vector<int> &region, const int *ptr_aidx,
       if( region.size() < max_size ) {
         remove = true;
         if( region.size() > 200 ) {
-          spread_idx = spread( region, len, ptr_nidx );
+          spread_idx = spread( region, ptr_seg_copy,
+                               len, ptr_nidx );
           if( spread_idx < 2 ) {
             // Find enh inside the tumor region
             for( int j = 0; j < region.size(); ++ j ) {

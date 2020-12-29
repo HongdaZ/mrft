@@ -12,7 +12,8 @@
 #include "nSurface.h"
 #include "roundness.h"
 
-void grow( const int &last, int &n_tumor, const int &len, 
+void grow( int *ptr_seg_copy,
+           const int &last, int &n_tumor, const int &len, 
            vector<int> &region,
            const int *ptr_nidx, const int *ptr_aidx,
            int *ptr_whole, int *ptr_res,
@@ -44,7 +45,7 @@ void grow( const int &last, int &n_tumor, const int &len,
     
     cnctRegion( idx, ptr_nidx, ptr_keep, ptr_keep, 1, region );
     pad2zero( ptr_keep, region );
-    spread_keep = spread( region, len, ptr_nidx );
+    spread_keep = spread( region, ptr_seg_copy, len, ptr_nidx );
     round_keep = roundness( region, ptr_aidx );
     if( spread_keep > s_trim * .85 || round_keep > r_trim * 0.85 ) {
       keep = false;
@@ -56,10 +57,9 @@ void grow( const int &last, int &n_tumor, const int &len,
                       region ) ) {
         p_tnbr = pTNbr( region, ptr_keep, 1, ptr_nidx );
         n_tnbr = p_tnbr * region.size();
-        spread_remain = spread( region, len, ptr_nidx );
+        spread_remain = spread( region, ptr_seg_copy,
+                                len, ptr_nidx );
         round_remain = roundness( region, ptr_aidx );
-        // Rprintf( "length region = %d, n_tnbr = %d, spread_remain = %f\n",
-        //          region.size(), n_tnbr, spread_remain );
         r = radius( region.size() );
         if( n_tnbr < ( double )n_surface / 12 &&
             ( spread_remain > s_trim ||

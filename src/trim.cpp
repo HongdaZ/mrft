@@ -7,8 +7,8 @@
 #include "zeroVector.h"
 #include "grow.h"
 
-void trim( int *ptr_tumor, int *ptr_exclude,
-           const int *ptr_nidx, 
+void trim( int *ptr_tumor, int *ptr_exclude, 
+           int *ptr_seg_copy, const int *ptr_nidx, 
            const int *ptr_aidx, vector<int> &region,
            const int &len, const double &s_trim, 
            const double &r_trim ) {
@@ -42,14 +42,7 @@ void trim( int *ptr_tumor, int *ptr_exclude,
           idx = *it;
           ptr_one[ 2 * ( idx - 1 ) ] = 1;
         }
-        // int n_ptr_one = 0;
-        // for( int j = 0; j < len; ++ j ) {
-        //   if( ptr_one[ 2 * j ] == 1 ) {
-        //     ++ n_ptr_one;
-        //   }
-        // }
-        // Rprintf( "n_ptr_one = %d\n", n_ptr_one );
-        grow( last, n_tumor, len, region, ptr_nidx, 
+        grow( ptr_seg_copy, last, n_tumor, len, region, ptr_nidx, 
               ptr_aidx, ptr_whole, ptr_res, ptr_one,
               ptr_keep, ptr_remain, s_trim, r_trim );
       }
