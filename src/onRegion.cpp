@@ -110,7 +110,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           }
           spread_idx = spread( tmp_region, ptr_seg_copy, 
                                len, ptr_nidx );
-          if( spread_idx < 2 ) {
+          if( spread_idx < spread_factor ) {
             add = true;
           } else {
             add = false;
