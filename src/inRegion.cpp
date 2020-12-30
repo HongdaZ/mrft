@@ -14,7 +14,10 @@ void inRegion( int *ptr_enclose, const int &len,
                vector<int> &region, 
                const int *ptr_nidx, const int *ptr_aidx,
                const int &nr, const int &nc, const int &ns,
-               const int n_in ) {
+               const int &in_sagittal, 
+               const int &in_coronal, 
+               const int &in_axial,
+               const int &n_in ) {
   // Find connected regions in ptr_seg1
   list<vector<int>> regions1 = regions( ptr_seg1, len,
                                         region, label1, 
@@ -26,7 +29,8 @@ void inRegion( int *ptr_enclose, const int &len,
                                         label2, ptr_aidx ); 
   vector<list<vector<int>>> slices2 = 
     region2slice( regions2, nr, nc, ns );
-  enclose( ptr_enclose, len, slices1, slices2, n_in );
+  enclose( ptr_enclose, len, slices1, slices2, 
+           in_sagittal, in_coronal, in_axial, n_in );
 }
 // 2D version of inregion
 void inRegion2D( int *ptr_enclose, const int &len,
@@ -35,7 +39,10 @@ void inRegion2D( int *ptr_enclose, const int &len,
                  vector<int> &region, 
                  const int *ptr_nidx, const int *ptr_aidx,
                  const int &nr, const int &nc, const int &ns,
-                 const int n_in ) {
+                 const int &in_sagittal, 
+                 const int &in_coronal, 
+                 const int &in_axial,
+                 const int &n_in ) {
   // Find connected regions in ptr_seg1
   vector<list<vector<int>>> slices1 = regions2D( ptr_seg1, len,
                                         region, label1, 
@@ -45,5 +52,6 @@ void inRegion2D( int *ptr_enclose, const int &len,
                                         label2, ptr_aidx ); 
   vector<list<vector<int>>> slices2 = 
     region2slice( regions2, nr, nc, ns );
-  enclose( ptr_enclose, len, slices1, slices2, n_in );
+  enclose( ptr_enclose, len, slices1, slices2, 
+           in_sagittal, in_coronal, in_axial, n_in );
 }

@@ -8,11 +8,15 @@
 void enclose( int *ptr_seg, const int &len, 
               const vector<list<vector<int>>> &slices1,
               const vector<list<vector<int>>> &slices2,
-              const int n_in ) {
+              const int &in_sagittal, 
+              const int &in_coronal, 
+              const int &in_axial,
+              const int &n_in ) {
   // Axial, sagittal and coronal
   vector<int> enclosed( 3 * len );
   vector<int> row{ 2, 3, 1, 3, 1, 2 };
   int plane1, plane2, len_slice1, len_slice2, v1, v2, idx, local_n_in;
+  bool inside;
   for( int i = 0; i < 3; ++ i ) {
     const list<vector<int>> &p_slice1 = slices1[ i ];
     const list<vector<int>> &p_slice2 = slices2[ i ];
@@ -57,14 +61,36 @@ void enclose( int *ptr_seg, const int &len,
   }
   // Rprintf( "n_in = %d \n", n_in );
   for( int i = 0; i < len; ++ i ) {
-    local_n_in = 0;
-    for( int j = 0; j < 3; ++ j ) {
-      if( enclosed[ 3 * i + j ] == 1 ) {
-        ++ local_n_in;
+    if( n_in == 0 ) {
+      inside = true;
+      if( in_sagittal == 1 ) {
+        if( enclosed[ 3 * i ] == 0 ) {
+          inside = false;
+        }
       }
-    }
-    if( local_n_in >= n_in ) {
-      ptr_seg[ 2 * i ] = 1; 
+      if( in_coronal == 1 ) {
+        if( enclosed[ 3 * i + 1 ] == 0 ) {
+          inside = false;
+        }
+      }
+      if( in_axial == 1 ) {
+        if( enclosed[ 3 * i + 2 ] == 0 ) {
+          inside = false;
+        }
+      }
+      if( inside ) {
+        ptr_seg[ 2 * i ] = 1; 
+      }
+    } else {
+      local_n_in = 0;
+      for( int j = 0; j < 3; ++ j ) {
+        if( enclosed[ 3 * i + j ] == 1 ) {
+          ++ local_n_in;
+        }
+      }
+      if( local_n_in >= n_in ) {
+        ptr_seg[ 2 * i ] = 1; 
+      }
     }
   }
 }
