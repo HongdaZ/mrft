@@ -41,16 +41,18 @@ extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh,
                             SEXP max_prop_enh_enc,
                             SEXP max_prop_enh_slice,
                             SEXP min_tumor, SEXP spread_add,
-                            SEXP spread_rm, SEXP spread_trim,
-                            SEXP round_trim,
-                            SEXP first_trim, SEXP first_remove ) ;
+                            SEXP spread_rm, 
+                            SEXP trim1_spread, SEXP trim1_round,
+                            SEXP remove2d_spread, SEXP remove2d_round,
+                            SEXP spread_trim, SEXP round_trim ) ;
 SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP min_enh_enc, SEXP max_prop_enh_enc,
                   SEXP max_prop_enh_slice,
                   SEXP min_tumor, SEXP spread_add,
-                  SEXP spread_rm, SEXP spread_trim,
-                  SEXP round_trim,
-                  SEXP first_trim, SEXP first_remove ) {
+                  SEXP spread_rm, 
+                  SEXP trim1_spread, SEXP trim1_round,
+                  SEXP remove2d_spread, SEXP remove2d_round,
+                  SEXP spread_trim, SEXP round_trim ) {
   SEXP t1ce = getListElement( post_data, "t1ce_seg" );
   SEXP flair = getListElement( post_data, "flair_seg" );
   SEXP t2 = getListElement( post_data, "t2_seg" );
@@ -135,8 +137,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   const double s_rm = REAL( spread_rm )[ 0 ];
   const double s_trim = REAL( spread_trim )[ 0 ];
   const double r_trim = REAL( round_trim )[ 0 ];
-  const double f_trim = REAL( first_trim )[ 0 ];
-  const double f_rm = REAL( first_remove )[ 0 ];
+  const double trim1_s = REAL( trim1_spread )[ 0 ];
+  const double trim1_r = REAL( trim1_round )[ 0 ];
+  const double remove2d_s = REAL( remove2d_spread )[ 0 ];
+  const double remove2d_r = REAL( remove2d_round )[ 0 ];
   
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
@@ -314,7 +318,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
           m_tumor, m_enh, m_enh_enc, len, nr, nc, ns, s_rm );
   // Trim tumor region
   trim( ptr_tumor, ptr_exclude, ptr_seg_copy,
-        ptr_nidx, ptr_aidx, region, len, f_trim, f_trim );
+        ptr_nidx, ptr_aidx, region, len, trim1_s, trim1_r );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
       ptr_seg[ 2 * i ] = 0;
@@ -332,7 +336,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       roundness_2d = roundness( region, Plane::Axial, ptr_aidx );
       // Rprintf( "size = %d, spread = %f, roundness = %f\n",
       //          region.size(), spread_idx_2d, roundness_2d );
-      if( spread_idx_2d > f_rm || roundness_2d > f_rm ) {
+      if( spread_idx_2d > remove2d_s || roundness_2d > remove2d_r ) {
         excldRegion( region, ptr_seg, ptr_tumor, ptr_hemorrhage,
                      ptr_necrosis, ptr_enh, ptr_edema, nr * nc * ns );
       }
