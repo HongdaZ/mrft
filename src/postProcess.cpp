@@ -417,7 +417,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 1, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -441,7 +441,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.6, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -466,7 +466,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.6, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -516,7 +516,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.6, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -545,7 +545,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.8, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -588,10 +588,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   zeroVector( ptr_extra_edema, len );
-  // Add ( T1ce( 1 ) && FLAIR( 1 ) ) && T2( 4 ) inside tumor (3D)
+  // Add ( T1ce( 1 ) || FLAIR( 1 ) ) && T2( 4 ) inside tumor (3D)
   // as necrosis
   for( int i = 0; i < len; ++ i ) {
-    if( ( ptr_t1ce[ 2 * i ] == T1ce::T1CSF &&
+    if( ( ptr_t1ce[ 2 * i ] == T1ce::T1CSF ||
           ptr_flair[ 2 * i ] == Flair::FCSF ) &&
         ptr_t2[ 2 * i ] == T2::T2CSF && 
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -611,9 +611,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_on, len ); 
   zeroVector( ptr_whole, len );
-  // T1ce( 1 ) && Flair( 1 ) && T2( 4 ) as Necrosis
+  // ( T1ce( 1 ) || Flair( 1 ) ) && T2( 4 ) as Necrosis
   for( int i = 0; i < len; ++ i ) {
-    if( ( ptr_t1ce[ 2 * i ] == T1ce::T1CSF &&
+    if( ( ptr_t1ce[ 2 * i ] == T1ce::T1CSF ||
           ptr_flair[ 2 * i ] == Flair::FCSF ) &&
         ptr_t2[ 2 * i ] == T2::T2CSF && 
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -622,7 +622,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.6, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
