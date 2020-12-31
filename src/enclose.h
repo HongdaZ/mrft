@@ -11,6 +11,7 @@ using std::list;
 void enclose( int *ptr_seg, const int &len,
               const vector<list<vector<int>>> &slices1,
               const vector<list<vector<int>>> &slices2,
+              vector<double> &volume,
               const int &in_sagittal = 0, 
               const int &in_coronal = 0, 
               const int &in_axial = 0,

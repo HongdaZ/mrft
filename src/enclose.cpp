@@ -3,11 +3,13 @@
 #include "enclose.h"
 #include "cHull.h"
 #include "inPoly.h"
+#include "polygonArea.h"
 
 // Find part of slices2 enclosed in slices1
 void enclose( int *ptr_seg, const int &len, 
               const vector<list<vector<int>>> &slices1,
               const vector<list<vector<int>>> &slices2,
+              vector<double> &volume,
               const int &in_sagittal, 
               const int &in_coronal, 
               const int &in_axial,
@@ -15,9 +17,11 @@ void enclose( int *ptr_seg, const int &len,
   // Axial, sagittal and coronal
   vector<int> enclosed( 3 * len );
   vector<int> row{ 2, 3, 1, 3, 1, 2 };
+  double hull_area;
   int plane1, plane2, len_slice1, len_slice2, v1, v2, idx, local_n_in;
   bool inside;
   for( int i = 0; i < 3; ++ i ) {
+    volume[ i ] = 0;
     const list<vector<int>> &p_slice1 = slices1[ i ];
     const list<vector<int>> &p_slice2 = slices2[ i ];
     for( list<vector<int>>::const_iterator it_s1 = p_slice1.begin();
@@ -42,6 +46,8 @@ void enclose( int *ptr_seg, const int &len,
               ( *it_s2 )[ 4 * j + row[ 2 * i + 1 ] ];
           }
           vector<int> hull = cHull( chull_input );
+          hull_area = polygonArea( hull );
+          volume[ i ] += hull_area;
           // Close the convex hull
           v1 = hull[ 0 ];
           v2 = hull[ 1 ];
