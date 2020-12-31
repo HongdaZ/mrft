@@ -2,6 +2,7 @@
 #include <Rinternals.h>
 
 #include <cmath>
+#include <algorithm>
 
 #include "onRegion.h"
 #include "cnctRegion.h"
@@ -19,6 +20,7 @@
 #include "thick.h"
 
 using std::cbrt;
+using std::max_element;
 
 // Extend ptr_seg1 to adjacent regions of ptr_seg2
 void onRegion( int *ptr_on, const int &len, const double &prop,
@@ -28,6 +30,9 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
                const int *ptr_nidx, const int *ptr_aidx,
                const int &nr, const int &nc, const int &ns,
                int *ptr_seg_copy ) {
+  vector<double> volume;
+  double min_volume;
+  double prop_tumor;
   int idx = 0, n_idx = 0;
   double p_t_nbr = 0;
   int n_enclose_t;
@@ -92,56 +97,63 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
             ptr_cnct_old[ 2 * ( idx - 1 ) ] = 0;
           }
         }
-        inRegion( ptr_enclose_tumor, len, ptr_new_region, 1,
-                  ptr_cnct_old, 1, tmp_region, ptr_nidx,
-                  ptr_aidx, nr, nc, ns );
+        volume = inRegion( ptr_enclose_tumor, len, ptr_new_region, 1,
+                           ptr_cnct_old, 1, tmp_region, ptr_nidx,
+                           ptr_aidx, nr, nc, ns );
+        min_volume = *min_element( volume.begin(), volume.end() );
         n_enclose_t = 0;
         for( int j = 0; j < len; ++ j ) {
           if( ptr_enclose_tumor[ 2 * j ] == 1 ) {
             ++ n_enclose_t;
           }
         }
-        if( n_enclose_t > .3 * n_new ) {
-          clearVector( tmp_region );
-          for( int j = 0; j < len; ++ j ) {
-            if( ptr_enclose_tumor[ 2 * j ] == 1 ||
-                ptr_new_region[ 2 * j ] == 1 ) {
-              tmp_region.push_back( j + 1 );
+        prop_tumor = ( double ) ( n_new + n_enclose_t ) / min_volume;
+        if( prop_tumor > 0.6 ) {
+          if( n_enclose_t > .3 * n_new ) {
+            clearVector( tmp_region );
+            for( int j = 0; j < len; ++ j ) {
+              if( ptr_enclose_tumor[ 2 * j ] == 1 ||
+                  ptr_new_region[ 2 * j ] == 1 ) {
+                tmp_region.push_back( j + 1 );
+              }
             }
-          }
-          spread_idx = spread( tmp_region, ptr_seg_copy, 
-                               len, ptr_nidx );
-          if( spread_idx < spread_factor ) {
-            add = true;
-          } else {
-            add = false;
-          }
-        } else {
-          p_t_nbr = pTNbr( region, ptr_seg1, label1, ptr_nidx );
-          r0 = radius2D( p_t_nbr * region.size() ); 
-          h = thick( ptr_tmp_seg1, label1, ptr_new_region, 1,
-                     len, ptr_nidx );
-          area_ratio = areaRatio( ptr_tmp_seg1, label1, 
-                                  ptr_new_region, 1, 
-                                  len, ptr_nidx );
-          
-          exp_ratio = expRatio( r0, h );
-          v = ballCrownVol( r0, h );
-          if( region.size() > v * 0.75 &&
-              area_ratio > exp_ratio * 0.75 ) {
-            spread_idx = spread( region, ptr_seg_copy, 
+            spread_idx = spread( tmp_region, ptr_seg_copy, 
                                  len, ptr_nidx );
-            Rprintf( "spread_idx = %f, spread_factor = %f\n",
-                     spread_idx, spread_factor );
             if( spread_idx < spread_factor ) {
               add = true;
             } else {
               add = false;
             }
           } else {
-            add = false;
+            p_t_nbr = pTNbr( region, ptr_seg1, label1, ptr_nidx );
+            r0 = radius2D( p_t_nbr * region.size() ); 
+            h = thick( ptr_tmp_seg1, label1, ptr_new_region, 1,
+                       len, ptr_nidx );
+            area_ratio = areaRatio( ptr_tmp_seg1, label1, 
+                                    ptr_new_region, 1, 
+                                    len, ptr_nidx );
+            
+            exp_ratio = expRatio( r0, h );
+            v = ballCrownVol( r0, h );
+            if( region.size() > v * 0.75 &&
+                area_ratio > exp_ratio * 0.75 ) {
+              spread_idx = spread( region, ptr_seg_copy, 
+                                   len, ptr_nidx );
+              
+              
+              if( spread_idx < spread_factor ) {
+                add = true;
+              } else {
+                add = false;
+              }
+            } else {
+              add = false;
+            }
           }
+        } else {
+          add = false;
         }
+        
         if( add ) {
           if( n_new < prop * n_cnct_old ) {
             for( vector<int>::const_iterator it = region.begin();
