@@ -57,6 +57,7 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
       int n_idx = excldRegion( region, ptr_nidx, ptr_seg2,
                                ptr_seg1, label1 );
       if(  n_idx != 0  ) {
+        add = false;
         zeroVector( ptr_new_region, len );
         zeroVector( ptr_enclose_tumor, len );
         zeroVector( ptr_old_new, len );
@@ -128,7 +129,15 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           v = ballCrownVol( r0, h );
           if( region.size() > v * 0.75 &&
               area_ratio > exp_ratio * 0.75 ) {
-            add = true;
+            spread_idx = spread( region, ptr_seg_copy, 
+                                 len, ptr_nidx );
+            Rprintf( "spread_idx = %f, spread_factor = %f\n",
+                     spread_idx, spread_factor );
+            if( spread_idx < spread_factor ) {
+              add = true;
+            } else {
+              add = false;
+            }
           } else {
             add = false;
           }
