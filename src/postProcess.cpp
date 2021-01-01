@@ -816,13 +816,6 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
               ptr_edema[ 2 * i ] = 0;
               ptr_hemorrhage[ 2 * i ] = 0;
               ptr_enh[ 2 * i ] = 0;
-            } else if(  ptr_sub_region[ 2 * i ] == 1 &&
-                        ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
-              ptr_seg[ 2 * i ] = Seg::SED;
-              ptr_necrosis[ 2 * i ] = 0;
-              ptr_edema[ 2 * i ] = Tumor::ED;
-              ptr_hemorrhage[ 2 * i ] = 0;
-              ptr_enh[ 2 * i ] = 0;
             }
           }
         }
