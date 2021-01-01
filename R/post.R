@@ -136,22 +136,24 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
             sub_edema_idx[ is.na( sub_edema_idx ) ] <- FALSE
             sub_edema_image[ sub_edema_idx ] <- 
               post_seg$image[ sub_edema_idx ]
-            
-            further_data <- splitFthrE( sub_edema_image, t2_intst )
-            m <- further_data$m
-            further_model <-initFther( further_data$label, 
-                                       further_data$intst )
-            further_seg <- estF( further_model, delta$fthr, gamma$fthr,
-                                 alpha$fthr, beta$fthr, lambda2$fthr,
-                                 m, nu2$fthr, maxit$fthr )
-            m <- further_seg$parm[ 2, ]
-            sigma2 <- further_seg$parm[ 3, ]
-            if( ( m[ 2 ] - m[ 1 ] ) /  delta$fthr[ 4 ] > 
-                sqrt( min( sigma2 ) ) ) {
-              edema_idx <- sub_edema_image == 2
-              edema_idx[ is.na( edema_idx ) ] <- FALSE
-              post_seg$image[ edema_idx ] <- 
-                further_seg$image[ edema_idx ]
+            if( sum( sub_edema_image == 2 |
+                     sub_edema_image == 4, na.rm = T) > 10) {
+              further_data <- splitFthrE( sub_edema_image, t2_intst )
+              m <- further_data$m
+              further_model <-initFther( further_data$label, 
+                                         further_data$intst )
+              further_seg <- estF( further_model, delta$fthr, gamma$fthr,
+                                   alpha$fthr, beta$fthr, lambda2$fthr,
+                                   m, nu2$fthr, maxit$fthr )
+              m <- further_seg$parm[ 2, ]
+              sigma2 <- further_seg$parm[ 3, ]
+              if( ( m[ 2 ] - m[ 1 ] ) /  delta$fthr[ 4 ] > 
+                  sqrt( min( sigma2 ) ) ) {
+                edema_idx <- sub_edema_image == 2
+                edema_idx[ is.na( edema_idx ) ] <- FALSE
+                post_seg$image[ edema_idx ] <- 
+                  further_seg$image[ edema_idx ]
+              }
             }
           }
         }
