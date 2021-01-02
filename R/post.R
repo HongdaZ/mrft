@@ -40,14 +40,14 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           max_prop_enh_enc = .1,
           max_prop_enh_slice = .2,
           min_tumor = 20000L,
-          spread_add = 5,
-          spread_rm = 5,
-          trim1_spread = 7,
+          spread_add = 6,
+          spread_rm = 6,
+          trim1_spread = 8,
           trim1_round = 17,
-          remove2d_spread = 13,
-          remove2d_round = 12,
-          spread_trim = 5,
-          round_trim = 13 ) {
+          remove2d_spread = 16,
+          remove2d_round = 16,
+          spread_trim = 6,
+          round_trim = 16 ) {
   ## Read segmentation results
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
