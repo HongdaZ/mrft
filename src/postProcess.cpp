@@ -198,7 +198,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_enh_include[ 2 * i ] = 1;
     }
   }
-  removeEnh( ptr_enh_include, 1, .70, 1 / 2, 3, len, 
+  removeEnh( ptr_enh_include, 1, .70, 1.0 / 2.0, 3, len, 
              region, ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_whole[ 2 * i ] == T1ce::T1TM &&
