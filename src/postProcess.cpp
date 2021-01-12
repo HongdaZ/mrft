@@ -228,12 +228,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   removeSlice( ptr_on, Flair::FTM, 10, 0.4, len,
                region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
-    if( ( (
-        ptr_whole[ 2 * i ] == T2::T2CSF &&
-          ( ptr_on[ 2 * i ] == Flair::FTM &&
-          ptr_t1ce[ 2 * i ] == T1ce::T1GM ) ) ||
+    if( ( ( ptr_whole[ 2 * i ] == T2::T2CSF &&
+            ptr_on[ 2 * i ] == Flair::FTM &&
+            ( ptr_t1ce[ 2 * i ] == T1ce::T1WM ||
+              ptr_t1ce[ 2 * i ] == T1ce::T1GM ) ) ||
           ptr_enh[ 2 * i ] == Tumor::ET ) &&
-          ( ptr_necrosis[ 2 * i ] != Tumor::NCR &&
+        ( ptr_necrosis[ 2 * i ] != Tumor::NCR &&
           ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) ) {
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
