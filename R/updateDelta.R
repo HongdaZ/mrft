@@ -33,17 +33,22 @@ updateDelta3Flair <- function( t1ce_image, flair_data, flair_seg ) {
                              ( t1ce_image == 4 |
                                t1ce_image == 2 ) ] 
   tumor <- tumor[ ! is.na( tumor ) ]
-  start <- quantile( tumor, probs = seq( 0, 1, length.out = 9 ) )
-  x <- kmeans( tumor, start )$centers
-  y <- order( x )
-  m <- x[ y ][ 3 ]
+  start_a <- quantile( tumor, probs = seq( 0, 1, length.out = 9 ) )
+  x_a <- kmeans( tumor, start_a )$centers
+  y_a <- order( x_a )
+  m_a <- x_a[ y_a ][ 3 ]
+  start_b <- quantile( tumor, probs = seq( 0, 1, length.out = 7 ) )
+  x_b <- kmeans( tumor, start_b )$centers
+  y_b <- order( x_b )
+  m_b <- x_b[ y_b ][ 3 ]
+  m <- ( m_a + m_b ) / 2
   ## t2_seg from est
   sigma2_3 <- flair_seg$parm[ 3, 3 ]  
   m_3 <- flair_seg$parm[ 2, 3 ]
   
   delta_3 <- ( m - m_3 ) / sqrt( sigma2_3 )
-  if( delta_3 > 13 ) {
-    delta_3 <- 13  
+  if( delta_3 > 16 ) {
+    delta_3 <- 16
   } else if( delta_3 < 4 ) {
     delta_3 <- 4
   }
