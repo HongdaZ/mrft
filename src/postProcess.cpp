@@ -404,11 +404,13 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
                ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
                200, len );
-  // 10-7.3: Extend edema in ( FLAIR( 4 ) && T1ce( 2 ) )
+  // 10-7.3: Extend edema in 
+  // ( FLAIR( 4 ) && T2( 4 ) && T1ce( 3 ) )
   for( int i = 0; i < len; ++ i ) {
     if(
       ( ptr_flair[ 2 * i ] == Flair::FTM &&
-        ptr_t1ce[ 2 * i ] ==  T1ce::T1GM ) &&
+        ptr_t2[ 2 * i ] == T2::T2CSF &&
+        ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) &&
         ptr_exclude[ 2 * i ] != 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
@@ -416,9 +418,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 3, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
-            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy, 0.2 );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -427,6 +429,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
+  zeroVector( ptr_whole, len ); 
   zeroVector( ptr_on, len );
   // ( T2( 4 ) && T1ce( 2 ) )
   for( int i = 0; i < len; ++ i ) {
@@ -451,13 +454,13 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
+  zeroVector( ptr_whole, len );
   zeroVector( ptr_on, len );
-  // ( FLAIR( 4 ) && T2( 4 ) && T1ce( 3 ) )
+  // ( FLAIR( 4 ) && T1ce( 2 ) )
   for( int i = 0; i < len; ++ i ) {
     if(
       ( ptr_flair[ 2 * i ] == Flair::FTM &&
-        ptr_t2[ 2 * i ] == T2::T2CSF &&
-        ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) &&
+        ptr_t1ce[ 2 * i ] ==  T1ce::T1GM ) &&
         ptr_exclude[ 2 * i ] != 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
@@ -465,7 +468,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -476,9 +479,36 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_on, len );
+  // FLAIR( 4 )
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_flair[ 2 * i ] == Flair::FTM &&
+        ptr_exclude[ 2 * i ] != 1 &&
+        ptr_tumor[ 2 * i ] == 0  ) {
+      ptr_whole[ 2 * i ] = 1;
+    } else {
+      ptr_whole[ 2 * i ] = 0;
+    }
+  }
+  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+            region, s_add,
+            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_on[ 2 * i ] == 1 &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      ptr_seg[ 2 * i ] = Seg::SED;
+      ptr_edema[ 2 * i ] = Tumor::ED;
+    }
+  }
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_on, len );
+  
+  
   // Remove large blocks of enh
-  zeroVector( ptr_whole, len ); // tumor \ enh
-  zeroVector( ptr_on, len );    // enh
+  // whole = tumor \ enh
+  // ptr_on = enh
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 1 &&
         ptr_enh[ 2 * i ] == 0 ) {
@@ -517,7 +547,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
-            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy, 0.6 );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -544,7 +574,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.6, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -621,7 +651,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.5, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.6, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {

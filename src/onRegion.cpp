@@ -29,9 +29,9 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
                vector<int> &region, const double &spread_factor,
                const int *ptr_nidx, const int *ptr_aidx,
                const int &nr, const int &nc, const int &ns,
-               int *ptr_seg_copy ) {
+               int *ptr_seg_copy, const double &prop_hull ) {
   vector<double> volume;
-  double min_volume;
+  double max_volume;
   double prop_tumor;
   int idx = 0, n_idx = 0;
   double p_t_nbr = 0;
@@ -100,15 +100,15 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
         volume = inRegion( ptr_enclose_tumor, len, ptr_new_region, 1,
                            ptr_cnct_old, 1, tmp_region, ptr_nidx,
                            ptr_aidx, nr, nc, ns );
-        min_volume = *min_element( volume.begin(), volume.end() );
+        max_volume = *max_element( volume.begin(), volume.end() );
         n_enclose_t = 0;
         for( int j = 0; j < len; ++ j ) {
           if( ptr_enclose_tumor[ 2 * j ] == 1 ) {
             ++ n_enclose_t;
           }
         }
-        prop_tumor = ( double ) ( n_new + n_enclose_t ) / min_volume;
-        if( prop_tumor > 0.6 ) {
+        prop_tumor = ( double ) ( n_new + n_enclose_t ) / max_volume;
+        if( prop_tumor > prop_hull ) {
           if( n_enclose_t > .3 * n_new ) {
             clearVector( tmp_region );
             for( int j = 0; j < len; ++ j ) {
