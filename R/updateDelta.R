@@ -43,10 +43,10 @@ updateDelta3Flair <- function( t1ce_image, flair_data, flair_seg ) {
   m_b <- x_b[ y_b ][ 3 ]
   m_ab <- c( m_a, m_b )
   m_ab <- m_ab[ order( m_ab ) ]
-  m_m <- median( tumor[ tumor < m_ab[ 2 ] & tumor > m_ab[ 1 ] ], 
-               na.rm = T )
-  m <- m_ab[ 2 ] - ( m_m - m_ab[ 1 ] )
-  # m <- ( m_a + m_b ) / 2
+  # m_m <- median( tumor[ tumor < m_ab[ 2 ] & tumor > m_ab[ 1 ] ], 
+  #              na.rm = T )
+  # m <- m_ab[ 2 ] - ( m_m - m_ab[ 1 ] )
+  m <- sum( m_ab ) / 2
   ## t2_seg from est
   sigma2_3 <- flair_seg$parm[ 3, 3 ]  
   m_3 <- flair_seg$parm[ 2, 3 ]
