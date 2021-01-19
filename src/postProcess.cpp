@@ -443,7 +443,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -468,7 +468,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -491,7 +491,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -545,9 +545,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
-            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy, 0.6 );
+            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy, 0.4 );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
