@@ -48,28 +48,28 @@ splitFlair3 <- function( flair, t1ce_image ) {
   
   ## Find the brightest 30% percent
   q_flair <- quantile( flair, probs = .70, na.rm = T )
-  ## Find threshold dynamically
-  tumor <- flair[ flair > q_flair &
-                  ( t1ce_image == 4 |
-                    t1ce_image == 2 ) ] 
-  tumor <- tumor[ ! is.na( tumor ) ]
-  start_a <- quantile( tumor, probs = seq( 0, 1, length.out = 9 ) )
-  x_a <- kmeans( tumor, start_a )$centers
-  y_a <- order( x_a )
-  m_a <- x_a[ y_a ][ 3 ]
-  start_b <- quantile( tumor, probs = seq( 0, 1, length.out = 7 ) )
-  x_b <- kmeans( tumor, start_b )$centers
-  y_b <- order( x_b )
-  m_b <- x_b[ y_b ][ 3 ]
-  m_ab <- c( m_a, m_b )
-  m_ab <- m_ab[ order( m_ab ) ]
-  # m_m <- median( tumor[ tumor < m_ab[ 2 ] & tumor > m_ab[ 1 ] ], 
-  #              na.rm = T )
-  # m <- m_ab[ 2 ] - ( m_m - m_ab[ 1 ] )
-  m <- sum( m_ab ) / 2
+  bright <- flair > q_flair
   
-  
-  bright <- flair > m
+  # ## Find threshold dynamically
+  # tumor <- flair[ flair > q_flair &
+  #                 ( t1ce_image == 4 |
+  #                   t1ce_image == 2 ) ] 
+  # tumor <- tumor[ ! is.na( tumor ) ]
+  # start_a <- quantile( tumor, probs = seq( 0, 1, length.out = 9 ) )
+  # x_a <- kmeans( tumor, start_a )$centers
+  # y_a <- order( x_a )
+  # m_a <- x_a[ y_a ][ 3 ]
+  # start_b <- quantile( tumor, probs = seq( 0, 1, length.out = 7 ) )
+  # x_b <- kmeans( tumor, start_b )$centers
+  # y_b <- order( x_b )
+  # m_b <- x_b[ y_b ][ 3 ]
+  # m_ab <- c( m_a, m_b )
+  # m_ab <- m_ab[ order( m_ab ) ]
+  # # m_m <- median( tumor[ tumor < m_ab[ 2 ] & tumor > m_ab[ 1 ] ], 
+  # #              na.rm = T )
+  # # m <- m_ab[ 2 ] - ( m_m - m_ab[ 1 ] )
+  # m <- sum( m_ab ) / 2
+  # bright <- flair > m
   label[ bright ] <- -4L
   
   ## Find CSF & necrosis
