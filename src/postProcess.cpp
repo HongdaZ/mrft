@@ -229,11 +229,11 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
                region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ( ( ptr_whole[ 2 * i ] == T2::T2CSF &&
-            ptr_on[ 2 * i ] == Flair::FTM &&
-            ptr_t1ce[ 2 * i ] == T1ce::T1GM ) ||
-          ptr_enh[ 2 * i ] == Tumor::ET ) &&
+        ptr_on[ 2 * i ] == Flair::FTM &&
+        ptr_t1ce[ 2 * i ] == T1ce::T1GM ) ||
+        ptr_enh[ 2 * i ] == Tumor::ET ) &&
         ( ptr_necrosis[ 2 * i ] != Tumor::NCR &&
-          ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) ) {
+        ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) ) {
       ptr_edema[ 2 * i ] = Tumor::ED;
     }
   }
@@ -242,8 +242,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // 10-5: Find necrosis
   // necrosis enclosed by edema
   inRegion2D( ptr_enclose_nec, len, ptr_edema, Tumor::ED,
-            ptr_necrosis, Tumor::NCR,
-            region, ptr_nidx, ptr_aidx, nr, nc, ns, 0, 0, 0, 1 );
+              ptr_necrosis, Tumor::NCR,
+              region, ptr_nidx, ptr_aidx, nr, nc, ns, 0, 0, 0, 1 );
   // Remove necrosis regions separate from edema
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_enclose_nec,
@@ -275,8 +275,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // 10-6: Find hemorrhage
   // hemorrhage enclosed by edema
   inRegion2D( ptr_enclose_hem, len, ptr_edema, Tumor::ED,
-            ptr_hemorrhage, Tumor::HMG,
-            region, ptr_nidx, ptr_aidx, nr, nc, ns, 0, 0, 0, 1 ); 
+              ptr_hemorrhage, Tumor::HMG,
+              region, ptr_nidx, ptr_aidx, nr, nc, ns, 0, 0, 0, 1 ); 
   // Remove hemorrhage regions separate from edema
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_hem, ptr_enclose_hem,
@@ -305,7 +305,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_hemorrhage[ 2 * i ] = 0;
     }
   }
-
+  
   // 10-7.1: Remove 3D connected regions with
   // size < min_tumor or Keep the tumor regions with
   // size = max_size
@@ -380,7 +380,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     if( ptr_t2[ 2 * i ] == T2::T2CSF &&
         ptr_flair[ 2 * i ] == Flair::FTM &&
         ( ptr_t1ce[ 2 * i ] ==  T1ce::T1GM ||
-          ptr_t1ce[ 2 * i ] == T1ce::T1TM ) ) {
+        ptr_t1ce[ 2 * i ] == T1ce::T1TM ) ) {
       ptr_whole[ 2 * i ] = 1;
     } else {
       ptr_whole[ 2 * i ] = 0;
@@ -418,9 +418,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 2, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 3, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
-            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy, 0.2 );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -443,7 +443,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -468,7 +468,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
@@ -535,9 +535,9 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // T1ce(4) || ( FLAIR( 4 ) && T2( 4 ) && T1ce( 3 ) )
   for( int i = 0; i < len; ++ i ) {
     if( ( ptr_enh_include[ 2 * i ] == 1 ||
-          ( ptr_flair[ 2 * i ] == Flair::FTM &&
-            ptr_t2[ 2 * i ] == T2::T2CSF &&
-            ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) ) &&
+        ( ptr_flair[ 2 * i ] == Flair::FTM &&
+        ptr_t2[ 2 * i ] == T2::T2CSF &&
+        ptr_t1ce[ 2 * i ] ==  T1ce::T1WM ) ) &&
         ptr_exclude[ 2 * i ] != 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
@@ -590,7 +590,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // 10-7.3.2 Add voxels inside tumor (2D)
   zeroVector( ptr_whole, len );
   zeroVector( ptr_extra_edema, len );
-
+  
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
@@ -603,10 +603,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_tumor[ 2 * i ] = 1;
       if( ptr_t1ce[ 2 * i ] == T1ce::T1TM
-          //   &&
-          // ( ptr_flair[ 2 * i ] == Flair::FTM ||
-          // ptr_t2[ 2 * i ] == T2::T2CSF )
-          ) {
+            //   &&
+            // ( ptr_flair[ 2 * i ] == Flair::FTM ||
+            // ptr_t2[ 2 * i ] == T2::T2CSF )
+      ) {
         ptr_seg[ 2 * i ] = Seg::SET;
         ptr_enh[ 2 * i ] = Tumor::ET;
       } else {
@@ -621,7 +621,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // as necrosis
   for( int i = 0; i < len; ++ i ) {
     if( ( ptr_t1ce[ 2 * i ] == T1ce::T1CSF ||
-          ptr_flair[ 2 * i ] == Flair::FCSF ) &&
+        ptr_flair[ 2 * i ] == Flair::FCSF ) &&
         ptr_t2[ 2 * i ] == T2::T2CSF && 
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_on[ 2 * i ] = 1;
@@ -643,7 +643,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // ( T1ce( 1 ) || Flair( 1 ) ) && T2( 4 ) as Necrosis
   for( int i = 0; i < len; ++ i ) {
     if( ( ptr_t1ce[ 2 * i ] == T1ce::T1CSF ||
-          ptr_flair[ 2 * i ] == Flair::FCSF ) &&
+        ptr_flair[ 2 * i ] == Flair::FCSF ) &&
         ptr_t2[ 2 * i ] == T2::T2CSF && 
         ptr_tumor[ 2 * i ] == 0 ) {
       ptr_whole[ 2 * i ] = 1;
@@ -759,12 +759,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
             ptr_whole[ 2 * i ] = 0;
           }
         }
-
+        
         // necrosis enclosed by enh
         zeroVector( ptr_enclose_ncr, len );
         inRegion2D( ptr_enclose_ncr, len, ptr_local_enh, Tumor::ET,
-                  ptr_whole, 1,
-                  region, ptr_nidx, ptr_aidx, nr, nc, ns );
+                    ptr_whole, 1,
+                    region, ptr_nidx, ptr_aidx, nr, nc, ns );
         // Remove new regions with size > 200
         zeroVector( ptr_on, len );
         for( int i = 0; i < len; ++ i ) {
@@ -797,7 +797,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
           } else if( ptr_local_enh[ 2 * i ] == Tumor::ET ) {
             ++ n_enh;
           } else if( ptr_sub_region[ 2 * i ] == 1 &&
-                     ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
+          ptr_necrosis[ 2 * i ] == Tumor::NCR ) {
             ptr_seg[ 2 * i ] = Seg::SED;
             ptr_necrosis[ 2 * i ] = 0;
             ptr_edema[ 2 * i ] = Tumor::ED;
@@ -857,7 +857,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
   }
   pad2zero( ptr_tumor_copy, len );
-
+  
   // 10-7.6: Add T1ce(4) inside edema
   assignCSF( ptr_csf, ptr_t1ce, ptr_flair, ptr_tumor, len );
   zeroVector( ptr_whole, len );
@@ -947,7 +947,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
           ptr_aidx, ptr_nidx, ptr_tumor, ptr_seg,
           ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
           m_tumor, m_enh, m_enh_enc, len, nr, nc, ns );
-
+  
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
       ptr_edema_regions[ 2 * i ] = 0;
@@ -974,7 +974,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
     pad2zero( ptr_edema_regions, len );
   }
-
+  
   // Find csf inside tumor
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 &&
