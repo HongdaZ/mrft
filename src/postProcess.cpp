@@ -664,6 +664,29 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   zeroVector( ptr_whole, len );
   zeroVector( ptr_on, len );
+  // T1ce( 3 ) && T2( 4 ) as Edema
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_t1ce[ 2 * i ] == T1ce::T1WM &&
+        ptr_t2[ 2 * i ] == T2::T2CSF && 
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_whole[ 2 * i ] = 1;
+    } else {
+      ptr_whole[ 2 * i ] = 0;
+    }
+  }
+  onRegion( ptr_on, len, 0.7, ptr_tumor, 1, ptr_whole, 1,
+            region, s_add,
+            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_on[ 2 * i ] == 1 &&
+        ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_tumor[ 2 * i ] = 1;
+      ptr_seg[ 2 * i ] = Seg::SED;
+      ptr_edema[ 2 * i ] = Tumor::ED;
+    }
+  }
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_on, len );
   // 10-7.3.3: T1ce(3) in tumor and connected to enh is enh
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 1 &&
