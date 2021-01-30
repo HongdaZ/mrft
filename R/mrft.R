@@ -2,14 +2,14 @@
 mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   ## Always four numbers for delta
                   delta = 
-                    list( t1ce = c( -1, 0, 5, 4 ),
-                          flair = c( -0.5, 0, NA_real_, 4 ),
-                          t2 = c( 2.5, 0, NA_real_, 4 ),
+                    list( t1ce = c( -1, 0, 8, 4 ),
+                          flair = c( -0.45, 0, NA_real_, 4 ),
+                          t2 = c( 3.0, 0, NA_real_, 4 ),
                           fthr = c( 0, 0, 4, 5 ) ),
                   delta_factor = 
                     list( t1ce = 1.75,
-                          flair = 2.60,
-                          t2 = 4.50 ),
+                          flair = 2.65,
+                          t2 = 4.60 ),
                   gamma = list( t1ce = 0.8,
                                 flair = 0.4,
                                 t2 = 0.4,
@@ -39,15 +39,15 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   min_enh_enc = 2000L,
                   max_prop_enh_enc = .1,
                   max_prop_enh_slice = .2,
-                  min_tumor = 20000L,
-                  spread_add = 8,
+                  min_tumor = 2000L,
+                  spread_add = 10,
                   spread_rm = 9,
-                  trim1_spread = 8,
-                  trim1_round = 17,
+                  trim1_spread = 10,
+                  trim1_round = 18,
                   remove2d_spread = 25,
                   remove2d_round = 25,
-                  spread_trim = 7,
-                  round_trim = 16 ) {
+                  spread_trim = 14,
+                  round_trim = 20 ) {
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
   out_new_delta_t2 <- gsub( "_flair.nii.gz", "_post.rds", outfile )
