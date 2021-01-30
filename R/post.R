@@ -4,7 +4,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           delta = 
             list( t1ce = c( -1, 0, 8, 4 ),
                   flair = c( -0.45, 0, NA_real_, 4 ),
-                  t2 = c( 2.25, 0, NA_real_, 4 ),
+                  t2 = c( 2.65, 0, NA_real_, 4 ),
                   fthr = c( 0, 0, 4, 5 ) ),
           delta_factor = 
             list( t1ce = 1.75,
