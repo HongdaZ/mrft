@@ -52,10 +52,6 @@ updateDelta3Flair <- function( t1ce_image, flair_data, flair_seg ) {
   m_3 <- flair_seg$parm[ 2, 3 ]
   delta_3 <- ( m - m_3 ) / sqrt( sigma2_3 )
   
-  x <- c( 0, 7, 10, 13, 13.5, 14 )
-  y <- c( 0, 11, 15, 19, 17,  21 )
-  spl <- smooth.spline( y, x )
-  delta_3 <- predict( spl, delta_3 )
   if( delta_3 > 16 ) {
     delta_3 <- 16
   } else if( delta_3 < 4 ) {

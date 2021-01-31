@@ -127,24 +127,34 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                       m, nu2$flair, 40L )
     flair_res <- flair_seg$parm[ c( 2, 3 ), ]
     ## update delta
+    
+    x <- c( 0, 7, 10, 13, 13.5, 14 )
+    y <- c( 0, 11, 15, 19, 17,  21 )
+    spl <- smooth.spline( y, x )
+    
     if( is.na( delta$flair[ 3 ] ) ) {
       shift_flair1 <- updateDelta3Flair( t1ce_image, 
                                          flair_data, flair_seg )
       shift_flair2 <- updateDelta12( flair_res[ 1, 3 ], 
                                      flair_res[ 2, 3 ],
-                                     flair_res[ 1, 1], 
+                                     flair_res[ 1, 1 ], 
                                      flair_res[ 2, 1 ], 
                                      shift_flair1 )
       delta$flair[ c( 1, 2 ) ] <- delta$flair[ c( 1, 2 ) ] - 
         shift_flair2
+      
+      
+      shift_flair1_ <- predict( spl, shift_flair1 )$y
+      
       delta$flair[ 3 ] <- delta$flair[ 2 ] + 
-        ( shift_flair1 / delta_factor$flair ) ^ 2 / 2
+        ( shift_flair1_ / delta_factor$flair ) ^ 2 / 2
       flair_shift <- c( delta$flair[ 1 : 2 ], shift_flair1, 
                         delta$flair[ 4 ] )
     } else {
       flair_shift <- delta$flair
       delta$flair[ 3 ] <- delta$flair[ 2 ] + 
-        ( flair_shift[ 3 ] / delta_factor$flair ) ^ 2 / 2
+        ( predict( spl, flair_shift[ 3 ] )$y /
+            delta_factor$flair ) ^ 2 / 2
     }
     ## Export normalized images
     flair_intst <- flair_data$flair
