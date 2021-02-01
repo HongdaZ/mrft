@@ -47,7 +47,8 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           remove2d_spread = 25,
           remove2d_round = 25,
           spread_trim = 7,
-          round_trim = 16 ) {
+          round_trim = 16,
+          on_flair_prop = 0.4  ) {
   ## Read segmentation results
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
@@ -64,7 +65,8 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                            max_prop_enh_enc, max_prop_enh_slice,
                            min_tumor, spread_add, spread_rm,
                            trim1_spread, trim1_round, remove2d_spread,
-                           remove2d_round, spread_trim, round_trim )
+                           remove2d_round, spread_trim, round_trim,
+                           on_flair_prop )
   # sink()
   if( sum( post_seg$image == 2 |
            post_seg$image == 1 |

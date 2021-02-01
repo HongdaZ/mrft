@@ -44,7 +44,8 @@ extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh,
                             SEXP spread_rm, 
                             SEXP trim1_spread, SEXP trim1_round,
                             SEXP remove2d_spread, SEXP remove2d_round,
-                            SEXP spread_trim, SEXP round_trim ) ;
+                            SEXP spread_trim, SEXP round_trim,
+                            SEXP on_flair_prop ) ;
 SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP min_enh_enc, SEXP max_prop_enh_enc,
                   SEXP max_prop_enh_slice,
@@ -52,7 +53,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP spread_rm, 
                   SEXP trim1_spread, SEXP trim1_round,
                   SEXP remove2d_spread, SEXP remove2d_round,
-                  SEXP spread_trim, SEXP round_trim ) {
+                  SEXP spread_trim, SEXP round_trim,
+                  SEXP on_flair_prop ) {
   SEXP t1ce = getListElement( post_data, "t1ce_seg" );
   SEXP flair = getListElement( post_data, "flair_seg" );
   SEXP t2 = getListElement( post_data, "t2_seg" );
@@ -141,7 +143,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   const double trim1_r = REAL( trim1_round )[ 0 ];
   const double remove2d_s = REAL( remove2d_spread )[ 0 ];
   const double remove2d_r = REAL( remove2d_round )[ 0 ];
-  
+  const double on_flair_p = REAL( on_flair_prop )[ 0 ];
+   
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
     if( ptr_flair[ 2 * i ] == Flair::FCSF && 
@@ -484,14 +487,14 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // FLAIR( 4 )
   for( int i = 0; i < len; ++ i ) {
     if( ptr_flair[ 2 * i ] == Flair::FTM &&
-        ptr_exclude[ 2 * i ] != 1 &&
+        // ptr_exclude[ 2 * i ] != 1 &&
         ptr_tumor[ 2 * i ] == 0  ) {
       ptr_whole[ 2 * i ] = 1;
     } else {
       ptr_whole[ 2 * i ] = 0;
     }
   }
-  onRegion( ptr_on, len, 0.8, ptr_tumor, 1, ptr_whole, 1,
+  onRegion( ptr_on, len, on_flair_p, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
   for( int i = 0; i < len; ++ i ) {
