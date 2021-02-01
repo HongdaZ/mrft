@@ -487,7 +487,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   // FLAIR( 4 )
   for( int i = 0; i < len; ++ i ) {
     if( ptr_flair[ 2 * i ] == Flair::FTM &&
-        // ptr_exclude[ 2 * i ] != 1 &&
+        ptr_exclude[ 2 * i ] != 1 &&
         ptr_tumor[ 2 * i ] == 0  ) {
       ptr_whole[ 2 * i ] = 1;
     } else {
