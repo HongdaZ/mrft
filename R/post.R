@@ -48,7 +48,7 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           remove2d_round = 25,
           spread_trim = 7,
           round_trim = 16,
-          on_flair_prop = 0.4  ) {
+          on_flair_prop = 1.5  ) {
   ## Read segmentation results
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
