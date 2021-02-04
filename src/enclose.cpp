@@ -27,27 +27,32 @@ void enclose( int *ptr_seg, const int &len,
     for( list<vector<int>>::const_iterator it_s1 = p_slice1.begin();
          it_s1 != p_slice1.end(); ++ it_s1 ) {
       plane1 = ( *it_s1 )[ 1 + i ];
+      
+      len_slice1 = it_s1->size() / 4;
+      vector<int> chull_input( 2 * len_slice1 );
+      for( int j = 0; j < len_slice1; ++ j ) {
+        chull_input[ 2 * j ] = ( *it_s1 )[ 4 * j + row[ 2 * i ] ];
+        chull_input[ 2 * j + 1 ] = 
+          ( *it_s1 )[ 4 * j + row[ 2 * i + 1 ] ];
+      }
+      vector<int> hull = cHull( chull_input );
+      hull_area = polygonArea( hull );
+      volume[ i ] += hull_area;
+      
       for( list<vector<int>>::const_iterator it_s2 = p_slice2.begin();
            it_s2 != p_slice2.end(); ++ it_s2 ) {
         plane2 = ( *it_s2 )[ 1 + i ];
         if( plane1 == plane2 ) {
-          len_slice1 = it_s1->size() / 4;
+          
           len_slice2 = it_s2->size() / 4;
-          vector<int> chull_input( 2 * len_slice1 );
           vector<int> inpoly_points( 2 * len_slice2 );
-          for( int j = 0; j < len_slice1; ++ j ) {
-            chull_input[ 2 * j ] = ( *it_s1 )[ 4 * j + row[ 2 * i ] ];
-            chull_input[ 2 * j + 1 ] = 
-              ( *it_s1 )[ 4 * j + row[ 2 * i + 1 ] ];
-          }
+          
           for( int j = 0; j < len_slice2; ++ j ) {
             inpoly_points[ 2 * j ] = ( *it_s2 )[ 4 * j + row[ 2 * i ] ];
             inpoly_points[ 2 * j + 1 ] = 
               ( *it_s2 )[ 4 * j + row[ 2 * i + 1 ] ];
           }
-          vector<int> hull = cHull( chull_input );
-          hull_area = polygonArea( hull );
-          volume[ i ] += hull_area;
+          
           // Close the convex hull
           v1 = hull[ 0 ];
           v2 = hull[ 1 ];
