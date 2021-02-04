@@ -31,6 +31,7 @@
 #include "pTNbr.h"
 #include "spread.h"
 #include "roundness.h"
+#include "descr.h"
 
 using std::vector;
 using std::list;
