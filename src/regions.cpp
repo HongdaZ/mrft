@@ -36,10 +36,10 @@ vector<list<vector<int>>> regions2D( int *ptr_seg, const int &len,
                                      const int *ptr_nidx,
                                      const int *ptr_aidx ) {
   vector<list<vector<int>>> res( 3 );
-  list<vector<int>> plane;
   int n;
   int idx;
   for( int k = 0; k < 3; ++ k ) {
+    list<vector<int>> plane;
     for( int i = 0; i < len; ++ i ) {
       if( cnctRegion( i + 1, ptr_nidx, ptr_aidx, k, ptr_seg, ptr_seg, 
                       label, region ) ) { 

@@ -48,7 +48,10 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   remove2d_round = 25,
                   spread_trim = 14,
                   round_trim = 20,
-                  on_flair_prop = 1.5 ) {
+                  on_flair_prop = 1.5,
+                  last_rm_solidity = 2,
+                  last_rm_spread = 16,
+                  last_rm_round = 16 ) {
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
   out_new_delta_t2 <- gsub( "_flair.nii.gz", "_post.rds", outfile )
@@ -77,7 +80,8 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           min_tumor, spread_add, spread_rm,
           trim1_spread, trim1_round, remove2d_spread,
           remove2d_round, spread_trim, round_trim, 
-          on_flair_prop )
+          on_flair_prop, 
+          last_rm_solidity, last_rm_spread, last_rm_round )
     if( file.exists( out_new_delta_t2 ) ) {
       new_delta_t2 <- readRDS( out_new_delta_t2 )
       if( is.null( new_delta_t2 ) ) {

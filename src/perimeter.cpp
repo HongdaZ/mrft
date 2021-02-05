@@ -11,8 +11,8 @@ int perimeter( const int *ptr_seg, const int &label,
                const int &len, const int *ptr_nidx,
                const int &plane ) {
   int count = 0, nidx = 0;
-  const vector<int> plane_idx{ 0, 2, 3, 5, 
-                               0, 1, 4, 5,
+  const vector<int> plane_idx{ 0, 1, 4, 5,
+                               0, 2, 3, 5, 
                                1, 2, 3, 4 };
   const vector<int> curr_plane{ plane_idx[ 4 * plane ],
                                 plane_idx[ 4 * plane + 1 ],
