@@ -18,10 +18,10 @@ void calcDescr( const int &size_region,
                 const int *ptr_aidx, const int *ptr_nidx ) {
   // Sagittal, coronal and axial
   vector<int> row{ 2, 3, 1, 3, 1, 2 };
-  vector<double> shift{ -0.71, 0, 
-                       0, 0.71, 
-                       0, -0.71, 
-                       0.71, 0 };
+  vector<double> shift{ -0.5, 0.5, 
+                       -0.5, -0.5, 
+                       0.5, -0.5, 
+                       0.5, 0.5 };
   double hull_area, c_spread, c_roundness;
   int len_slice;
   double c_1, c_2;
