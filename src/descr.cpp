@@ -37,8 +37,9 @@ vector<double> descr2D( const int &len,
   res[ 0 ] = *max_element( solidity.begin(), solidity.end() );
   res[ 1 ] = *max_element( avg_spread.begin(), avg_spread.end() );
   res[ 2 ] = *max_element( avg_round.begin(), avg_round.end() );
-  // Rprintf( "sodility = %f, spread = %f, roundness = %f",
-  //          res[ 0 ], res[ 1 ], res[ 2 ] );
+  Rprintf( "region size = %d; ", size_region );
+  Rprintf( "sodility = %f, spread = %f, roundness = %f\n",
+           res[ 0 ], res[ 1 ], res[ 2 ] );
   return res;
 }
                            
