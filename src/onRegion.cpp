@@ -29,7 +29,8 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
                vector<int> &region, const double &spread_factor,
                const int *ptr_nidx, const int *ptr_aidx,
                const int &nr, const int &nc, const int &ns,
-               int *ptr_seg_copy, const double &prop_hull ) {
+               int *ptr_seg_copy, const double &prop_hull,
+               const double &nt_prop ) {
   vector<double> volume;
   double max_volume;
   double prop_tumor;
@@ -108,8 +109,13 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           }
         }
         prop_tumor = ( double ) ( n_new + n_enclose_t ) / max_volume;
+        // Rprintf( "max_volume = %f, ", max_volume );
+        // Rprintf( "prop_tumor = %f, prop_hull = %f\n",
+        //          prop_tumor, prop_hull );
         if( prop_tumor > prop_hull ) {
-          if( n_enclose_t > .3 * n_new ) {
+          // Rprintf( "n_enclose_t = %d, nt_prop * n_new = %f\n",
+          //          n_enclose_t, nt_prop * n_new );
+          if( n_enclose_t > nt_prop * n_new ) {
             clearVector( tmp_region );
             for( int j = 0; j < len; ++ j ) {
               if( ptr_enclose_tumor[ 2 * j ] == 1 ||
@@ -119,6 +125,8 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
             }
             spread_idx = spread( tmp_region, ptr_seg_copy, 
                                  len, ptr_nidx );
+            // Rprintf( "spread_idx = %f, spread_add = %f\n",
+            //          spread_idx, spread_factor );
             if( spread_idx < spread_factor ) {
               add = true;
             } else {

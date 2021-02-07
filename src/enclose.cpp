@@ -17,9 +17,14 @@ void enclose( int *ptr_seg, const int &len,
   // Axial, sagittal and coronal
   vector<int> enclosed( 3 * len );
   vector<int> row{ 2, 3, 1, 3, 1, 2 };
+  vector<double> shift{ -0.5, 0.5, 
+                        -0.5, -0.5, 
+                        0.5, -0.5, 
+                        0.5, 0.5 };
   double hull_area;
   int plane1, plane2, len_slice1, len_slice2, v1, v2, idx, local_n_in;
   bool inside;
+  double c_1, c_2;
   for( int i = 0; i < 3; ++ i ) {
     volume[ i ] = 0;
     const list<vector<int>> &p_slice1 = slices1[ i ];
@@ -30,13 +35,21 @@ void enclose( int *ptr_seg, const int &len,
       
       len_slice1 = it_s1->size() / 4;
       vector<int> chull_input( 2 * len_slice1 );
+      vector<double> chull_input_vol( 2 * len_slice1 * 4 );
       for( int j = 0; j < len_slice1; ++ j ) {
-        chull_input[ 2 * j ] = ( *it_s1 )[ 4 * j + row[ 2 * i ] ];
-        chull_input[ 2 * j + 1 ] = 
-          ( *it_s1 )[ 4 * j + row[ 2 * i + 1 ] ];
+        
+        c_1 = ( *it_s1 )[ 4 * j + row[ 2 * i ] ];
+        c_2 = ( *it_s1 )[ 4 * j + row[ 2 * i + 1 ] ];
+        chull_input[ 2 * j ] = c_1;
+        chull_input[ 2 * j + 1 ] = c_2;
+        for( int k = 0; k < 4; ++ k ) {
+          chull_input_vol[ 8 * j + 2 * k ] = c_1 + shift[ 2 * k ];
+          chull_input_vol[ 8 * j + 2 * k + 1 ] = c_2 + shift[ 2 * k + 1 ];
+        }
       }
       vector<int> hull = cHull( chull_input );
-      hull_area = polygonArea( hull );
+      vector<double> hull_vol = cHull( chull_input_vol );
+      hull_area = polygonArea( hull_vol );
       volume[ i ] += hull_area;
       
       for( list<vector<int>>::const_iterator it_s2 = p_slice2.begin();

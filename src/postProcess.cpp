@@ -47,6 +47,8 @@ extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh,
                             SEXP remove2d_spread, SEXP remove2d_round,
                             SEXP spread_trim, SEXP round_trim,
                             SEXP on_flair_prop, 
+                            SEXP on_flair_hull_prop,
+                            SEXP on_flair_nt_prop,
                             SEXP last_rm_solidity, 
                             SEXP last_rm_spread, 
                             SEXP last_rm_round );
@@ -59,6 +61,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP remove2d_spread, SEXP remove2d_round,
                   SEXP spread_trim, SEXP round_trim,
                   SEXP on_flair_prop, 
+                  SEXP on_flair_hull_prop,
+                  SEXP on_flair_nt_prop,
                   SEXP last_rm_solidity, 
                   SEXP last_rm_spread, 
                   SEXP last_rm_round ) {
@@ -154,6 +158,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   const double remove2d_s = REAL( remove2d_spread )[ 0 ];
   const double remove2d_r = REAL( remove2d_round )[ 0 ];
   const double on_flair_p = REAL( on_flair_prop )[ 0 ];
+  const double on_flair_hull_p = REAL( on_flair_hull_prop )[ 0 ];
+  const double on_flair_nt_p = REAL( on_flair_nt_prop )[ 0 ];
   const double l_solid = REAL( last_rm_solidity )[ 0 ];
   const double l_spread = REAL( last_rm_spread )[ 0 ];
   const double l_round = REAL( last_rm_round )[ 0 ];
@@ -507,9 +513,11 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_whole[ 2 * i ] = 0;
     }
   }
+  // Rprintf( "onRegion flair\n" );
   onRegion( ptr_on, len, on_flair_p, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
-            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+            ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy, 
+            on_flair_hull_p, on_flair_nt_p );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {

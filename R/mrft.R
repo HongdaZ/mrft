@@ -49,6 +49,8 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   spread_trim = 14,
                   round_trim = 20,
                   on_flair_prop = 1.5,
+                  on_flair_hull_prop = 0.3,
+                  on_flair_nt_prop = 0.3,
                   last_rm_solidity = 2,
                   last_rm_spread = 16,
                   last_rm_round = 16 ) {
@@ -80,7 +82,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           min_tumor, spread_add, spread_rm,
           trim1_spread, trim1_round, remove2d_spread,
           remove2d_round, spread_trim, round_trim, 
-          on_flair_prop, 
+          on_flair_prop, on_flair_hull_prop, on_flair_nt_prop,
           last_rm_solidity, last_rm_spread, last_rm_round )
     if( file.exists( out_new_delta_t2 ) ) {
       new_delta_t2 <- readRDS( out_new_delta_t2 )
