@@ -25,8 +25,9 @@ void remove( vector<int> &region, int *ptr_seg_copy,
              int *ptr_hemorrhage, int *ptr_necrosis,
              int *ptr_enh, int *ptr_edema, const int &m_tumor,
              const int &m_enh, const int &m_enh_enc,
-             const int len, const int &nr, const int &nc, const int &ns,
-             const double &spread_factor ) {
+             const double &spread_factor,
+             const int len, const int &nr, const int &nc, 
+             const int &ns ) {
   
   int *ptr_enclose_tumor = new int[ 2 * len ]();
   int *ptr_tmp_tumor = new int[ 2 * len ]();

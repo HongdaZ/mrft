@@ -347,7 +347,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   remove( region, ptr_seg_copy,
           ptr_aidx, ptr_nidx, ptr_tumor, ptr_seg,
           ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
-          m_tumor, m_enh, m_enh_enc, len, nr, nc, ns, s_rm );
+          m_tumor, m_enh, m_enh_enc, s_rm, len, nr, nc, ns );
   // Trim tumor region
   trim( ptr_tumor, ptr_exclude, ptr_seg_copy,
         ptr_nidx, ptr_aidx, region, len, trim1_s, trim1_r );
