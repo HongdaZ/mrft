@@ -53,7 +53,17 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           on_flair_nt_prop = 0.3,
           last_rm_solidity = 2,
           last_rm_spread = 16,
-          last_rm_round = 16 ) {
+          last_rm_round = 16,
+          last_trim_spread = NULL,
+          last_trim_round = NULL,
+          last_trim_rm_spread = 2,
+          last_trim_rm_round = 10000 ) {
+  if( is.null( last_trim_spread ) ) {
+    last_trim_spread <- spread_trim
+  }
+  if( is.null( last_trim_round ) ) {
+    last_trim_round <- round_trim
+  }
   ## Read segmentation results
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
@@ -75,7 +85,10 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                            on_flair_nt_prop,
                            last_rm_solidity, 
                            last_rm_spread,
-                           last_rm_round )
+                           last_rm_round,
+                           last_trim_spread, last_trim_round, 
+                           last_trim_rm_spread,
+                           last_trim_rm_round  )
   # sink()
   if( sum( post_seg$image == 2 |
            post_seg$image == 1 |

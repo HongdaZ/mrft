@@ -9,7 +9,10 @@ postProcess <- function( post_data, min_enh, min_enh_enc,
                          on_flair_nt_prop,
                          last_rm_solidity, 
                          last_rm_spread, 
-                         last_rm_round ) {
+                         last_rm_round,
+                         last_trim_spread, last_trim_round, 
+                         last_trim_rm_spread,
+                         last_trim_rm_round  ) {
   .Call( "postProcess", post_data, min_enh, min_enh_enc,
          max_prop_enh_enc, max_prop_enh_slice,
          min_tumor, spread_add, spread_rm, 
@@ -20,5 +23,7 @@ postProcess <- function( post_data, min_enh, min_enh_enc,
          on_flair_nt_prop,
          last_rm_solidity,
          last_rm_spread,
-         last_rm_round )
+         last_rm_round,
+         last_trim_spread, last_trim_round, last_trim_rm_spread,
+         last_trim_rm_round  )
 }

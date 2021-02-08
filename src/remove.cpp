@@ -11,6 +11,7 @@
 #include "tissueType.h"
 #include "zeroVector.h"
 #include "spread.h"
+#include "roundness.h"
 #include "inRegion.h"
 #include "removeSmall.h"
 
@@ -155,7 +156,8 @@ void remove( vector<int> &region, int *ptr_seg_copy,
              int *ptr_hemorrhage, int *ptr_necrosis,
              int *ptr_enh, int *ptr_edema, const int &m_tumor,
              const int &m_enh, const int &m_enh_enc, const int len,
-             const int &nr, const int &nc, const int &ns ) {
+             const int &nr, const int &nc, const int &ns,
+             const double &rm_spread, const double &rm_round ) {
   
   int *ptr_enclose_tumor = new int[ 2 * len ]();
   int *ptr_tmp_tumor = new int[ 2 * len ]();
@@ -164,7 +166,7 @@ void remove( vector<int> &region, int *ptr_seg_copy,
   int max_size = 0, n_enc_t = 0, idx = 0;
   int MAX = nr * nc * ns;
   bool remove = true;
-  double spread_idx = 0;
+  double spread_idx = 0, round_idx = 0;
   
   for( int i = 0; i < len; ++ i ) {
     ptr_tmp_tumor[ 2 * i ] = ptr_tumor[ 2 * i ];
@@ -192,7 +194,9 @@ void remove( vector<int> &region, int *ptr_seg_copy,
         if( region.size() > 200 ) {
           spread_idx = spread( region, ptr_seg_copy,
                                len, ptr_nidx );
-          if( spread_idx < 2 ) {
+          round_idx = roundness( region, ptr_aidx );
+          if( spread_idx < rm_spread  && 
+              round_idx < rm_round ) {
             // Find enh inside the tumor region
             for( int j = 0; j < region.size(); ++ j ) {
               idx = region[ j ];

@@ -51,7 +51,11 @@ extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh,
                             SEXP on_flair_nt_prop,
                             SEXP last_rm_solidity, 
                             SEXP last_rm_spread, 
-                            SEXP last_rm_round );
+                            SEXP last_rm_round,
+                            SEXP last_trim_spread,
+                            SEXP last_trim_round,
+                            SEXP last_trim_rm_spread,
+                            SEXP last_trim_rm_round );
 SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP min_enh_enc, SEXP max_prop_enh_enc,
                   SEXP max_prop_enh_slice,
@@ -65,7 +69,11 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP on_flair_nt_prop,
                   SEXP last_rm_solidity, 
                   SEXP last_rm_spread, 
-                  SEXP last_rm_round ) {
+                  SEXP last_rm_round,
+                  SEXP last_trim_spread,
+                  SEXP last_trim_round,
+                  SEXP last_trim_rm_spread,
+                  SEXP last_trim_rm_round  ) {
   SEXP t1ce = getListElement( post_data, "t1ce_seg" );
   SEXP flair = getListElement( post_data, "flair_seg" );
   SEXP t2 = getListElement( post_data, "t2_seg" );
@@ -163,7 +171,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   const double l_solid = REAL( last_rm_solidity )[ 0 ];
   const double l_spread = REAL( last_rm_spread )[ 0 ];
   const double l_round = REAL( last_rm_round )[ 0 ];
-   
+  const double l_t_s = REAL( last_trim_spread )[ 0 ];
+  const double l_t_r = REAL( last_trim_round )[ 0 ];
+  const double l_t_r_s = REAL( last_trim_rm_spread )[ 0 ];
+  const double l_t_r_r = REAL( last_trim_rm_round )[ 0 ];
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
     if( ptr_flair[ 2 * i ] == Flair::FCSF && 
@@ -980,7 +991,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
           ptr_flair, ptr_seg, ptr_tumor );
   // Trim tumor region
   trim( ptr_tumor, ptr_exclude, ptr_seg_copy,
-        ptr_nidx, ptr_aidx, region, len, s_trim, r_trim );
+        ptr_nidx, ptr_aidx, region, len, l_t_s, l_t_r );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
       ptr_seg[ 2 * i ] = 0;
@@ -993,7 +1004,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   remove( region, ptr_seg_copy,
           ptr_aidx, ptr_nidx, ptr_tumor, ptr_seg,
           ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
-          m_tumor, m_enh, m_enh_enc, len, nr, nc, ns );
+          m_tumor, m_enh, m_enh_enc, len, nr, nc, ns, 
+          l_t_r_s, l_t_r_r );
   
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 ) {
@@ -1004,6 +1016,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_tumor, ptr_tumor, 1,
                     region_tmp ) ) {
+      double round_idx = roundness( region_tmp, ptr_aidx );
+      zeroVector( ptr_seg_copy, len );
+      double spread_idx = spread( region_tmp, ptr_seg_copy, 
+                                  len, ptr_nidx );
+      Rprintf( "3D: Spread = %f, roundness = %f\n",
+               spread_idx, round_idx );
       int idx = 0;
       zeroVector( ptr_seg_copy, len );
       for( vector<int>::const_iterator it = region_tmp.begin();
