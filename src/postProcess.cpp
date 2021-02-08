@@ -1020,8 +1020,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       zeroVector( ptr_seg_copy, len );
       double spread_idx = spread( region_tmp, ptr_seg_copy, 
                                   len, ptr_nidx );
-      Rprintf( "3D: Spread = %f, roundness = %f\n",
-               spread_idx, round_idx );
+      Rprintf( "Region size = %d, 3D: Spread = %f, roundness = %f\n",
+               region_tmp.size(), spread_idx, round_idx );
       int idx = 0;
       zeroVector( ptr_seg_copy, len );
       for( vector<int>::const_iterator it = region_tmp.begin();
