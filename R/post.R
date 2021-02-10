@@ -57,7 +57,8 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
           last_trim_spread = NULL,
           last_trim_round = NULL,
           last_trim_rm_spread = 2,
-          last_trim_rm_round = 10000 ) {
+          last_trim_rm_round = 10000,
+          csf_check = 1L ) {
   if( is.null( last_trim_spread ) ) {
     last_trim_spread <- spread_trim
   }
@@ -69,12 +70,15 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   outfile <- gsub( infolder, out, infile )
   out_t1ce_seg <- gsub( "_flair.nii.gz", "_t1ce_seg", outfile )
   t1ce_image <- readNIfTI( out_t1ce_seg, reorient = FALSE )@.Data
+  out_t1ce_intst <- gsub( "_flair.nii.gz", "_t1ce_norm", outfile )
+  t1ce_intst <- readNIfTI( out_t1ce_intst, reorient = FALSE )@.Data
   out_flair_seg <- gsub( "_flair.nii.gz", "_flair_seg", outfile )
   flair_image <- readNIfTI( out_flair_seg, reorient = FALSE )@.Data
   out_t2_seg <- gsub( "_flair.nii.gz", "_t2_seg", outfile )
   t2_image <- readNIfTI( out_t2_seg, reorient = FALSE )@.Data
   ## Initialize data for postprocessing
-  post_data <- initPost( t1ce_image, flair_image, t2_image )
+  post_data <- initPost( t1ce_image, flair_image, t2_image,
+                         t1ce_intst )
   # sink( '/media/hzhang/ZHD-P1/result/output.txt' )
   post_seg <- postProcess( post_data, min_enh, min_enh_enc,
                            max_prop_enh_enc, max_prop_enh_slice,
@@ -88,7 +92,8 @@ post <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                            last_rm_round,
                            last_trim_spread, last_trim_round, 
                            last_trim_rm_spread,
-                           last_trim_rm_round  )
+                           last_trim_rm_round,
+                           csf_check )
   # sink()
   if( sum( post_seg$image == 2 |
            post_seg$image == 1 |

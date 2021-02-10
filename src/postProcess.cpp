@@ -32,6 +32,7 @@
 #include "spread.h"
 #include "roundness.h"
 #include "descr.h"
+#include "excludeNecrosis.h"
 
 using std::vector;
 using std::list;
@@ -55,7 +56,9 @@ extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh,
                             SEXP last_trim_spread,
                             SEXP last_trim_round,
                             SEXP last_trim_rm_spread,
-                            SEXP last_trim_rm_round );
+                            SEXP last_trim_rm_round,
+                            SEXP csf_check );
+                            
 SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP min_enh_enc, SEXP max_prop_enh_enc,
                   SEXP max_prop_enh_slice,
@@ -73,7 +76,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP last_trim_spread,
                   SEXP last_trim_round,
                   SEXP last_trim_rm_spread,
-                  SEXP last_trim_rm_round  ) {
+                  SEXP last_trim_rm_round,
+                  SEXP csf_check ) {
   SEXP t1ce = getListElement( post_data, "t1ce_seg" );
   SEXP flair = getListElement( post_data, "flair_seg" );
   SEXP t2 = getListElement( post_data, "t2_seg" );
@@ -83,15 +87,18 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   SEXP r_nr = getListElement( post_data, "nr" );
   SEXP r_nc = getListElement( post_data, "nc" );
   SEXP r_ns = getListElement( post_data, "ns" );
+  SEXP t1ce_intst = getListElement( post_data, "t1ce_intst" );
   
   const int nr = INTEGER( r_nr )[ 0 ];
   const int nc = INTEGER( r_nc )[ 0 ];
   const int ns = INTEGER( r_ns )[ 0 ];
   const int MAX = nr * nc * ns;
-  
+  int n_necrosis = 0;
+    
   int *ptr_t1ce = INTEGER( t1ce );
   int *ptr_flair = INTEGER( flair );
   int *ptr_t2 = INTEGER( t2 );
+  const double *ptr_t1ce_intst = REAL( t1ce_intst );
   const int *ptr_idx = INTEGER( idx );
   const int *ptr_nidx = INTEGER( nidx );
   const int *ptr_aidx = INTEGER( aidx );
@@ -103,6 +110,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   list<int> edema_codes, csf_codes;
   int n_edema = 0, n_csf = 0;
   double spread_idx_2d, roundness_2d;
+  double mean_t1ce_csf, mean_t1ce_necrosis;
   
   // Store the results for each tissue type
   int *ptr_seg = new int[ 2 * len ]();
@@ -142,6 +150,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   int *ptr_tumor_copy = new int[ 2 * len ]();
   int *ptr_seg_copy = new int[ 2 * len ]();
   int *ptr_local_enh = new int[ 2 * len ]();
+  int *ptr_add_necrosis = new int[ 2 * len ]();
+  int *ptr_t1ce_csf = new int[ 2 * len ]();
   // Store the result of findRegion
   vector<int> region;
   region.reserve( len );
@@ -149,6 +159,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   region_tmp.reserve( len );
   vector<int> region_shape;
   region_shape.reserve( len );
+  vector<int> add_necrosis_region;
+  add_necrosis_region.reserve( len );
   list<int> ncr_switch;
   vector<double> shape_descriptor( 3, 0 );
   
@@ -175,6 +187,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   const double l_t_r = REAL( last_trim_round )[ 0 ];
   const double l_t_r_s = REAL( last_trim_rm_spread )[ 0 ];
   const double l_t_r_r = REAL( last_trim_rm_round )[ 0 ];
+  const bool check_csf = INTEGER( csf_check )[ 0 ];
   // 10-1: Find hemorrhage
   for( int i = 0; i < len; ++ i ) {
     if( ptr_flair[ 2 * i ] == Flair::FCSF && 
@@ -201,6 +214,18 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_necrosis[ 2 * i ] = Tumor::NCR;
     }
   }
+  // mean t1ce intensity of csf
+  n_necrosis = 0;
+  mean_t1ce_csf = 0;
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_necrosis[ 2 * i ] == Tumor::NCR &&
+        ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) {
+      ptr_t1ce_csf[ 2 * i ] = 1;
+      ++ n_necrosis;
+      mean_t1ce_csf += ptr_t1ce_intst[ i ];
+    }
+  }
+  mean_t1ce_csf /= n_necrosis;
   // for( int i = 0; i < len; ++ i ) {
   //   if( ptr_t2[ 2 * i ] == T2::T2CSF &&
   //       ptr_t1ce[ 2 * i ] != T1ce::T1TM &&
@@ -277,6 +302,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   inRegion2D( ptr_enclose_nec, len, ptr_edema, Tumor::ED,
               ptr_necrosis, Tumor::NCR,
               region, ptr_nidx, ptr_aidx, nr, nc, ns, 0, 0, 0, 1 );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_enclose_nec,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   // Remove necrosis regions separate from edema
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_nec, ptr_enclose_nec,
@@ -398,6 +429,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   inRegion( ptr_extra_edema, len, ptr_tumor, 1,
             ptr_whole, 1,
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_extra_edema,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_extra_edema[ 2 * i ] == 1 &&
         ptr_seg[ 2 * i ] == 0 ) {
@@ -422,6 +459,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   inRegion( ptr_extra_edema, len, ptr_tumor, 1,
             ptr_whole, 1,
             region, ptr_nidx, ptr_aidx, nr, nc, ns, 1, 1, 0 );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_extra_edema,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_extra_edema[ 2 * i ] == 1 &&
         ptr_seg[ 2 * i ] == 0 ) {
@@ -454,6 +497,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   onRegion( ptr_on, len, 3, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy, 0.2 );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_on,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -479,6 +528,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_on,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -504,6 +559,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_on,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -529,6 +590,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy, 
             on_flair_hull_p, on_flair_nt_p );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_on,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -583,6 +650,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   onRegion( ptr_on, len, 0.2, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy, 0.4 );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_on,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -612,6 +685,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   onRegion( ptr_on, len, 0.6, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_on,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -633,6 +712,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   }
   addInside( ptr_extra_edema, len, ptr_tumor, 1, ptr_whole, 1,
              region, ptr_nidx, ptr_aidx, nr, nc, ns );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_extra_edema,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_extra_edema[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -666,6 +751,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
             ptr_on, 1,
             region, ptr_nidx, ptr_aidx, nr, nc, ns, 
             1, 1, 0, 0 );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_whole,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_whole[ 2 * i ] == 1 ) {
       ptr_tumor[ 2 * i ] = 1;
@@ -689,6 +780,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_on,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -712,6 +809,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   onRegion( ptr_on, len, 0.4, ptr_tumor, 1, ptr_whole, 1,
             region, s_add,
             ptr_nidx, ptr_aidx, nr, nc, ns, ptr_seg_copy );
+  if( check_csf ) {
+    excludeNecrosis( len, ptr_nidx, ptr_on,
+                     ptr_t1ce_csf, ptr_t1ce_intst,
+                     ptr_add_necrosis, add_necrosis_region,
+                     mean_t1ce_csf );
+  }
   for( int i = 0; i < len; ++ i ) {
     if( ptr_on[ 2 * i ] == 1 &&
         ptr_tumor[ 2 * i ] == 0 ) {
@@ -1103,6 +1206,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
   }
   // Assign CSF code
+  n_csf = 0;
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_seg,
                     ptr_seg, Seg::SECSF,
@@ -1182,6 +1286,8 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   delete [] ptr_tumor_copy;
   delete [] ptr_seg_copy;
   delete [] ptr_local_enh;
+  delete [] ptr_add_necrosis;
+  delete [] ptr_t1ce_csf;
   
   UNPROTECT( 7 );
   return res;
