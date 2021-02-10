@@ -58,7 +58,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                   last_trim_round = NULL,
                   last_trim_rm_spread = 2,
                   last_trim_rm_round = 10000,
-                  csf_check = 1L ) {
+                  csf_check = 0L ) {
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )
   out_new_delta_t2 <- gsub( "_flair.nii.gz", "_post.rds", outfile )
