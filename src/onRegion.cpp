@@ -26,6 +26,7 @@ using std::max_element;
 void onRegion( int *ptr_on, const int &len, const double &prop,
                int *ptr_seg1, const int &label1, 
                int *ptr_seg2, const int &label2,
+               int *ptr_seg2_copy,
                vector<int> &region, const double &spread_factor,
                const int *ptr_nidx, const int *ptr_aidx,
                const int &nr, const int &nc, const int &ns,
@@ -99,7 +100,9 @@ void onRegion( int *ptr_on, const int &len, const double &prop,
           }
         }
         volume = inRegion( ptr_enclose_tumor, len, ptr_new_region, 1,
-                           ptr_cnct_old, 1, tmp_region, ptr_nidx,
+                           ptr_cnct_old, 1, 
+                           ptr_seg2_copy,
+                           tmp_region, ptr_nidx,
                            ptr_aidx, nr, nc, ns );
         max_volume = *max_element( volume.begin(), volume.end() );
         n_enclose_t = 0;

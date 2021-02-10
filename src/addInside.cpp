@@ -9,11 +9,13 @@
 void addInside( int *ptr_inside, const int &len,
                 int *ptr_seg1, const int &label1, 
                 int *ptr_seg2, const int &label2,
+                int *ptr_seg2_copy,
                 vector<int> &region, 
                 const int *ptr_nidx, const int *ptr_aidx,
                 const int &nr, const int &nc, const int &ns ) {
   int MAX = nr * nc * ns;
   inRegion2D( ptr_inside, len, ptr_seg1, label1, ptr_seg2, label2,
+              ptr_seg2_copy,
               region, ptr_nidx, ptr_aidx, nr, nc, ns );
   double p_t_nbr;
   double r;

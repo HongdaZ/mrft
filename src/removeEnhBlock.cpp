@@ -11,6 +11,7 @@
 void removeEnhBlock( int *ptr_exclude,
                      int *ptr_seg1, const int &label1,
                      int *ptr_seg2, const int &label2,
+                     int *ptr_seg2_copy,
                      const double &prop1, const double &prop2, 
                      const int &len, vector<int> &region, 
                      const int *ptr_nidx, 
@@ -46,7 +47,8 @@ void removeEnhBlock( int *ptr_exclude,
         }
       }
       inRegion( ptr_enclose, len, ptr_local_seg1, label1, 
-                ptr_seg2, label2, tmp_region, ptr_nidx,
+                ptr_seg2, label2, ptr_seg2_copy,
+                tmp_region, ptr_nidx,
                 ptr_aidx, nr, nc, ns );
       for( int j = 0; j < len; ++ j ) {
         if( ptr_enclose[ 2 * j ] == 1 ) {
@@ -67,7 +69,7 @@ void removeEnhBlock( int *ptr_exclude,
   pad2zero( ptr_seg1, len );
   zeroVector( ptr_enclose, len );
   inRegion2D( ptr_enclose, len, ptr_seg2, label2, ptr_copy_seg1,
-              label1, tmp_region, ptr_nidx, ptr_aidx,
+              label1, ptr_seg2_copy, tmp_region, ptr_nidx, ptr_aidx,
               nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( cnctRegion( i + 1, ptr_nidx, ptr_aidx, Plane::Axial, 

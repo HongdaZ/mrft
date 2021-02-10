@@ -138,6 +138,7 @@ SEXP estF( SEXP model, SEXP delta, SEXP gamma,
   int *ptr_tissue2 = new int[ 2 * len ]();
   int *ptr_enclose_ts1 = new int[ 2 * len ]();
   int *ptr_enclose_ts2 = new int[ 2 * len ]();
+  int *ptr_seg2_copy = new int[ 2 * len ]();
   int n_ts1 = 0, n_ts2 = 0, n_en_ts1 = 0, n_en_ts2 = 0;
   for( int i = 0; i < len; ++ i ) {
     if( ptr_res_seg[ 2 * i ] == -1 ) {
@@ -149,7 +150,7 @@ SEXP estF( SEXP model, SEXP delta, SEXP gamma,
     }
   }
   inRegion( ptr_enclose_ts1, len, ptr_tissue2, 1, 
-            ptr_tissue1, 2, 
+            ptr_tissue1, 2, ptr_seg2_copy, 
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_enclose_ts1[ 2 * i ] == 1 ) {
@@ -157,7 +158,7 @@ SEXP estF( SEXP model, SEXP delta, SEXP gamma,
     }
   }
   inRegion( ptr_enclose_ts2, len, ptr_tissue1, 2,
-            ptr_tissue2, 1,
+            ptr_tissue2, 1, ptr_seg2_copy,
             region, ptr_nidx, ptr_aidx, nr, nc, ns );
   for( int i = 0; i < len; ++ i ) {
     if( ptr_enclose_ts2[ 2 * i ] == 1 ) {
@@ -209,6 +210,8 @@ SEXP estF( SEXP model, SEXP delta, SEXP gamma,
   delete [] ptr_tissue2;
   delete [] ptr_enclose_ts1;
   delete [] ptr_enclose_ts2;
+  delete [] ptr_seg2_copy;
+  
   UNPROTECT( 6 );
   return res;
 }

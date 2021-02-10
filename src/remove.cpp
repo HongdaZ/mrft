@@ -19,7 +19,9 @@ using std::max;
 using std::min;
 using std::list;
 
-void remove( vector<int> &region, int *ptr_seg_copy,
+void remove( vector<int> &region, 
+             int *ptr_seg2_copy,
+             int *ptr_seg_copy,
              const int *ptr_aidx,
              const int *ptr_nidx, int *ptr_tumor, int *ptr_seg,
              int *ptr_hemorrhage, int *ptr_necrosis,
@@ -99,7 +101,8 @@ void remove( vector<int> &region, int *ptr_seg_copy,
   pad2zero( ptr_tumor, len );
   // Tumor enclosed by enh (including enh)
   inRegion( ptr_enclose_tumor, len, ptr_enh, Tumor::ET,
-            ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
+            ptr_tmp_tumor, 1, ptr_seg2_copy,
+            tmp_region, ptr_nidx, ptr_aidx,
             nr, nc, ns );
   // Rprintf( "s_factor = %f\n", s_factor );
   for( int i = 0; i < len; ++ i ) {
@@ -151,7 +154,9 @@ void remove( vector<int> &region, int *ptr_seg_copy,
 //                       ( max enh size < m_enh &&
 //                         enclosed tumor < m_enh_enc &&
 //                         prop enclose tumor < 0.75 ) )
-void remove( vector<int> &region, int *ptr_seg_copy,
+void remove( vector<int> &region, 
+             int *ptr_seg2_copy,
+             int *ptr_seg_copy,
              const int *ptr_aidx,
              const int *ptr_nidx, int *ptr_tumor, int *ptr_seg,
              int *ptr_hemorrhage, int *ptr_necrosis,
@@ -183,7 +188,8 @@ void remove( vector<int> &region, int *ptr_seg_copy,
   }
   pad2zero( ptr_tmp_tumor, len );
   inRegion( ptr_enclose_tumor, len, ptr_enh, Tumor::ET,
-            ptr_tmp_tumor, 1, tmp_region, ptr_nidx, ptr_aidx,
+            ptr_tmp_tumor, 1, ptr_seg2_copy,
+            tmp_region, ptr_nidx, ptr_aidx,
             nr, nc, ns );
   max_size = min( m_tumor, max_size );
   // remove

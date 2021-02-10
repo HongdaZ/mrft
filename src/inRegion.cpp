@@ -4,6 +4,9 @@
 #include "regions.h"
 #include "region2slice.h"
 #include "enclose.h"
+#include "getRange.h"
+#include "zeroVector.h"
+#include "smallRegion.h"
 
 using std::list;
 using std::vector;
@@ -12,6 +15,7 @@ using std::vector;
 vector<double> inRegion( int *ptr_enclose, const int &len,
                          int *ptr_seg1, const int &label1, 
                          int *ptr_seg2, const int &label2,
+                         int *ptr_seg2_copy,
                          vector<int> &region, 
                          const int *ptr_nidx, const int *ptr_aidx,
                          const int &nr, const int &nc, const int &ns,
@@ -27,7 +31,14 @@ vector<double> inRegion( int *ptr_enclose, const int &len,
                                         ptr_aidx );
   vector<list<vector<int>>> slices1 =
     region2slice( regions1, nr, nc, ns );
-  list<vector<int>> regions2 = regions( ptr_seg2, len,
+  
+  zeroVector( ptr_seg2_copy, len );
+  vector<int> range = getRange( ptr_seg1, label1, ptr_aidx, len,
+                                nr, nc, ns );
+  smallRegion( range, ptr_seg2, label2, ptr_aidx, ptr_seg2_copy,
+               len );
+  
+  list<vector<int>> regions2 = regions( ptr_seg2_copy, len,
                                         label2, ptr_aidx ); 
   vector<list<vector<int>>> slices2 = 
     region2slice( regions2, nr, nc, ns );
@@ -39,6 +50,7 @@ vector<double> inRegion( int *ptr_enclose, const int &len,
 vector<double> inRegion2D( int *ptr_enclose, const int &len,
                            int *ptr_seg1, const int &label1, 
                            int *ptr_seg2, const int &label2,
+                           int *ptr_seg2_copy,
                            vector<int> &region, 
                            const int *ptr_nidx, const int *ptr_aidx,
                            const int &nr, const int &nc, const int &ns,
@@ -52,7 +64,13 @@ vector<double> inRegion2D( int *ptr_enclose, const int &len,
                                         region, label1, 
                                         ptr_nidx,
                                         ptr_aidx );
-  list<vector<int>> regions2 = regions( ptr_seg2, len,
+  zeroVector( ptr_seg2_copy, len );
+  vector<int> range = getRange( ptr_seg1, label1, ptr_aidx, len,
+                                nr, nc, ns );
+  smallRegion( range, ptr_seg2, label2, ptr_aidx, ptr_seg2_copy,
+               len );
+  
+  list<vector<int>> regions2 = regions( ptr_seg2_copy, len,
                                         label2, ptr_aidx ); 
   vector<list<vector<int>>> slices2 = 
     region2slice( regions2, nr, nc, ns );
