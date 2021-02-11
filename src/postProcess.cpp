@@ -1089,10 +1089,18 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
         }
       }
       zeroVector( ptr_enclose_enh, len );
-      inRegion( ptr_enclose_enh, len, ptr_sub_region, 1,
-                ptr_whole, 1, ptr_seg2_copy,
-                region, ptr_nidx, ptr_aidx, nr, nc, ns,
-                0, 0, 0, 2 );
+      if( check_csf ) {
+        inRegion( ptr_enclose_enh, len, ptr_sub_region, 1,
+                  ptr_whole, 1, ptr_seg2_copy,
+                  region, ptr_nidx, ptr_aidx, nr, nc, ns,
+                  0, 0, 0, 2 );
+      } else {
+        inRegion( ptr_enclose_enh, len, ptr_sub_region, 1,
+                  ptr_whole, 1, ptr_seg2_copy,
+                  region, ptr_nidx, ptr_aidx, nr, nc, ns,
+                  0, 0, 0, 3 );
+      }
+      
       // Remove new enh regions separate from old enh
       for( int i = 0; i < len; ++ i ) {
         if( cnctRegion( i + 1, ptr_nidx, ptr_aidx, Plane::Axial,
