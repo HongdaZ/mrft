@@ -219,7 +219,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   n_necrosis = 0;
   mean_t1ce_csf = 0;
   for( int i = 0; i < len; ++ i ) {
-    if( ptr_necrosis[ 2 * i ] == Tumor::NCR &&
+    if( ptr_t1ce[ 2 * i ] == T1ce::T1CSF &&
         ptr_hemorrhage[ 2 * i ] != Tumor::HMG ) {
       ptr_t1ce_csf[ 2 * i ] = 1;
       ++ n_necrosis;
