@@ -1107,7 +1107,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
                         ptr_enclose_enh,
                         ptr_enclose_enh, 1, region ) ) {
           excldRegion( region, ptr_nidx, ptr_enclose_enh,
-                       ptr_enh, Tumor::ET );
+                       ptr_tumor, 1 );
         }
       }
       pad2zero( ptr_enclose_enh, len );
