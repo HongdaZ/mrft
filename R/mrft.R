@@ -103,5 +103,6 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
         }
       }
     }
+    break
   }
 }
