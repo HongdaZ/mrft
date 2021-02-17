@@ -1055,7 +1055,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
       ptr_edema_regions[ 2 * i ] = 0;
     }
   }
-  // 10-7.6: Add T1ce(4), necrosis, and others inside edema
+  // 10-7.6: Add T1ce(4), necrosis, and others inside tumor
   assignCSF( ptr_csf, ptr_t1ce, ptr_flair, ptr_tumor, len );
   zeroVector( ptr_whole, len );
   for( int i = 0; i < len; ++ i ) {
@@ -1065,7 +1065,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
             // ptr_t1ce[ 2 * i ] == T1ce::T1GM ||
             ptr_flair[ 2 * i ] == Flair::FTM ||
             ptr_t2[ 2 * i ] == T2::T2CSF ||
-            ptr_enh[ 2 * i ] == Tumor::ET ||
+            ptr_t1ce[ 2 * i ] == T1ce::T1TM ||
             ptr_hemorrhage[ 2 * i ] == Tumor::HMG ) ) {
       ptr_whole[ 2 * i ] = 1;
     } else {
