@@ -43,6 +43,41 @@ int excldRegion( const vector<int> &region, const int *ptr_nidx,
   }
   
 }
+int excldRegion( const vector<int> &region, const int *ptr_nidx,
+                 const int *ptr_seg1, const int &label1, int *ptr_seg2 ) {
+  int n_idx, index;
+  bool remove = false;
+  
+  for( vector<int>::const_iterator it = region.begin(); 
+       it != region.end(); ++ it ) {
+    index = *it;
+    if( index != 0 ) {
+      for( int i = 0; i < 6; ++ i ) {
+        n_idx = ptr_nidx[ 6 * ( index - 1 ) + i ];
+        if( n_idx != NA_INTEGER ) {
+          if( ptr_seg2[ 2 * ( n_idx - 1 ) ] == 0 &&
+              ptr_seg1[ 2 * ( n_idx - 1 ) ] == 0 ) {
+            remove = true;
+            break;
+          }
+        }
+      }
+    }
+  }
+  if( remove ) {
+    for( vector<int>::const_iterator it = region.begin(); 
+         it != region.end(); ++ it ) {
+      index = *it;
+      if( index != 0 ) {
+        ptr_seg2[ 2 * ( index - 1 ) ] = 0;
+      }
+    }
+    return 0;
+  } else {
+    return -1;
+  }
+  
+}
 void excldRegion( const vector<int> &region,
                   int *ptr_seg1,
                   int *ptr_seg2, 

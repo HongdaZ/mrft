@@ -11,6 +11,10 @@ int excldRegion( const vector<int> &region, const int *ptr_nidx,
                  int *ptr_seg2,
                  const int *ptr_seg1, 
                  const int &label1, const bool &has = true );
+// Remove the region from ptr_seg2 if there are neighboring voxels with 
+// ptr_seg1 == 0 && ptr_seg2 == 0
+int excldRegion( const vector<int> &region, const int *ptr_nidx,
+                 const int *ptr_seg1, const int &label1, int *ptr_seg2 );
 // Remove the region from ptr_seg1 if the number of voxels with 
 // ptr_seg2 == label is less than size
 void excldRegion( const vector<int> &region,

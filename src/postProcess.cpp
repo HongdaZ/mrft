@@ -1145,6 +1145,81 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
   }
   pad2zero( ptr_tumor_copy, len );
+  // 10-7.7 Fill hole
+  zeroVector( ptr_whole, len );
+  zeroVector( ptr_tumor_copy, len );
+  
+  for( int i = 0; i < len; ++ i ) {
+    if( ptr_tumor[ 2 * i ] == 0 ) {
+      ptr_whole[ 2 * i ] = 1;
+    } else {
+      ptr_whole[ 2 * i ] = 0;
+    }
+  }
+  for( int i = 0; i < len; ++ i ) {
+    ptr_tumor_copy[ 2 * i ] = ptr_tumor[ 2 * i ];
+  }
+  for( int j = 0; j < len; ++ j ) {
+    if( cnctRegion( j + 1, ptr_nidx, ptr_tumor_copy, ptr_tumor_copy, 1,
+                    region_tmp ) ) {
+      e_code = ptr_edema_regions[ 2 * j ];
+      int idx = 0;
+      zeroVector( ptr_sub_region, len );
+      for( vector<int>::const_iterator it = region_tmp.begin();
+           it != region_tmp.end(); ++ it ) {
+        idx = *it;
+        if( idx != 0 ) {
+          ptr_sub_region[ 2 * ( idx - 1 ) ] = 1;
+        }
+      }
+      zeroVector( ptr_enclose_enh, len );
+      inRegion( ptr_enclose_enh, len, ptr_sub_region, 1,
+                ptr_whole, 1, ptr_seg2_copy,
+                region, ptr_nidx, ptr_aidx, nr, nc, ns,
+                0, 0, 0, 3 );
+      // Remove new regions connected to voxels outside convex hull
+      for( int i = 0; i < len; ++ i ) {
+        if( cnctRegion( i + 1, ptr_nidx, ptr_aidx, Plane::Axial,
+                        ptr_enclose_enh,
+                        ptr_enclose_enh, 1, region ) ) {
+          excldRegion( region, ptr_nidx, ptr_tumor, 1, ptr_enclose_enh );
+        }
+      }
+      pad2zero( ptr_enclose_enh, len );
+      // // Extend in ptr_enh_include
+      // for( int i = 0; i < len; ++ i ) {
+      //   if( cnctRegion( i + 1, ptr_nidx, ptr_enclose_enh,
+      //                   ptr_enh_include, 1, region ) ) {
+      //     extRegion( region, ptr_enclose_enh, 1, .6, false);
+      //   }
+      // }
+      // // Recover the padding to zero
+      // pad2zero( ptr_enclose_enh, len );
+      for( int i = 0; i < len; ++ i ) {
+        if( ptr_enclose_enh[ 2 * i ] == 1 &&
+            ptr_seg[ 2 * i ] == 0 ) {
+          ptr_sub_region[ 2 * i ] = 1;
+          ptr_tumor[ 2 * i ] = 1;
+          if(  ptr_t1ce[ 2 * i ] == T1ce::T1TM ) {
+            ptr_seg[ 2 * i ] = Seg::SET;
+            ptr_enh[ 2 * i ] = Tumor::ET;
+          } else if( ptr_t1ce[ 2 * i ] == T1ce::T1CSF ) {
+            ptr_seg[ 2 * i ] = Seg::SNET;
+            ptr_necrosis[ 2 * i ] = Tumor::NCR;
+          } else {
+            ptr_seg[ 2 * i ] = Seg::SED;
+            ptr_edema[ 2 * i ] = Tumor::ED;
+          }
+        }
+      }
+      for( int i = 0; i < len; ++ i ) {
+        if( ptr_sub_region[ 2 * i ] == 1 ) {
+          ptr_edema_regions[ 2 * i ] = e_code;
+        }
+      }
+    }
+  }
+  pad2zero( ptr_tumor_copy, len );
   removeSmall( region, ptr_nidx, ptr_seg, ptr_tumor,
                ptr_hemorrhage, ptr_necrosis, ptr_enh, ptr_edema,
                200, len );
