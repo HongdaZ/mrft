@@ -58,7 +58,7 @@ extern "C" SEXP postProcess( SEXP post_data, SEXP min_enh,
                             SEXP last_trim_rm_spread,
                             SEXP last_trim_rm_round,
                             SEXP csf_check );
-                            
+
 SEXP postProcess( SEXP post_data, SEXP min_enh,
                   SEXP min_enh_enc, SEXP max_prop_enh_enc,
                   SEXP max_prop_enh_slice,
@@ -94,7 +94,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
   const int ns = INTEGER( r_ns )[ 0 ];
   const int MAX = nr * nc * ns;
   int n_necrosis = 0;
-    
+  
   int *ptr_t1ce = INTEGER( t1ce );
   int *ptr_flair = INTEGER( flair );
   int *ptr_t2 = INTEGER( t2 );
@@ -1062,11 +1062,11 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     if( ptr_tumor[ 2 * i ] == 0 &&
         (
             ptr_t1ce[ 2 * i ] == T1ce::T1CSF ||
-            // ptr_t1ce[ 2 * i ] == T1ce::T1GM ||
-            ptr_flair[ 2 * i ] == Flair::FTM ||
-            ptr_t2[ 2 * i ] == T2::T2CSF ||
-            ptr_t1ce[ 2 * i ] == T1ce::T1TM ||
-            ptr_hemorrhage[ 2 * i ] == Tumor::HMG ) ) {
+              // ptr_t1ce[ 2 * i ] == T1ce::T1GM ||
+              ptr_flair[ 2 * i ] == Flair::FTM ||
+              ptr_t2[ 2 * i ] == T2::T2CSF ||
+              ptr_t1ce[ 2 * i ] == T1ce::T1TM ||
+              ptr_hemorrhage[ 2 * i ] == Tumor::HMG ) ) {
       ptr_whole[ 2 * i ] = 1;
     } else {
       ptr_whole[ 2 * i ] = 0;
@@ -1203,12 +1203,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
           if(  ptr_t1ce[ 2 * i ] == T1ce::T1TM ) {
             ptr_seg[ 2 * i ] = Seg::SET;
             ptr_enh[ 2 * i ] = Tumor::ET;
-          } else if( ptr_flair[ 2 * i ] == Flair::FTM ) {
-            ptr_seg[ 2 * i ] = Seg::SED;
-            ptr_edema[ 2 * i ] = Tumor::ED;
-          } else {
+          } else if( ptr_t1ce[ 2 * i ] == T1ce::T1CSF ) {
             ptr_seg[ 2 * i ] = Seg::SNET;
             ptr_necrosis[ 2 * i ] = Tumor::NCR;
+          } else {
+            ptr_seg[ 2 * i ] = Seg::SED;
+            ptr_edema[ 2 * i ] = Tumor::ED;
           }
         }
       }
@@ -1295,7 +1295,7 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     }
     pad2zero( ptr_edema_regions, len );
   }
- 
+  
   // Find csf inside tumor
   for( int i = 0; i < len; ++ i ) {
     if( ptr_tumor[ 2 * i ] == 0 &&
