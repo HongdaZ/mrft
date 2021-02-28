@@ -1203,12 +1203,12 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
           if(  ptr_t1ce[ 2 * i ] == T1ce::T1TM ) {
             ptr_seg[ 2 * i ] = Seg::SET;
             ptr_enh[ 2 * i ] = Tumor::ET;
-          } else if( ptr_t1ce[ 2 * i ] == T1ce::T1CSF ) {
-            ptr_seg[ 2 * i ] = Seg::SNET;
-            ptr_necrosis[ 2 * i ] = Tumor::NCR;
-          } else {
+          } else if( ptr_flair[ 2 * i ] == Flair::FTM ) {
             ptr_seg[ 2 * i ] = Seg::SED;
             ptr_edema[ 2 * i ] = Tumor::ED;
+          } else {
+            ptr_seg[ 2 * i ] = Seg::SNET;
+            ptr_necrosis[ 2 * i ] = Tumor::NCR;
           }
         }
       }
