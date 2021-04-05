@@ -61,7 +61,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      alpha$t1ce[ 1 : 3 ], beta$t1ce[ 1 : 3 ], 
                      lambda2$t1ce[ 1 : 3 ], 
                      m, nu2$t1ce, 40L )
-    t1ce_res <- t1ce_seg$parm[ c( 2, 3 ), ]
+    t1ce_res <- t1ce_seg$parm[ c( 2 : 9  ), ]
     ## Update delta[ 1, 2 ] for t1ce
     shift_t1ce1 <- delta$t1ce[ 3 ]
     shift_t1ce2 <- updateDelta12( t1ce_res[ 1, 3 ], 
@@ -125,7 +125,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                       alpha$flair[ 1 : 3 ], beta$flair[ 1 : 3 ], 
                       lambda2$flair[ 1 : 3 ],
                       m, nu2$flair, 40L )
-    flair_res <- flair_seg$parm[ c( 2, 3 ), ]
+    flair_res <- flair_seg$parm[ c( 2 : 9  ), ]
     ## update delta
     
     x <- c( 0, 7, 10, 13, 13.5, 14 )
@@ -209,7 +209,7 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                    alpha$t2[ 1 : 2 ], beta$t2[ 1 : 2 ], 
                    lambda2$t2[ 1 : 2 ],
                    m, nu2$t2, 40L )
-    t2_res <- t2_seg$parm[ c( 2, 3 ), ]
+    t2_res <- t2_seg$parm[ c( 2 : 9  ), ]
     # sink()
     ## update delta
     if( is.na( delta$t2[ 3 ] ) ) {
