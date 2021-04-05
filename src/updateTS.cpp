@@ -25,13 +25,13 @@ void updateTS( const int &nrow,
                vector<double> &theta,
                const double &alphal,
                const double &betal,
-               double *yl, double *yln,
+               double *yl, double *yln, double *ylna,
                const double *yln_,
                const double *yln_i,
                const double *yl_ ){
-  int ncol = 6;
+  int ncol = 6 / 2; // only 6 / 2 different theta's
   // Initialize yln and yl;
-  initMV( yl, yl_, yln, yln_, yln_i, nrow, mu );
+  initMV( yl, yl_, yln, ylna, yln_, yln_i, nrow, mu );
   // for( int i = 0; i < nrow; ++ i ) {
   //   Rprintf( "%f\n", yl[ i ] );
   // }
@@ -50,13 +50,13 @@ void updateTS( const int &nrow,
     }
   }
   double *tmp = new double[ ncol ];
-  double *vtheta = new double[ ncol ]; 
-  // t( Yln ) Yln / sigma2 + I / lambda2 
+  double *vthetah = new double[ ncol ]; 
+  // t( Ylna ) Ylna / sigma2 + I / lambda2 
   double alpha = 1 / sigma2;
   double beta = 1 / lambda2;
   // Rprintf( "nrow = %d, ncol = %d, alpha = %f, beta = %f\n", 
   //          nrow, ncol, alpha, beta );
-  F77_CALL( dsyrk )( "u", "t", &ncol, &nrow, &alpha, yln, &nrow, &beta, 
+  F77_CALL( dsyrk )( "u", "t", &ncol, &nrow, &alpha, ylna, &nrow, &beta, 
             I, &ncol );
   for( int i = 0; i < ncol; ++ i ) {
     for( int j = i + 1; j < ncol; ++ j ) {
@@ -78,11 +78,11 @@ void updateTS( const int &nrow,
   //   }
   //   Rprintf( "\n" );
   // }
-  // t( yln ) yl \ sigma2
+  // t( ylna ) yl \ sigma2
   int incx = 1;
   double *x = new double[ nrow ];
   beta = 0;
-  F77_CALL( dgemv )( "t", &nrow, &ncol, &alpha, yln, &nrow, yl, &incx, &beta, 
+  F77_CALL( dgemv )( "t", &nrow, &ncol, &alpha, ylna, &nrow, yl, &incx, &beta, 
             tmp, &incx );
   // // debug matrix vector multiply
   // for( int i = 0; i < ncol; ++ i ) {
@@ -91,9 +91,10 @@ void updateTS( const int &nrow,
   // ////////////////////////////////////
   alpha = 1;
   F77_CALL( dgemv )( "t", &ncol, &ncol, &alpha, I, &ncol, tmp, &incx, &beta, 
-            vtheta, &incx );
+            vthetah, &incx );
   for( int i = 0; i < ncol; ++ i ) {
-    theta[ i ] = vtheta[ i ];
+    theta[ i ] = vthetah[ i ];
+    theta[ 2 * ncol - 1 - i ] = vthetah[ i ];
   }
   // // debug matrix vector multiply
   // for( int i = 0; i < ncol; ++ i ) {
@@ -102,10 +103,10 @@ void updateTS( const int &nrow,
   // ////////////////////////////////////
   
   // update sigma2
-  // yl - yln * thetal
+  // yl - yln * theta; = yl - ylna * thetah
   alpha = - 1;
   beta = 1;
-  F77_CALL( dgemv )( "n", &nrow, &ncol, &alpha, yln, &nrow, vtheta, &incx, 
+  F77_CALL( dgemv )( "n", &nrow, &ncol, &alpha, ylna, &nrow, vthetah, &incx, 
             &beta, yl, &incx );
   // // debug matrix vector multiply
   // for( int i = 0; i < nrow; ++ i ) {
@@ -121,7 +122,7 @@ void updateTS( const int &nrow,
 
   delete [] I;
   delete [] tmp;
-  delete [] vtheta;
+  delete [] vthetah;
   delete [] ipiv;
   delete [] work;
   delete [] x;

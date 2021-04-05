@@ -46,6 +46,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
           ptr_seg, curr_label );
   
   double *yln = new double[ nrow * ncol ];
+  double *ylna = new double[ nrow * ( ncol / 2 ) ];
   double *yl = new double[ nrow ];
   
   double sum_theta;
@@ -59,7 +60,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     tol = abs( mu - tmp );
     mu = tmp;
     updateTS( nrow, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
-              ptr_intst, ptr_nintst, theta, alphal, betal, yl, yln,
+              ptr_intst, ptr_nintst, theta, alphal, betal, yl, yln, ylna,
               yln_, yln_i, yl_ );
     // for( int j = 0; j < 6; ++ j ) {
     //   Rprintf( "%f\t", theta[ j ] );
@@ -72,6 +73,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   delete [] yln_i;
   delete [] yl_;
   delete [] yln;
+  delete [] ylna;
   delete [] yl;
   
   return;
@@ -116,6 +118,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
+  double *ylna = new double[ nrow * ( ncol / 2 ) ];
   double sum_theta;
   
   while(  i < 1 || ( i < maxit && tol > .0001 ) ) {
@@ -128,7 +131,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
     tol = abs( mu - tmp );
     mu = tmp;
     updateTS( nrow, mu, sigma2, lambda2, ptr_seg, ptr_nidx,
-              ptr_intst, ptr_nintst, theta, alphal, betal, yl, yln,
+              ptr_intst, ptr_nintst, theta, alphal, betal, yl, yln, ylna,
               yln_, yln_i, yl_ );
     // for( int j = 0; j < 6; ++ j ) {
     //   Rprintf( "%f\t", theta[ j ] );
@@ -143,6 +146,7 @@ void updateParm( double &mu, vector<double> &theta, double &sigma2,
   delete [] yln_i;
   delete [] yl_;
   delete [] yln;
+  delete [] ylna;
   delete [] yl;
   return;
 }

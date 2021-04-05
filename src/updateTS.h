@@ -20,7 +20,7 @@ void updateTS( const int &nrow,
                vector<double> &theta,
                const double &alphal,
                const double &betal,
-               double *yl, double *yln,
+               double *yl, double *yln, double *ylna,
                const double *yln_,
                const double *yln_i,
                const double *yl_ );

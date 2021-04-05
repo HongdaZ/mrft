@@ -64,14 +64,40 @@ void initMV( const vector<int> &region, double *yln_,
   }
   return;
 }
-// initialize yl and yln
-void initMV( double *yl, const double *yl_, double *yln, const double *yln_,
+// initialize yl, yln and ylna
+void initMV( double *yl, const double *yl_, double *yln,
+             double *ylna, const double *yln_,
              const double *yln_i, const int &nrow, const double &mu ) {
   int ncol = 6;
   for( int j = 0; j < nrow; ++ j ) {
     yl[ j ] = yl_[ j ] - mu;
   }
-  for( int i = 0; i < 6; ++ i ) {
+  for( int i = 0; i < ncol; ++ i ) {
+    for( int j = 0; j < nrow; ++ j ) {
+      if( yln_i[ i * nrow + j ] == 1 ) {
+        yln[ i * nrow + j ] = yln_[ i * nrow + j ] - mu;
+      } else {
+        yln[ i * nrow + j ] = 0;
+      }
+    }
+  }
+  for( int i = 0; i < ( ncol / 2 ); ++ i ) {
+    for( int j = 0; j < nrow; ++ j ) {
+      ylna[ i * nrow + j ] = yln[ i * nrow + j ] + 
+        yln[ ( ncol - 1 - i ) * nrow + j ];
+    }
+  }
+  return;
+}
+// initialize yl and yln
+void initMV( double *yl, const double *yl_, double *yln,
+             const double *yln_,
+             const double *yln_i, const int &nrow, const double &mu ) {
+  int ncol = 6;
+  for( int j = 0; j < nrow; ++ j ) {
+    yl[ j ] = yl_[ j ] - mu;
+  }
+  for( int i = 0; i < ncol; ++ i ) {
     for( int j = 0; j < nrow; ++ j ) {
       if( yln_i[ i * nrow + j ] == 1 ) {
         yln[ i * nrow + j ] = yln_[ i * nrow + j ] - mu;

@@ -47,7 +47,7 @@ double energyY( const vector<int> &region,
   double *yln = new double[ nrow * ncol ];
   double *yl = new double[ nrow ];
   // Initialize yln and yl;
-  initMV( yl, yl_, yln, yln_, yln_i, nrow, mu );
+  initMV( yl, yl_, yln, yln_, yln_i, nrow, mu ); 
   
   // yl - yln * thetal
   double *vtheta = new double[ ncol ];
@@ -81,8 +81,8 @@ double energyY( const vector<int> &region,
     }
   }
   
-  energy += log( 2 * Pi ) * ncol / 2 + log( lambda2 ) * ncol / 2 +
-    sum_theta / ( 2 * lambda2 );
+  energy += ( log( 2 * Pi ) * ncol / 2 + log( lambda2 ) * ncol / 2 +
+    sum_theta / ( 2 * lambda2 ) ) / 2;
   // change ptr_seg[ 2, region ] back
   recoverLabel( region, ptr_seg );
   
@@ -181,6 +181,6 @@ double energyY( const int &curr_label,
   energy += ( alphak + 1 ) * log( sigma2 ) + betak / sigma2 -
     log( pow( betak, alphak ) / tgamma( alphak ) );
   int ncol = 6;
-  energy += log( 2 * Pi ) * ncol / 2 + log( lambda2 ) * ncol / 2;
+  energy += ( log( 2 * Pi ) * ncol / 2 + log( lambda2 ) * ncol / 2 ) / 2;
   return energy;
 }
