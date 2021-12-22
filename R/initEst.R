@@ -5,6 +5,6 @@ initEst <- function( label, intst ) {
   pad <- vector( mode = "integer", length( seg ) )
   seg_pad <- rbind( seg, pad )
   
-  res <- list( info = info, seg = seg_pad )
+  res <- list( info = info, seg = seg_pad, dim = dim( label ) )
   return( res )
 } 

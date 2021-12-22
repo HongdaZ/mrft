@@ -5,9 +5,9 @@
 
 // restore 3D image from vector
 void restoreImg( const int *ptr_idx, int *ptr_res_seg, int *ptr_res_image, 
-                 const int &len ) {
+                 const int &len, const int *dim__ ) {
   int label, vidx;
-  for( int i = 0; i < 240 * 240 * 155; ++ i ) {
+  for( int i = 0; i < dim__[ 0 ] * dim__[ 1 ] * dim__[ 2 ]; ++ i ) {
     ptr_res_image[ i ] = NA_INTEGER;
   }
   for( int i = 1; i <= len; ++ i ) {

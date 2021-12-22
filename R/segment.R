@@ -37,9 +37,13 @@ segment <- function( patient, out = "SEG", infolder = "N4ITK433Z",
                      maxit = 
                        list( t1ce = 10L, flair = 1L,
                              t2 = 1L, fthr = 40L ),
-                     redo = TRUE
+                     redo = TRUE,
+                     shrink = FALSE
                      ) {
   images <- readImage( patient )
+  if( shrink ) {
+    images <- shrink( images )
+  }
   ## Output files
   infile <- patient[ 1 ]
   outfile <- gsub( infolder, out, infile )

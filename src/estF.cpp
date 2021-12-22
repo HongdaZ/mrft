@@ -38,7 +38,9 @@ SEXP estF( SEXP model, SEXP delta, SEXP gamma,
            SEXP m, SEXP nu2, SEXP maxit ) {
   SEXP info = getListElement( model, "info" );
   SEXP seg = getListElement( model, "seg" );
+  SEXP dim_ = getListElement( model, "dim" );
   
+  const int *dim__ = INTEGER( dim_ );
   const int *old_seg = INTEGER( seg );
   
   SEXP idx = getListElement( info, "idx" );
@@ -190,7 +192,7 @@ SEXP estF( SEXP model, SEXP delta, SEXP gamma,
     }
   }           
   
-  restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len );
+  restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len, dim__ );
   
   // results to list
   SEXP names = PROTECT( allocVector( STRSXP, 4 ) );

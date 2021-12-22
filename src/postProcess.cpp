@@ -1356,9 +1356,10 @@ SEXP postProcess( SEXP post_data, SEXP min_enh,
     ptr_csf_code_[ i ] = *it_c;
   }
   
-  restoreImg( ptr_idx, ptr_seg, ptr_res_image, len );
-  restoreImg( ptr_idx, ptr_edema_regions, ptr_res_edema, len );
-  restoreImg( ptr_idx, ptr_csf_regions, ptr_res_csf, len );
+  int dim__[3] = { nr, nc, ns };
+  restoreImg( ptr_idx, ptr_seg, ptr_res_image, len, dim__ );
+  restoreImg( ptr_idx, ptr_edema_regions, ptr_res_edema, len, dim__ );
+  restoreImg( ptr_idx, ptr_csf_regions, ptr_res_csf, len, dim__ );
   SEXP res = PROTECT( allocVector( VECSXP, 5 ) );
   SET_VECTOR_ELT( res, 0, res_image );
   SET_VECTOR_ELT( res, 1, res_edema );

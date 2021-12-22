@@ -1,5 +1,6 @@
 # Markov random field model for brain tumor segmentation
-mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
+mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z", 
+                  shrink = FALSE,
                   ## Always four numbers for delta
                   delta = 
                     list( t1ce = c( -1, 0, 8, 4 ),
@@ -78,7 +79,7 @@ mrft <- function( patient, out = "SEG", infolder = "N4ITK433Z",
   while( redo ) {
     segment( patient, out, infolder, delta, delta_factor,
              gamma, alpha,
-             beta, lambda2, a, nu2, maxit, redo )
+             beta, lambda2, a, nu2, maxit, redo, shrink )
     post( patient, out, infolder, delta, delta_factor,
           gamma, alpha,
           beta, lambda2, a, nu2, maxit, 

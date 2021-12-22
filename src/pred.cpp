@@ -33,7 +33,9 @@ SEXP pred( SEXP model, SEXP delta, SEXP gamma,
             SEXP a, SEXP b, SEXP m, SEXP nu2, SEXP maxit ) {
   SEXP info = getListElement( model, "info" );
   SEXP seg = getListElement( model, "seg" );
+  SEXP dim_ = getListElement( model, "dim" );
   
+  const int *dim__ = INTEGER( dim_ );
   const int *old_seg = INTEGER( seg );
   
   SEXP idx = getListElement( info, "idx" );
@@ -212,13 +214,16 @@ SEXP pred( SEXP model, SEXP delta, SEXP gamma,
   n_col = n_tumor + n_health + n_outl;
   
   SEXP res_parm = PROTECT( allocMatrix( REALSXP, n_row, n_col ) );
-  SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );
+  SEXP res_image = PROTECT( alloc3DArray( INTSXP, 
+                                          dim__[ 0 ], 
+                                          dim__[ 1 ], 
+                                          dim__[ 2 ] ) );
   double *ptr_res_parm = REAL( res_parm );
   int *ptr_res_image = INTEGER( res_image );
   copyParm( n_health,
             health_parm, tumor_parm, outl_parm, ptr_res_parm, n_row,
             tumor_regions, outl_labels, len );
-  restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len );
+  restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len, dim__ );
   
   // results to list
   SEXP names = PROTECT( allocVector( STRSXP, 4 ) );

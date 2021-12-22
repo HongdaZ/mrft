@@ -24,7 +24,9 @@ SEXP est( SEXP model, SEXP delta, SEXP gamma,
            SEXP m, SEXP nu2, SEXP maxit ) {
   SEXP info = getListElement( model, "info" );
   SEXP seg = getListElement( model, "seg" );
+  SEXP dim_ = getListElement( model, "dim" );
   
+  const int *dim__ = INTEGER( dim_ );
   const int *old_seg = INTEGER( seg );
   
   SEXP idx = getListElement( info, "idx" );
@@ -104,11 +106,14 @@ SEXP est( SEXP model, SEXP delta, SEXP gamma,
   int ncol = health_parm.size() / 8;
   
   SEXP res_parm = PROTECT( allocMatrix( REALSXP, nrow, ncol ) );
-  SEXP res_image = PROTECT( alloc3DArray( INTSXP, 240, 240, 155 ) );
+  SEXP res_image = PROTECT( alloc3DArray( INTSXP, 
+                                          dim__[ 0 ], 
+                                          dim__[ 1 ], 
+                                          dim__[ 2 ] ) );
   double *ptr_res_parm = REAL( res_parm );
   int *ptr_res_image = INTEGER( res_image );
   copyParmHealth( n_health, health_parm, ptr_res_parm, nrow );
-  restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len );
+  restoreImg( ptr_idx, ptr_res_seg, ptr_res_image, len, dim__ );
   
   // results to list
   SEXP names = PROTECT( allocVector( STRSXP, 4 ) );
